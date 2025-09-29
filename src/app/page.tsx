@@ -46,25 +46,27 @@ export default function Home() {
       <main className="flex-1">
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de frutos secos, a tu manera</h1>
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos, a tu manera</h1>
             <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados. Delivery en Ciudad Universitaria y alrededores.</p>
             <div className="flex gap-3">
               <Link href="/builder" className="hover:cursor-pointer">
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
-                  Empezá ahora
+                  Comenzá ahora
                 </Button>
               </Link>
             </div>
           </div>
           <div className="flex justify-center">
-            <Image
-              src="/Capsule Corp.png"
-              alt="Moovimiento - Hero"
-              width={520}
-              height={360}
-              className="rounded-lg shadow-sm w-auto h-auto object-cover"
-              priority
-            />
+            <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block rounded-lg overflow-hidden shadow-sm">
+              <Image
+                src="/Capsule Corp.png"
+                alt="Moovimiento - Hero"
+                width={720}
+                height={480}
+                className="w-auto h-auto object-cover cursor-pointer transition-transform duration-300 ease-out group-hover:scale-105"
+                priority
+              />
+            </a>
           </div>
         </section>
       </main>
