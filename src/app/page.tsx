@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Source_Sans_3 } from "next/font/google";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
@@ -10,7 +11,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <header className="w-full border-b">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3" aria-label="Ir al inicio">
+          <Link href="/" className="flex items-center gap-3 hover:cursor-pointer" aria-label="Ir al inicio">
             {/* Logo para tema claro */}
             <Image
               src="/moovimiento.png"
@@ -32,8 +33,13 @@ export default function Home() {
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
           </Link>
           <nav className="flex items-center gap-3">
-            <Link href="/builder"><Button size="sm">Armá tu mix</Button></Link>
-            <Link href="/account"><Button variant="outline" size="sm">Mi cuenta</Button></Link>
+            <Link href="/builder" className="hover:cursor-pointer">
+              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
+                Armá tu mix
+              </Button>
+            </Link>
+            <Link href="/account" className="hover:cursor-pointer"><Button variant="outline" size="sm" className="cursor-pointer">Mi cuenta</Button></Link>
+            <ThemeToggle />
           </nav>
         </div>
       </header>
@@ -43,8 +49,11 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de frutos secos, a tu manera</h1>
             <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados. Delivery en Ciudad Universitaria y alrededores.</p>
             <div className="flex gap-3">
-              <Link href="/builder"><Button size="lg">Empezar ahora</Button></Link>
-              <Link href="/ofertas"><Button variant="outline" size="lg">Promos</Button></Link>
+              <Link href="/builder" className="hover:cursor-pointer">
+                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
+                  Empezá ahora
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="flex justify-center">
@@ -62,12 +71,12 @@ export default function Home() {
       <footer className="border-t">
         <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
           <span>
-            © {new Date().getFullYear()} Desarrollado por {" "}
+            © {new Date().getFullYear()} Generado por {" "}
             <a
               href="https://catsulecorp.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline-offset-4 hover:underline text-sky-500 hover:text-sky-600"
+              className="underline-offset-4 hover:underline text-sky-500 hover:text-sky-600 cursor-pointer"
             >
               Catsule Corp
             </a>
