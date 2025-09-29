@@ -113,10 +113,28 @@
 }
 
 @layer base {
+  html {
+    /* Reserve gutter for vertical scrollbar to avoid horizontal layout shift between pages */
+    scrollbar-gutter: stable;
+  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    /* Fallback for browsers without scrollbar-gutter support */
+    overflow-y: scroll;
+  }
+  /* Ocultar flechitas (spinners) de inputs numéricos */
+  /* Chrome, Safari, Edge, Opera */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }

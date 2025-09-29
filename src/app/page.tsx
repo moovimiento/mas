@@ -11,7 +11,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <header className="w-full border-b">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:cursor-pointer" aria-label="Ir al inicio">
+          <Link href="/" className="flex items-center gap-3 hover:cursor-pointer shrink-0 w-[220px]" aria-label="Ir al inicio">
             {/* Logo para tema claro */}
             <Image
               src="/moovimiento.png"
@@ -32,13 +32,13 @@ export default function Home() {
             />
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
           </Link>
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-3 justify-end w-[360px]">
             <Link href="/builder" className="hover:cursor-pointer">
               <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
                 Armá tu mix
               </Button>
             </Link>
-            <Link href="/account" className="hover:cursor-pointer"><Button variant="outline" size="sm" className="cursor-pointer">Mi cuenta</Button></Link>
+            <Link href="#" aria-disabled className="pointer-events-none opacity-60"><Button variant="outline" size="sm" disabled>Mi cuenta</Button></Link>
             <ThemeToggle />
           </nav>
         </div>
