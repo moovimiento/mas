@@ -14,25 +14,27 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:cursor-pointer shrink-0" aria-label="Ir a moovimiento.com">
             {/* Logo para tema claro */}
-            <Image
-              src="/moovimiento.png"
-              alt="Moovimiento"
-              width={128}
-              height={32}
-              className="block dark:hidden h-8 object-contain"
-              style={{ width: 'auto', height: '2rem' }}
-              priority
-            />
+            <div className="w-32 h-8 flex items-center">
+              <Image
+                src="/moovimiento.png"
+                alt="Moovimiento"
+                width={128}
+                height={32}
+                className="block dark:hidden h-8 w-auto object-contain"
+                priority
+              />
+            </div>
             {/* Logo para tema oscuro */}
-            <Image
-              src="/moovimiento-white.png"
-              alt="Moovimiento"
-              width={128}
-              height={32}
-              className="hidden dark:block h-8 object-contain"
-              style={{ width: 'auto', height: '2rem' }}
-              priority
-            />
+            <div className="w-32 h-8 flex items-center">
+              <Image
+                src="/moovimiento-white.png"
+                alt="Moovimiento"
+                width={128}
+                height={32}
+                className="hidden dark:block h-8 w-auto object-contain"
+                priority
+              />
+            </div>
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
           </a>
           <nav className="flex items-center gap-4 justify-end">
