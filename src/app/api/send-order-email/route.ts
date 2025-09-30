@@ -16,12 +16,13 @@ interface EmailBody {
   deliveryAddress: string;
   totalPrice: number;
   totalMixQty: number;
+  paymentLink?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
-    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
+    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink } = body;
 
     // Inicializar Resend solo cuando se necesita
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -112,8 +113,15 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <div class="warning">
-                  <strong>⚠️ Último paso</strong><br>
-                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, completá el pago en Mercado Pago haciendo click en el link que te enviamos.</p>
+                  <strong>⚠️ Último paso: completá el pago</strong><br>
+                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo si todavía no lo hiciste:</p>
+                  ${paymentLink ? `
+                    <div style="text-align: center; margin-top: 16px;">
+                      <a href="${paymentLink}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                        Pagar con Mercado Pago
+                      </a>
+                    </div>
+                  ` : ''}
                 </div>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">

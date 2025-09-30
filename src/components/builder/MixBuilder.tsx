@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,14 +37,52 @@ const preset44x5: Mix = {
 };
 
 export function MixBuilder() {
-  const [mix, setMix] = useState<Mix>(preset44x5);
+  const [mix, setMix] = useState<Mix>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('moovimiento_mix');
+      return saved ? JSON.parse(saved) : preset44x5;
+    }
+    return preset44x5;
+  });
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
-  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
-  const [deliveryAddress, setDeliveryAddress] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('moovimiento_deliveryOption');
+      return saved ? JSON.parse(saved) : "ciudad";
+    }
+    return "ciudad";
+  });
+  const [deliveryAddress, setDeliveryAddress] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('moovimiento_deliveryAddress') || "";
+    }
+    return "";
+  });
+  const [phone, setPhone] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('moovimiento_phone') || "";
+    }
+    return "";
+  });
+  const [name, setName] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('moovimiento_name') || "";
+    }
+    return "";
+  });
+  const [email, setEmail] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('moovimiento_email') || "";
+    }
+    return "";
+  });
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('moovimiento_cartItems');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [shakeRemaining, setShakeRemaining] = useState(false);
   const [hoveredIngredient, setHoveredIngredient] = useState<IngredientId | null>(null);
 
@@ -89,6 +127,35 @@ export function MixBuilder() {
   const isValidEmail = useMemo(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }, [email]);
+
+  // Guardar en localStorage cuando cambien los valores
+  useEffect(() => {
+    localStorage.setItem('moovimiento_mix', JSON.stringify(mix));
+  }, [mix]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_deliveryOption', JSON.stringify(deliveryOption));
+  }, [deliveryOption]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_deliveryAddress', deliveryAddress);
+  }, [deliveryAddress]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_phone', phone);
+  }, [phone]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_name', name);
+  }, [name]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_email', email);
   }, [email]);
 
   const pricing = useMemo(() => {
@@ -652,23 +719,7 @@ export function MixBuilder() {
                     });
                   }
 
-                  // Enviar email con resumen
-                  await fetch("/api/send-order-email", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name,
-                      email,
-                      phone,
-                      items: mixItems,
-                      deliveryOption,
-                      deliveryAddress,
-                      totalPrice: pricing.price,
-                      totalMixQty,
-                    }),
-                  });
-
-                  // Llamar a la API para crear la preferencia
+                  // Llamar a la API para crear la preferencia primero
                   const response = await fetch("/api/checkout", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -677,6 +728,8 @@ export function MixBuilder() {
                       deliveryOption,
                       deliveryAddress,
                       email,
+                      name,
+                      phone,
                     }),
                   });
 
@@ -689,6 +742,23 @@ export function MixBuilder() {
                   }
 
                   if (data.init_point) {
+                    // Enviar email con resumen y link de pago
+                    await fetch("/api/send-order-email", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        name,
+                        email,
+                        phone,
+                        items: mixItems,
+                        deliveryOption,
+                        deliveryAddress,
+                        totalPrice: pricing.price,
+                        totalMixQty,
+                        paymentLink: data.init_point,
+                      }),
+                    });
+
                     // Redirigir a Mercado Pago
                     window.location.href = data.init_point;
                   } else {

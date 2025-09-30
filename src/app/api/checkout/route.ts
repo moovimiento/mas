@@ -16,12 +16,15 @@ interface CheckoutBody {
   items: CheckoutItem[];
   deliveryOption: string;
   deliveryAddress: string;
+  email: string;
+  name?: string;
+  phone?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as CheckoutBody;
-    const { items, deliveryOption, deliveryAddress } = body;
+    const { items, deliveryOption, deliveryAddress, email, name, phone } = body;
 
     console.log("Creating preference with items:", items);
 
@@ -37,6 +40,14 @@ export async function POST(request: NextRequest) {
           unit_price: item.unit_price,
           currency_id: "ARS",
         })),
+        payer: {
+          name: name || undefined,
+          email: email,
+          phone: phone ? {
+            area_code: "",
+            number: phone,
+          } : undefined,
+        },
         back_urls: {
           success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
@@ -46,6 +57,9 @@ export async function POST(request: NextRequest) {
         external_reference: JSON.stringify({
           deliveryOption,
           deliveryAddress,
+          name,
+          email,
+          phone,
           timestamp: Date.now(),
         }),
       },
