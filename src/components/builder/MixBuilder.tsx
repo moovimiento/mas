@@ -588,9 +588,9 @@ export function MixBuilder() {
 
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <div className="text-muted-foreground">Cantidad</div>
-            <div className="text-right font-medium">{promoBreakdown} 📦</div>
+            <div className="text-right font-medium">{promoBreakdown} <span className="ml-1">📦</span></div>
             <div className="text-muted-foreground">Gramos</div>
-            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g ⚡</div>
+            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g <span className="ml-1">⚡</span></div>
             <div className="text-muted-foreground">Delivery</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button

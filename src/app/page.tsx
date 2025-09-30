@@ -49,7 +49,7 @@ export default function Home() {
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-4 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos a tu manera</h1>
-            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados.<br />Delivery gratuito a Ciudad Universitaria.</p>
+            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados.<br /><span className="hidden md:inline">Delivery gratuito a Ciudad Universitaria.</span></p>
           </div>
           <div className="flex justify-center">
             <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block rounded-lg overflow-hidden shadow-sm">
@@ -69,7 +69,8 @@ export default function Home() {
       <footer className="border-t">
         <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
           <span>
-            © {new Date().getFullYear()} Generado por {" "}
+            © {new Date().getFullYear()}<br className="md:hidden" />
+            <span className="hidden md:inline"> </span>Generado por {" "}
             <a
               href="https://catsulecorp.com"
               target="_blank"
@@ -79,7 +80,10 @@ export default function Home() {
               Catsule Corp
             </a>
           </span>
-          <span>Hecho en Argentina 🇦🇷</span>
+          <span className="text-right">
+            🇦🇷<br className="md:hidden" />
+            <span className="hidden md:inline"> </span>Hecho en Argentina
+          </span>
         </div>
       </footer>
     </div>
