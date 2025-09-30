@@ -85,6 +85,7 @@ export function MixBuilder() {
   });
   const [shakeRemaining, setShakeRemaining] = useState(false);
   const [hoveredIngredient, setHoveredIngredient] = useState<IngredientId | null>(null);
+  const cartRef = useRef<HTMLDivElement>(null);
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
@@ -300,14 +301,14 @@ export function MixBuilder() {
           </CardHeader>
           <CardContent className="space-y-4 flex-1">
             {INGREDIENTS.map((ing) => (
-              <div key={ing.id} className="grid grid-cols-[1fr_auto] items-center gap-3">
+              <div key={ing.id} className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] items-start sm:items-center gap-2 sm:gap-3">
                 <div className={cn("font-medium", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
-                <div className={cn("flex items-center gap-2 rounded-md")}
+                <div className={cn("flex items-center gap-2 rounded-md w-full sm:w-auto justify-end")}
                 >
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8 cursor-pointer"
+                    className="h-8 w-8 cursor-pointer flex-shrink-0"
                     onMouseDown={() => {
                       setSelectedId(ing.id);
                       startHold(ing.id, -2);
@@ -325,7 +326,7 @@ export function MixBuilder() {
                   >
                     -
                   </Button>
-                  <div className="relative">
+                  <div className="relative flex-shrink-0">
                     <Input
                       inputMode="numeric"
                       pattern="[0-9]*"
@@ -346,7 +347,7 @@ export function MixBuilder() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8 cursor-pointer"
+                    className="h-8 w-8 cursor-pointer flex-shrink-0"
                     onMouseDown={() => {
                       setSelectedId(ing.id);
                       startHold(ing.id, +2);
@@ -395,6 +396,10 @@ export function MixBuilder() {
                   if (cartItems.length === 0) {
                     setDeliveryOption("envio");
                   }
+                  // Scroll al carrito después de agregar
+                  setTimeout(() => {
+                    cartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
                 }}
                 className={cn(
                   "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500",
@@ -509,7 +514,7 @@ export function MixBuilder() {
       </div>
 
       {/* Carrito debajo del builder */}
-      <Card>
+      <Card ref={cartRef}>
         <CardHeader>
           <CardTitle>Carrito</CardTitle>
         </CardHeader>
