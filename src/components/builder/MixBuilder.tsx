@@ -608,9 +608,13 @@ export function MixBuilder() {
                 try {
                   // Preparar items para Mercado Pago
                   const mixItems = cartItems.map((item) => {
+                    const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
                     const ingredients = INGREDIENTS
                       .filter((ing) => (item.mix[ing.id] ?? 0) > 0)
-                      .map((ing) => ing.name)
+                      .map((ing) => {
+                        const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
+                        return `${ing.name} ${percent}%`;
+                      })
                       .join(", ");
                     
                     return {

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
-      bcc: "gonza@moovimiento.com",
+      bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
       subject: "¡Tu pedido de Frutos Secos está casi listo! 🎉",
       html: `
         <!DOCTYPE html>
