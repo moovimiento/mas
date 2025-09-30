@@ -19,7 +19,8 @@ export default function Home() {
               alt="Moovimiento"
               width={128}
               height={32}
-              className="block dark:hidden h-8 w-auto object-contain"
+              className="block dark:hidden h-8 object-contain"
+              style={{ width: 'auto', height: '2rem' }}
               priority
             />
             {/* Logo para tema oscuro */}
@@ -28,7 +29,8 @@ export default function Home() {
               alt="Moovimiento"
               width={128}
               height={32}
-              className="hidden dark:block h-8 w-auto object-contain"
+              className="hidden dark:block h-8 object-contain"
+              style={{ width: 'auto', height: '2rem' }}
               priority
             />
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>

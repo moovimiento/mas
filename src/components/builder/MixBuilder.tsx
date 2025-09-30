@@ -620,6 +620,7 @@ export function MixBuilder() {
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 className="w-full"
                 required
+                title="Este campo es obligatorio"
               />
             </div>
             <div>
@@ -634,6 +635,7 @@ export function MixBuilder() {
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full"
                 required
+                title="Este campo es obligatorio"
               />
             </div>
           </div>
@@ -652,6 +654,7 @@ export function MixBuilder() {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full"
                 required
+                title="Este campo es obligatorio"
               />
             </div>
             <div>
@@ -666,6 +669,7 @@ export function MixBuilder() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full"
                 required
+                title="Por favor ingresa un email válido"
               />
             </div>
           </div>
