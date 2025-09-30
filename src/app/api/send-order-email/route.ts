@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 
                 <div class="warning">
                   <strong>⚠️ Último paso: completá el pago</strong><br>
-                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo si todavía no lo hiciste:</p>
+                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo <strong>si todavía no lo hiciste</strong>:</p>
                   ${paymentLink ? `
                     <div style="text-align: center; margin-top: 16px;">
                       <a href="${paymentLink}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
