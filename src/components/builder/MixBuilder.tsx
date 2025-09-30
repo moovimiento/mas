@@ -124,6 +124,22 @@ export function MixBuilder() {
     return cartItems.reduce((sum, item) => sum + item.quantity, 0);
   }, [cartItems]);
 
+  const promoBreakdown = useMemo(() => {
+    const qty = totalMixQty;
+    const n15 = Math.floor(qty / 15);
+    let rem = qty - n15 * 15;
+    const n5 = Math.floor(rem / 5);
+    rem = rem - n5 * 5;
+    const n1 = rem;
+    
+    const parts: string[] = [];
+    if (n15 > 0) parts.push(`${n15 * 15} Mix${n15 * 15 > 1 ? 's' : ''} (${n15} promo${n15 > 1 ? 's' : ''} de 15)`);
+    if (n5 > 0) parts.push(`${n5 * 5} Mix${n5 * 5 > 1 ? 's' : ''} (${n5} promo${n5 > 1 ? 's' : ''} de 5)`);
+    if (n1 > 0) parts.push(`${n1} Mix${n1 > 1 ? 's' : ''}`);
+    
+    return parts.length > 0 ? parts.join(' + ') : '0 Mixs';
+  }, [totalMixQty]);
+
   const isValidEmail = useMemo(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -566,6 +582,8 @@ export function MixBuilder() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-muted-foreground">Cantidad</div>
+            <div className="text-right font-medium">{promoBreakdown} 📦</div>
             <div className="text-muted-foreground">Gramos</div>
             <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g ⚡</div>
             <div className="text-muted-foreground">Delivery</div>

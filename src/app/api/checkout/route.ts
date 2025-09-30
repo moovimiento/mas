@@ -21,6 +21,32 @@ interface CheckoutBody {
   phone?: string;
 }
 
+interface PreferenceData {
+  items: Array<{
+    id: string;
+    title: string;
+    quantity: number;
+    unit_price: number;
+    currency_id: string;
+  }>;
+  back_urls: {
+    success: string;
+    failure: string;
+    pending: string;
+  };
+  auto_return: string;
+  statement_descriptor: string;
+  external_reference: string;
+  payer?: {
+    email: string;
+    name?: string;
+    phone?: {
+      area_code: string;
+      number: string;
+    };
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as CheckoutBody;
@@ -31,38 +57,51 @@ export async function POST(request: NextRequest) {
     // Crear preferencia de pago
     const preference = new Preference(client);
 
-    const response = await preference.create({
-      body: {
-        items: items.map((item, index) => ({
-          id: `item-${index}`,
-          title: item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          currency_id: "ARS",
-        })),
-        payer: {
-          name: name || undefined,
-          email: email,
-          phone: phone ? {
-            area_code: "",
-            number: phone,
-          } : undefined,
-        },
-        back_urls: {
-          success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
-          failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
-          pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
-        },
-        auto_return: "approved",
-        external_reference: JSON.stringify({
-          deliveryOption,
-          deliveryAddress,
-          name,
-          email,
-          phone,
-          timestamp: Date.now(),
-        }),
+    const preferenceData: PreferenceData = {
+      items: items.map((item, index) => ({
+        id: `item-${index}`,
+        title: item.title,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        currency_id: "ARS",
+      })),
+      back_urls: {
+        success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
+        failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
+        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
+      auto_return: "approved",
+      statement_descriptor: "MOOVIMIENTO",
+      external_reference: JSON.stringify({
+        deliveryOption,
+        deliveryAddress,
+        name,
+        email,
+        phone,
+        timestamp: Date.now(),
+      }),
+    };
+
+    // Solo agregar payer si tenemos email
+    if (email) {
+      preferenceData.payer = {
+        email: email,
+      };
+      
+      if (name) {
+        preferenceData.payer.name = name;
+      }
+      
+      if (phone) {
+        preferenceData.payer.phone = {
+          area_code: "",
+          number: phone.replace(/\s/g, ""),
+        };
+      }
+    }
+
+    const response = await preference.create({
+      body: preferenceData,
     });
 
     console.log("Preference created:", response.id);
