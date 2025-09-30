@@ -80,31 +80,19 @@ export async function POST(request: NextRequest) {
         phone,
         timestamp: Date.now(),
       }),
+      payer: {
+        email: email,
+      },
     };
 
-    // Solo agregar payer si tenemos email
-    if (email) {
-      preferenceData.payer = {
-        email: email,
-      };
-      
-      if (name) {
-        preferenceData.payer.name = name;
-      }
-      
-      if (phone) {
-        preferenceData.payer.phone = {
-          area_code: "",
-          number: phone.replace(/\s/g, ""),
-        };
-      }
-    }
+    console.log("Preference data:", JSON.stringify(preferenceData, null, 2));
 
     const response = await preference.create({
       body: preferenceData,
     });
 
     console.log("Preference created:", response.id);
+    console.log("Init point:", response.init_point);
 
     return NextResponse.json({
       id: response.id,
