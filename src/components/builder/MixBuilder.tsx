@@ -595,9 +595,9 @@ export function MixBuilder() {
                     return;
                   }
 
-                  if (data.sandbox_init_point) {
+                  if (data.init_point) {
                     // Redirigir a Mercado Pago
-                    window.location.href = data.sandbox_init_point;
+                    window.location.href = data.init_point;
                   } else {
                     alert("Error al crear el checkout");
                   }
