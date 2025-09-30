@@ -50,8 +50,8 @@ export default function Home() {
       </header>
       <main className="flex-1">
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos, a tu manera</h1>
+          <div className="space-y-4 text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos a tu manera</h1>
             <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados.<br />Delivery gratuito a Ciudad Universitaria.</p>
           </div>
           <div className="flex justify-center">
