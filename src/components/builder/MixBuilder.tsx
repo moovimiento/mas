@@ -38,6 +38,7 @@ export function MixBuilder() {
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
   const [cartMix, setCartMix] = useState<Mix | null>(null);
+  const [shakeRemaining, setShakeRemaining] = useState(false);
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
@@ -114,9 +115,23 @@ export function MixBuilder() {
       const maxAllowedEven = Math.floor(maxAllowed / 2) * 2;
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
       let nextVal = Math.max(0, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
+      
+      // Trigger shake animation if trying to add but no space
+      if (delta > 0 && nextVal === current && maxAllowedEven === 0) {
+        setShakeRemaining(true);
+        setTimeout(() => setShakeRemaining(false), 500);
+      }
+      
       // Apply 0 <-> 22 jump logic
       if (delta > 0) {
-        if (current === 0 && nextVal > 0) nextVal = Math.max(MIN_NONZERO, Math.min(nextVal, perIngredientEven, maxAllowedEven));
+        if (current === 0 && nextVal > 0) {
+          // Jump to MIN_NONZERO only if there's enough space
+          nextVal = maxAllowedEven >= MIN_NONZERO ? MIN_NONZERO : 0;
+          if (nextVal === 0) {
+            setShakeRemaining(true);
+            setTimeout(() => setShakeRemaining(false), 500);
+          }
+        }
         if (nextVal > 0 && nextVal < MIN_NONZERO) nextVal = MIN_NONZERO;
       } else if (delta < 0) {
         if (current <= MIN_NONZERO && nextVal < current) nextVal = 0;
@@ -155,7 +170,10 @@ export function MixBuilder() {
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal">Máximo por ingrediente: <span className="font-medium">88g</span></div>
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col md:flex-row md:gap-4">
+          <span>Mínimo por ingrediente: <span className="font-medium">0g ↔ 22g</span></span>
+          <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
@@ -165,7 +183,12 @@ export function MixBuilder() {
               <CardTitle>Ingredientes</CardTitle>
               <div className="flex items-center gap-2">
                 <Badge variant={remaining === 0 ? "default" : "secondary"}>Total: {total}g</Badge>
-                <Badge variant={remaining === 0 ? "secondary" : "default"}>Restan: {remaining}g</Badge>
+                <Badge 
+                  variant={remaining === 0 ? "secondary" : "default"}
+                  className={shakeRemaining ? "animate-shake" : ""}
+                >
+                  Restan: {remaining}g
+                </Badge>
               </div>
             </div>
           </CardHeader>
