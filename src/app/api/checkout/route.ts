@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
           currency_id: "ARS",
         })),
         back_urls: {
-          success: "http://localhost:3000/checkout/success",
-          failure: "http://localhost:3000/checkout/failure",
-          pending: "http://localhost:3000/checkout/pending",
+          success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
+          failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
+          pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
         },
         auto_return: "approved",
         external_reference: JSON.stringify({
@@ -59,10 +59,16 @@ export async function POST(request: NextRequest) {
       sandbox_init_point: response.sandbox_init_point,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Error al crear la preferencia de pago";
     console.error("Error creating preference:", error);
+    if (error && typeof error === 'object' && 'message' in error) {
+      console.error("Error message:", error.message);
+    }
+    if (error && typeof error === 'object' && 'cause' in error) {
+      console.error("Error cause:", error.cause);
+    }
+    const errorMessage = error instanceof Error ? error.message : "Error al crear la preferencia de pago";
     return NextResponse.json(
-      { error: errorMessage },
+      { error: errorMessage, details: error },
       { status: 500 }
     );
   }
