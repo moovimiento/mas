@@ -41,6 +41,7 @@ export function MixBuilder() {
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -520,27 +521,43 @@ export function MixBuilder() {
             </div>
           </div>
 
-          {/* Campo de dirección de entrega */}
-          <div>
-            <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
-              {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"} <span className="text-red-500">*</span>
-            </label>
-            <Input
-              id="delivery-address"
-              type="text"
-              placeholder={deliveryOption === "ciudad" ? "Ej: Pabellón Argentina" : "Ej: Av. Valparaíso 1234, Córdoba"}
-              value={deliveryAddress}
-              onChange={(e) => setDeliveryAddress(e.target.value)}
-              className="w-full"
-              required
-            />
+          {/* Campos de dirección y celular */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
+                {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"} <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="delivery-address"
+                type="text"
+                placeholder={deliveryOption === "ciudad" ? "Ej: Pabellón Argentina" : "Ej: Av. Valparaíso 1234, Córdoba"}
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+                className="w-full"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="text-sm text-muted-foreground block mb-1">
+                Celular (para coordinar la entrega) <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Ej: 351 153 123456"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full"
+                required
+              />
+            </div>
           </div>
 
           {/* Campos de nombre y email */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="name" className="text-sm text-muted-foreground block mb-1">
-                Nombre
+                Nombre <span className="text-red-500">*</span>
               </label>
               <Input
                 id="name"
@@ -549,6 +566,7 @@ export function MixBuilder() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full"
+                required
               />
             </div>
             <div>
@@ -603,7 +621,7 @@ export function MixBuilder() {
 
           <div className="flex items-center justify-center">
             <Button
-              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !isValidEmail}
+              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
                 try {
                   // Preparar items para Mercado Pago
@@ -641,6 +659,7 @@ export function MixBuilder() {
                     body: JSON.stringify({
                       name,
                       email,
+                      phone,
                       items: mixItems,
                       deliveryOption,
                       deliveryAddress,

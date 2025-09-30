@@ -10,6 +10,7 @@ interface OrderItem {
 interface EmailBody {
   name?: string;
   email: string;
+  phone: string;
   items: OrderItem[];
   deliveryOption: string;
   deliveryAddress: string;
@@ -20,7 +21,7 @@ interface EmailBody {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
-    const { name, email, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
+    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
 
     // Inicializar Resend solo cuando se necesita
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -104,6 +105,7 @@ export async function POST(request: NextRequest) {
                 <h3>Información de entrega:</h3>
                 <p><strong>Opción:</strong> ${deliveryText}</p>
                 <p><strong>Dirección:</strong> ${deliveryAddress || "No especificada"}</p>
+                <p><strong>Celular:</strong> ${phone}</p>
 
                 <div class="total">
                   <p>Total a pagar: ${currency.format(totalPrice)}</p>
