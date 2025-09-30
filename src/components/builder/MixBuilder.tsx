@@ -521,7 +521,7 @@ export function MixBuilder() {
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
-              <div className="text-muted-foreground">No hay mixs en el carrito. Armalo arriba y agregalo.</div>
+              <div className="text-muted-foreground pb-4">No hay mixs en el carrito. Armalo arriba y agregalo.</div>
             ) : (
               <>
                 {cartItems.map((item, index) => {
@@ -588,9 +588,9 @@ export function MixBuilder() {
 
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <div className="text-muted-foreground">Cantidad</div>
-            <div className="text-right font-medium">{promoBreakdown} <span className="ml-1">📦</span></div>
+            <div className="text-right font-medium">{promoBreakdown} <span className="ml-2">📦</span></div>
             <div className="text-muted-foreground">Gramos</div>
-            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g <span className="ml-1">⚡</span></div>
+            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g <span className="ml-2">⚡</span></div>
             <div className="text-muted-foreground">Delivery</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
@@ -600,7 +600,7 @@ export function MixBuilder() {
               >
                 ←
               </button>
-              <span className="whitespace-nowrap">{deliveryOption === "ciudad" ? "Ciudad Universitaria (gratis)" : "Córdoba ($1000 de envío)"}</span>
+              <span className="whitespace-nowrap">{deliveryOption === "ciudad" ? "Ciudad Universitaria (free)" : "Córdoba ($1000 de envío)"}</span>
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
                 className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer flex-shrink-0"
