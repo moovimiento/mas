@@ -12,14 +12,14 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <header className="w-full border-b">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:cursor-pointer shrink-0 w-[220px]" aria-label="Ir a moovimiento.com">
+          <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:cursor-pointer shrink-0" aria-label="Ir a moovimiento.com">
             {/* Logo para tema claro */}
             <Image
               src="/moovimiento.png"
               alt="Moovimiento"
               width={128}
               height={32}
-              className="block dark:hidden h-8 w-auto"
+              className="block dark:hidden h-8 w-auto object-contain"
               priority
             />
             {/* Logo para tema oscuro */}
@@ -28,7 +28,7 @@ export default function Home() {
               alt="Moovimiento"
               width={128}
               height={32}
-              className="hidden dark:block h-8 w-auto"
+              className="hidden dark:block h-8 w-auto object-contain"
               priority
             />
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>

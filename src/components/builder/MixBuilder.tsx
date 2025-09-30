@@ -210,10 +210,16 @@ export function MixBuilder() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 cursor-pointer"
-                    onMouseDown={() => startHold(ing.id, -2)}
+                    onMouseDown={() => {
+                      setSelectedId(ing.id);
+                      startHold(ing.id, -2);
+                    }}
                     onMouseUp={stopHold}
                     onMouseLeave={stopHold}
-                    onTouchStart={() => startHold(ing.id, -2)}
+                    onTouchStart={() => {
+                      setSelectedId(ing.id);
+                      startHold(ing.id, -2);
+                    }}
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Restar 2 gramos a ${ing.name}`}
@@ -243,10 +249,16 @@ export function MixBuilder() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 cursor-pointer"
-                    onMouseDown={() => startHold(ing.id, +2)}
+                    onMouseDown={() => {
+                      setSelectedId(ing.id);
+                      startHold(ing.id, +2);
+                    }}
                     onMouseUp={stopHold}
                     onMouseLeave={stopHold}
-                    onTouchStart={() => startHold(ing.id, +2)}
+                    onTouchStart={() => {
+                      setSelectedId(ing.id);
+                      startHold(ing.id, +2);
+                    }}
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Sumar 2 gramos a ${ing.name}`}
