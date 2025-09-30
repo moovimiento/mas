@@ -15,8 +15,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mixs de ⚡ Frutos Secos",
-  description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery en Ciudad Universitaria y alrededores.",
+  title: "Mixs de ⚡ Frutos Secos | Moovimiento",
+  description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery gratuito en Ciudad Universitaria.",
+  metadataBase: new URL('https://mas.moovimiento.com'),
+  openGraph: {
+    title: "Mixs de ⚡ Frutos Secos | Moovimiento",
+    description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery gratuito en Ciudad Universitaria.",
+    url: 'https://mas.moovimiento.com',
+    siteName: 'Moovimiento',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Moovimiento - Mixs de Frutos Secos',
+      },
+    ],
+    locale: 'es_AR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Mixs de ⚡ Frutos Secos | Moovimiento",
+    description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery gratuito en Ciudad Universitaria.",
+    images: ['/og-image.png'],
+  },
 };
 
 export default function RootLayout({
