@@ -18,7 +18,7 @@ export default function CheckoutFailure() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-4">
-        <h1 className="text-2xl font-bold text-red-600">Pago rechazado</h1>
+        <h1 className="text-2xl font-bold text-sky-600">Pago rechazado</h1>
         <p className="text-muted-foreground">
           Redirigiendo... Tus datos se guardaron para que puedas intentar nuevamente.
         </p>

@@ -781,8 +781,10 @@ export function MixBuilder() {
                       }),
                     });
 
-                    // Redirigir a Mercado Pago
-                    window.location.href = data.init_point;
+                    // Redirigir a Mercado Pago con locale configurado
+                    const checkoutUrl = new URL(data.init_point);
+                    checkoutUrl.searchParams.set('locale', 'es-AR');
+                    window.location.href = checkoutUrl.toString();
                   } else {
                     alert("Error al crear el checkout");
                   }

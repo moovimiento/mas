@@ -37,6 +37,7 @@ interface PreferenceData {
   auto_return: string;
   statement_descriptor: string;
   external_reference: string;
+  locale?: string;
   payer?: {
     email: string;
     name?: string;
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       },
       auto_return: "approved",
       statement_descriptor: "MOOVIMIENTO",
+      locale: "es-AR",
       external_reference: JSON.stringify({
         deliveryOption,
         deliveryAddress,
