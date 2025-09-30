@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mixs ⚡ de Frutos Secos",
+  title: "Mixs de ⚡ Frutos Secos",
   description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery en Ciudad Universitaria y alrededores.",
 };
 
