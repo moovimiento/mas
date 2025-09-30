@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/theme-toggle";
-import Image from "next/image";
-import Link from "next/link";
-import { Source_Sans_3 } from "next/font/google";
-
-const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
 const TOTAL_GRAMS = 220;
 const MAX_PER_INGREDIENT = 88;
@@ -37,18 +31,12 @@ const preset44x5: Mix = {
   banana: 44,
 };
 
-const preset4x55: Mix = {
-  pera: 55,
-  almendras: 55,
-  nueces: 55,
-  uva: 55,
-  banana: 0,
-};
-
-export default function BuilderPage() {
+export function MixBuilder() {
   const [mix, setMix] = useState<Mix>(preset44x5);
   const [mixQty, setMixQty] = useState<number>(1);
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
+  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("envio");
+  const [deliveryAddress, setDeliveryAddress] = useState<string>("");
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
@@ -67,6 +55,7 @@ export default function BuilderPage() {
   const PRICE_SINGLE = 4000;
   const PRICE_PACK5 = 18000;  // per 5
   const PRICE_PACK15 = 48000; // per 15
+  const DELIVERY_COST = 1000;
 
   const currency = useMemo(() => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }), []);
 
@@ -83,13 +72,15 @@ export default function BuilderPage() {
     return { price, discount, breakdown: { n15, n5, n1 } };
   }
 
-  const pricing = useMemo(() => computePrice(mixQty), [mixQty]);
-
-  const selectedName = useMemo(() => {
-    return (INGREDIENTS as readonly { id: IngredientId; name: string }[]).find(
-      (i) => i.id === selectedId
-    )?.name ?? "ingrediente";
-  }, [selectedId]);
+  const pricing = useMemo(() => {
+    const basePrice = computePrice(mixQty);
+    const deliveryCost = deliveryOption === "envio" ? DELIVERY_COST : 0;
+    return {
+      ...basePrice,
+      price: basePrice.price + deliveryCost,
+      deliveryCost,
+    };
+  }, [mixQty, deliveryOption]);
 
   function setGram(id: IngredientId, grams: number) {
     // Set grams for a single ingredient, ensuring the overall total never exceeds TOTAL_GRAMS
@@ -133,46 +124,6 @@ export default function BuilderPage() {
     });
   }
 
-  function setRemainingFor(id: IngredientId) {
-    setMix((prev) => {
-      const current = prev[id] ?? 0;
-      const otherTotal = (Object.values(prev).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0) - current);
-      const maxAllowed = Math.max(0, TOTAL_GRAMS - otherTotal);
-      // Fill to even maximum
-      const maxAllowedEven = Math.floor(maxAllowed / 2) * 2;
-      const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
-      const target = Math.min(current + maxAllowedEven, perIngredientEven);
-      const targetEven = Math.round(target / 2) * 2;
-      const nextVal = Math.max(0, targetEven);
-      return { ...prev, [id]: nextVal } as Mix;
-    });
-  }
-
-  // Numeric keypad style handlers for the selected ingredient
-  function pressDigit(d: number) {
-    const current = mix[selectedId] ?? 0;
-    const desired = current * 10 + d;
-    setGram(selectedId, desired);
-  }
-
-  function backspace() {
-    const current = mix[selectedId] ?? 0;
-    const next = Math.floor(current / 10);
-    setGram(selectedId, next);
-  }
-
-  function clearVal() {
-    setGram(selectedId, 0);
-  }
-
-  function setExact(val: number) {
-    setGram(selectedId, val);
-  }
-
-  function applyPreset(preset: Mix) {
-    setMix(preset);
-  }
-
   // Press-and-hold support for +/- buttons
   const holdTimer = useRef<NodeJS.Timeout | null>(null)
   const holdActive = useRef(false)
@@ -200,43 +151,9 @@ export default function BuilderPage() {
   }, [])
 
   return (
-    <>
-      {/* Top bar (same as home) */}
-      <header className="w-full border-b">
-        <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:cursor-pointer shrink-0 w-[220px]" aria-label="Ir al inicio">
-            {/* Logo claro */}
-            <Image
-              src="/moovimiento.png"
-              alt="Moovimiento"
-              width={128}
-              height={32}
-              className="block dark:hidden h-8 w-auto"
-              priority
-            />
-            {/* Logo oscuro */}
-            <Image
-              src="/moovimiento-white.png"
-              alt="Moovimiento"
-              width={128}
-              height={32}
-              className="hidden dark:block h-8 w-auto"
-              priority
-            />
-            <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
-          </Link>
-          <nav className="flex items-center gap-3 justify-end w-[360px]">
-            <Link href="#" aria-disabled className="pointer-events-none opacity-60">
-              <Button variant="outline" size="sm" disabled>Mi cuenta</Button>
-            </Link>
-            <ThemeToggle />
-          </nav>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-5xl px-6 py-8 space-y-6">
+    <div className="mx-auto max-w-5xl px-6 py-8 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
-        <h1 className="text-2xl font-semibold">Armá tu mix (220g)</h1>
+        <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
         <div className="text-sm text-muted-foreground whitespace-normal">Máximo por ingrediente: <span className="font-medium">88g</span></div>
       </div>
 
@@ -428,22 +345,53 @@ export default function BuilderPage() {
             <div className="text-muted-foreground">Energía</div>
             <div className="text-right font-medium">{mixQty} ⚡</div>
             <div className="text-muted-foreground">Delivery</div>
-            <div className="text-right">Ciudad Universitaria y alrededores</div>
+            <div className="text-right flex items-center justify-end gap-2">
+              <button
+                onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
+                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer"
+                aria-label="Opción anterior de delivery"
+              >
+                ←
+              </button>
+              <span>{deliveryOption === "ciudad" ? "Ciudad Universitaria (gratis)" : "Córdoba ($1000 de envío)"}</span>
+              <button
+                onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
+                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer"
+                aria-label="Siguiente opción de delivery"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          {/* Campo de dirección de entrega */}
+          <div className="space-y-2">
+            <label htmlFor="delivery-address" className="text-sm text-muted-foreground">
+              {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"}
+            </label>
+            <Input
+              id="delivery-address"
+              type="text"
+              placeholder={deliveryOption === "ciudad" ? "Ej: Pabellón Argentina" : "Ej: Av. Valparaíso 1234, Córdoba"}
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              className="w-full"
+            />
           </div>
 
           {/* Precios */}
           <div className="space-y-1 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal (sin promo)</span>
-              <span className={pricing.discount > 0 ? "line-through text-muted-foreground" : "font-medium"}>
-                {currency.format(mixQty * PRICE_SINGLE)}
+              <span className={(pricing.discount > 0 || deliveryOption === "ciudad") ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
+                {currency.format(mixQty * PRICE_SINGLE + DELIVERY_COST)}
               </span>
             </div>
-            {pricing.discount > 0 && (
+            {(pricing.discount > 0 || deliveryOption === "ciudad") && (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Ahorro</span>
-                  <span className="text-green-600">{currency.format(pricing.discount)}</span>
+                  <span className="text-muted-foreground">{deliveryOption === "ciudad" && pricing.discount === 0 ? "Ahorro de Delivery" : "Ahorro"}</span>
+                  <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Total con promo</span>
@@ -453,10 +401,11 @@ export default function BuilderPage() {
                   {pricing.breakdown.n15 > 0 && (<span className="mr-2">{pricing.breakdown.n15}×15</span>)}
                   {pricing.breakdown.n5 > 0 && (<span className="mr-2">{pricing.breakdown.n5}×5</span>)}
                   {pricing.breakdown.n1 > 0 && (<span>{pricing.breakdown.n1}×1</span>)}
+                  {deliveryOption === "ciudad" && (<span className="ml-2">Envío gratis</span>)}
                 </div>
               </>
             )}
-            {pricing.discount === 0 && (
+            {pricing.discount === 0 && deliveryOption === "envio" && (
               <div className="flex items-center justify-between">
                 <span className="font-medium">Total</span>
                 <span className="font-semibold">{currency.format(pricing.price)}</span>
@@ -464,7 +413,7 @@ export default function BuilderPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-center">
             <Button
               disabled={!isValid}
               onClick={() => alert(`Ir al checkout con ${mixQty} mix(s) (pendiente)`)}
@@ -475,23 +424,6 @@ export default function BuilderPage() {
           </div>
         </CardContent>
       </Card>
-      <footer className="border-t mt-8">
-        <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
-          <span>
-            © {new Date().getFullYear()} Generado por {" "}
-            <a
-              href="https://catsulecorp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline-offset-4 hover:underline text-sky-500 hover:text-sky-600"
-            >
-              Catsule Corp
-            </a>
-          </span>
-          <span>Hecho en Argentina 🇦🇷</span>
-        </div>
-      </footer>
-      </div>
-    </>
+    </div>
   );
 }

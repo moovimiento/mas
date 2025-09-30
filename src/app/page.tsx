@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Source_Sans_3 } from "next/font/google";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { MixBuilder } from "@/components/builder/MixBuilder";
 
 const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
@@ -11,7 +12,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <header className="w-full border-b">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:cursor-pointer shrink-0 w-[220px]" aria-label="Ir al inicio">
+          <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:cursor-pointer shrink-0 w-[220px]" aria-label="Ir a moovimiento.com">
             {/* Logo para tema claro */}
             <Image
               src="/moovimiento.png"
@@ -31,13 +32,8 @@ export default function Home() {
               priority
             />
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
-          </Link>
+          </a>
           <nav className="flex items-center gap-3 justify-end w-[360px]">
-            <Link href="/builder" className="hover:cursor-pointer">
-              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
-                Armá tu mix
-              </Button>
-            </Link>
             <Link href="#" aria-disabled className="pointer-events-none opacity-60"><Button variant="outline" size="sm" disabled>Mi cuenta</Button></Link>
             <ThemeToggle />
           </nav>
@@ -47,14 +43,7 @@ export default function Home() {
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos, a tu manera</h1>
-            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados. Delivery en Ciudad Universitaria y alrededores.</p>
-            <div className="flex gap-3">
-              <Link href="/builder" className="hover:cursor-pointer">
-                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-white cursor-pointer">
-                  Comenzá ahora
-                </Button>
-              </Link>
-            </div>
+            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados.<br />Delivery gratuito a Ciudad Universitaria.</p>
           </div>
           <div className="flex justify-center">
             <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block rounded-lg overflow-hidden shadow-sm">
@@ -69,6 +58,7 @@ export default function Home() {
             </a>
           </div>
         </section>
+        <MixBuilder />
       </main>
       <footer className="border-t">
         <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
