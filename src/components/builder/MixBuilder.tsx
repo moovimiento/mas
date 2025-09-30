@@ -506,7 +506,62 @@ export function MixBuilder() {
           <div className="flex items-center justify-center">
             <Button
               disabled={cartItems.length === 0}
-              onClick={() => alert(`Ir al checkout con ${totalMixQty} mix(s) (pendiente)`)}
+              onClick={async () => {
+                try {
+                  // Preparar items para Mercado Pago
+                  const mixItems = cartItems.map((item) => {
+                    const ingredients = INGREDIENTS
+                      .filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                      .map((ing) => ing.name)
+                      .join(", ");
+                    
+                    return {
+                      title: `Mix personalizado (${ingredients})`,
+                      quantity: item.quantity,
+                      unit_price: PRICE_SINGLE,
+                    };
+                  });
+
+                  // Agregar delivery si corresponde
+                  const items = [...mixItems];
+                  if (deliveryOption === "envio") {
+                    items.push({
+                      title: "Envío a Córdoba",
+                      quantity: 1,
+                      unit_price: 1000,
+                    });
+                  }
+
+                  // Llamar a la API para crear la preferencia
+                  const response = await fetch("/api/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      items,
+                      deliveryOption,
+                      deliveryAddress,
+                    }),
+                  });
+
+                  const data = await response.json();
+
+                  if (data.error) {
+                    console.error("API Error:", data.error);
+                    alert(`Error: ${data.error}`);
+                    return;
+                  }
+
+                  if (data.sandbox_init_point) {
+                    // Redirigir a Mercado Pago
+                    window.location.href = data.sandbox_init_point;
+                  } else {
+                    alert("Error al crear el checkout");
+                  }
+                } catch (error) {
+                  console.error("Error:", error);
+                  alert("Error al procesar el checkout");
+                }
+              }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
             >
               Ir al checkout

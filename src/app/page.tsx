@@ -33,7 +33,16 @@ export default function Home() {
             />
             <span className={`${sourceSans.className} text-xl font-semibold leading-none`}>Moovimiento</span>
           </a>
-          <nav className="flex items-center gap-3 justify-end w-[360px]">
+          <nav className="flex items-center gap-4 justify-end">
+            <a 
+              href="https://www.moovimiento.com/#faq" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm hover:underline cursor-pointer"
+            >
+              <span className="hidden md:inline">Preguntas frecuentes</span>
+              <span className="md:hidden">FAQs</span>
+            </a>
             <Link href="#" aria-disabled className="pointer-events-none opacity-60"><Button variant="outline" size="sm" disabled>Mi cuenta</Button></Link>
             <ThemeToggle />
           </nav>
