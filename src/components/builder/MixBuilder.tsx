@@ -23,6 +23,11 @@ type IngredientId = typeof INGREDIENTS[number]["id"];
 
 type Mix = Record<IngredientId, number>;
 
+type CartItem = {
+  mix: Mix;
+  quantity: number;
+};
+
 const preset44x5: Mix = {
   pera: 44,
   almendras: 44,
@@ -33,11 +38,10 @@ const preset44x5: Mix = {
 
 export function MixBuilder() {
   const [mix, setMix] = useState<Mix>(preset44x5);
-  const [mixQty, setMixQty] = useState<number>(0);
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
-  const [cartMix, setCartMix] = useState<Mix | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shakeRemaining, setShakeRemaining] = useState(false);
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
@@ -74,15 +78,19 @@ export function MixBuilder() {
     return { price, discount, breakdown: { n15, n5, n1 } };
   }
 
+  const totalMixQty = useMemo(() => {
+    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cartItems]);
+
   const pricing = useMemo(() => {
-    const basePrice = computePrice(mixQty);
+    const basePrice = computePrice(totalMixQty);
     const deliveryCost = deliveryOption === "envio" ? DELIVERY_COST : 0;
     return {
       ...basePrice,
       price: basePrice.price + deliveryCost,
       deliveryCost,
     };
-  }, [mixQty, deliveryOption]);
+  }, [totalMixQty, deliveryOption]);
 
   function setGram(id: IngredientId, grams: number) {
     // Set grams for a single ingredient, ensuring the overall total never exceeds TOTAL_GRAMS
@@ -254,9 +262,25 @@ export function MixBuilder() {
               <Button
                 disabled={!isValid}
                 onClick={() => {
-                  setCartMix(mix);
-                  setMixQty(1);
-                  setDeliveryOption("envio");
+                  const existingIndex = cartItems.findIndex(
+                    (item) => JSON.stringify(item.mix) === JSON.stringify(mix)
+                  );
+                  if (existingIndex >= 0) {
+                    // Same mix exists, increment quantity
+                    setCartItems((prev) =>
+                      prev.map((item, i) =>
+                        i === existingIndex
+                          ? { ...item, quantity: item.quantity + 1 }
+                          : item
+                      )
+                    );
+                  } else {
+                    // New mix, add to cart
+                    setCartItems((prev) => [...prev, { mix, quantity: 1 }]);
+                  }
+                  if (cartItems.length === 0) {
+                    setDeliveryOption("envio");
+                  }
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
               >
@@ -327,59 +351,77 @@ export function MixBuilder() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
-            {!cartMix ? (
+            {cartItems.length === 0 ? (
               <div className="text-muted-foreground">No hay mixs en el carrito. Armalo arriba y agregalo.</div>
             ) : (
               <>
-                {/* Encabezado del ítem Mix con controles de cantidad */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-medium">Mix (220 g)</div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 cursor-pointer"
-                      onClick={() => setMixQty((q) => {
-                        const newQty = Math.max(0, q - 1);
-                        if (newQty === 0) setCartMix(null);
-                        return newQty;
-                      })}
-                      aria-label="Reducir cantidad de mix"
-                    >
-                      -
-                    </Button>
-                    <span className="min-w-6 text-center">{mixQty}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 cursor-pointer"
-                      onClick={() => setMixQty((q) => q + 1)}
-                      aria-label="Aumentar cantidad de mix"
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Composición con porcentajes en una sola línea */}
-                <div className="text-muted-foreground">
-                  ({INGREDIENTS.filter((ing) => (cartMix[ing.id] ?? 0) > 0)
-                    .map((ing) => {
-                      const cartTotal = Object.values(cartMix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
-                      const cartPercent = cartTotal > 0 ? Math.round(((cartMix[ing.id] ?? 0) / cartTotal) * 100) : 0;
-                      return `${ing.name} ${cartPercent}%`;
-                    })
-                    .join(", ")})
-                </div>
+                {cartItems.map((item, index) => {
+                  const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+                  return (
+                    <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="font-medium">Mix (220 g)</div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 cursor-pointer"
+                            onClick={() => {
+                              setCartItems((prev) =>
+                                prev
+                                  .map((cartItem, i) =>
+                                    i === index
+                                      ? { ...cartItem, quantity: Math.max(0, cartItem.quantity - 1) }
+                                      : cartItem
+                                  )
+                                  .filter((cartItem) => cartItem.quantity > 0)
+                              );
+                              if (cartItems.length === 1 && item.quantity === 1) {
+                                setDeliveryOption("ciudad");
+                              }
+                            }}
+                            aria-label="Reducir cantidad de mix"
+                          >
+                            -
+                          </Button>
+                          <span className="min-w-6 text-center">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 cursor-pointer"
+                            onClick={() =>
+                              setCartItems((prev) =>
+                                prev.map((cartItem, i) =>
+                                  i === index ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
+                                )
+                              )
+                            }
+                            aria-label="Aumentar cantidad de mix"
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-muted-foreground">
+                        ({INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                          .map((ing) => {
+                            const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
+                            return `${ing.name} ${percent}%`;
+                          })
+                          .join(", ")})
+                      </div>
+                    </div>
+                  );
+                })}
               </>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="text-muted-foreground">Gramos totales</div>
-            <div className="text-right font-medium">{cartMix ? mixQty * TOTAL_GRAMS : 0} g</div>
+            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS} g</div>
             <div className="text-muted-foreground">Energía acumulada</div>
-            <div className="text-right font-medium">{cartMix ? mixQty : 0} ⚡</div>
+            <div className="text-right font-medium">{totalMixQty} ⚡</div>
             <div className="text-muted-foreground">Delivery</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
@@ -420,7 +462,7 @@ export function MixBuilder() {
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal (sin promo)</span>
               <span className={(pricing.discount > 0 || deliveryOption === "ciudad") ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
-                {currency.format(cartMix ? (mixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
+                {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
             {(pricing.discount > 0 || deliveryOption === "ciudad") && (
@@ -451,8 +493,8 @@ export function MixBuilder() {
 
           <div className="flex items-center justify-center">
             <Button
-              disabled={!cartMix}
-              onClick={() => alert(`Ir al checkout con ${mixQty} mix(s) (pendiente)`)}
+              disabled={cartItems.length === 0}
+              onClick={() => alert(`Ir al checkout con ${totalMixQty} mix(s) (pendiente)`)}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
             >
               Ir al checkout
