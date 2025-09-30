@@ -33,10 +33,11 @@ const preset44x5: Mix = {
 
 export function MixBuilder() {
   const [mix, setMix] = useState<Mix>(preset44x5);
-  const [mixQty, setMixQty] = useState<number>(1);
+  const [mixQty, setMixQty] = useState<number>(0);
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
-  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("envio");
+  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
+  const [cartMix, setCartMix] = useState<Mix | null>(null);
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
@@ -151,7 +152,7 @@ export function MixBuilder() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8 space-y-6">
+    <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
         <div className="text-sm text-muted-foreground whitespace-normal">Máximo por ingrediente: <span className="font-medium">88g</span></div>
@@ -229,7 +230,11 @@ export function MixBuilder() {
             <div className="flex items-center justify-center pt-2">
               <Button
                 disabled={!isValid}
-                onClick={() => alert("Agregar al carrito (pendiente)")}
+                onClick={() => {
+                  setCartMix(mix);
+                  setMixQty(1);
+                  setDeliveryOption("envio");
+                }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
               >
                 Agregar al carrito
@@ -299,8 +304,8 @@ export function MixBuilder() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
-            {total === 0 ? (
-              <div className="text-muted-foreground">No hay ingredientes aún. Empezá a armar tu mix.</div>
+            {!cartMix ? (
+              <div className="text-muted-foreground">No hay mixs en el carrito. Armalo arriba y agregalo.</div>
             ) : (
               <>
                 {/* Encabezado del ítem Mix con controles de cantidad */}
@@ -311,7 +316,11 @@ export function MixBuilder() {
                       variant="outline"
                       size="icon"
                       className="h-8 w-8 cursor-pointer"
-                      onClick={() => setMixQty((q) => Math.max(1, q - 1))}
+                      onClick={() => setMixQty((q) => {
+                        const newQty = Math.max(0, q - 1);
+                        if (newQty === 0) setCartMix(null);
+                        return newQty;
+                      })}
                       aria-label="Reducir cantidad de mix"
                     >
                       -
@@ -331,8 +340,12 @@ export function MixBuilder() {
 
                 {/* Composición con porcentajes en una sola línea */}
                 <div className="text-muted-foreground">
-                  ({INGREDIENTS.filter((ing) => (mix[ing.id] ?? 0) > 0)
-                    .map((ing) => `${ing.name} ${percentages[ing.id]}%`)
+                  ({INGREDIENTS.filter((ing) => (cartMix[ing.id] ?? 0) > 0)
+                    .map((ing) => {
+                      const cartTotal = Object.values(cartMix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+                      const cartPercent = cartTotal > 0 ? Math.round(((cartMix[ing.id] ?? 0) / cartTotal) * 100) : 0;
+                      return `${ing.name} ${cartPercent}%`;
+                    })
                     .join(", ")})
                 </div>
               </>
@@ -340,10 +353,10 @@ export function MixBuilder() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-muted-foreground">Total</div>
-            <div className="text-right font-medium">{mixQty * TOTAL_GRAMS} g</div>
-            <div className="text-muted-foreground">Energía</div>
-            <div className="text-right font-medium">{mixQty} ⚡</div>
+            <div className="text-muted-foreground">Gramos totales</div>
+            <div className="text-right font-medium">{cartMix ? mixQty * TOTAL_GRAMS : 0} g</div>
+            <div className="text-muted-foreground">Energía acumulada</div>
+            <div className="text-right font-medium">{cartMix ? mixQty : 0} ⚡</div>
             <div className="text-muted-foreground">Delivery</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
@@ -365,8 +378,8 @@ export function MixBuilder() {
           </div>
 
           {/* Campo de dirección de entrega */}
-          <div className="space-y-2">
-            <label htmlFor="delivery-address" className="text-sm text-muted-foreground">
+          <div>
+            <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
               {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"}
             </label>
             <Input
@@ -384,30 +397,30 @@ export function MixBuilder() {
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal (sin promo)</span>
               <span className={(pricing.discount > 0 || deliveryOption === "ciudad") ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
-                {currency.format(mixQty * PRICE_SINGLE + DELIVERY_COST)}
+                {currency.format(cartMix ? (mixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
             {(pricing.discount > 0 || deliveryOption === "ciudad") && (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">{deliveryOption === "ciudad" && pricing.discount === 0 ? "Ahorro de Delivery" : "Ahorro"}</span>
+                  <span className="text-muted-foreground">Ahorro acumulado</span>
                   <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Total con promo</span>
+                  <span className="font-medium">
+                    {deliveryOption === "ciudad" && pricing.discount > 0
+                      ? "Total (con promo y envío gratis)"
+                      : deliveryOption === "ciudad"
+                      ? "Total (con envío gratis)"
+                      : "Total (con promo)"}
+                  </span>
                   <span className="font-semibold">{currency.format(pricing.price)}</span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {pricing.breakdown.n15 > 0 && (<span className="mr-2">{pricing.breakdown.n15}×15</span>)}
-                  {pricing.breakdown.n5 > 0 && (<span className="mr-2">{pricing.breakdown.n5}×5</span>)}
-                  {pricing.breakdown.n1 > 0 && (<span>{pricing.breakdown.n1}×1</span>)}
-                  {deliveryOption === "ciudad" && (<span className="ml-2">Envío gratis</span>)}
                 </div>
               </>
             )}
             {pricing.discount === 0 && deliveryOption === "envio" && (
               <div className="flex items-center justify-between">
-                <span className="font-medium">Total</span>
+                <span className="font-medium">Total (sin promo)</span>
                 <span className="font-semibold">{currency.format(pricing.price)}</span>
               </div>
             )}
@@ -415,7 +428,7 @@ export function MixBuilder() {
 
           <div className="flex items-center justify-center">
             <Button
-              disabled={!isValid}
+              disabled={!cartMix}
               onClick={() => alert(`Ir al checkout con ${mixQty} mix(s) (pendiente)`)}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
             >
