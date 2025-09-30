@@ -40,10 +40,8 @@ export default function Home() {
               rel="noopener noreferrer"
               className="text-sm hover:underline cursor-pointer"
             >
-              <span className="hidden md:inline">Preguntas frecuentes</span>
-              <span className="md:hidden">FAQs</span>
+              Preguntas frecuentes
             </a>
-            <Link href="#" aria-disabled className="pointer-events-none opacity-60"><Button variant="outline" size="sm" disabled>Mi cuenta</Button></Link>
             <ThemeToggle />
           </nav>
         </div>

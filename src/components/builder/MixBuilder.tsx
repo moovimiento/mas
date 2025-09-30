@@ -41,6 +41,7 @@ export function MixBuilder() {
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shakeRemaining, setShakeRemaining] = useState(false);
@@ -497,10 +498,8 @@ export function MixBuilder() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-muted-foreground">Gramos totales</div>
-            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS} g</div>
-            <div className="text-muted-foreground">Energía acumulada</div>
-            <div className="text-right font-medium">{totalMixQty} ⚡</div>
+            <div className="text-muted-foreground">Gramos</div>
+            <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g ⚡</div>
             <div className="text-muted-foreground">Delivery</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
@@ -537,20 +536,35 @@ export function MixBuilder() {
             />
           </div>
 
-          {/* Campo de email */}
-          <div>
-            <label htmlFor="email" className="text-sm text-muted-foreground block mb-1">
-              Email (para recibir el resumen de la compra) <span className="text-red-500">*</span>
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full"
-              required
-            />
+          {/* Campos de nombre y email */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4">
+            <div>
+              <label htmlFor="name" className="text-sm text-muted-foreground block mb-1">
+                Nombre
+              </label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Tu nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="text-sm text-muted-foreground block mb-1">
+                Email (para recibir el resumen de la compra) <span className="text-red-500">*</span>
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="tu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full"
+                required
+              />
+            </div>
           </div>
 
           {/* Precios */}
@@ -621,6 +635,7 @@ export function MixBuilder() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                      name,
                       email,
                       items: mixItems,
                       deliveryOption,

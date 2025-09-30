@@ -8,6 +8,7 @@ interface OrderItem {
 }
 
 interface EmailBody {
+  name?: string;
   email: string;
   items: OrderItem[];
   deliveryOption: string;
@@ -19,7 +20,7 @@ interface EmailBody {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
-    const { email, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
+    const { name, email, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
 
     // Inicializar Resend solo cuando se necesita
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -31,13 +32,23 @@ export async function POST(request: NextRequest) {
     });
 
     // Generar HTML del resumen
-    const itemsHTML = items.map(item => `
-      <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.title}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(item.unit_price * item.quantity)}</td>
-      </tr>
-    `).join('');
+    const itemsHTML = items.map(item => {
+      // Extraer composición del título (ej: "Mix personalizado (Pera 20%, ...)")
+      const match = item.title.match(/^(.*?)\s*\((.*)\)$/);
+      const productName = match ? match[1] : item.title;
+      const composition = match ? match[2] : '';
+      
+      return `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee;">
+            <strong>${productName}</strong>
+            ${composition ? `<br><span style="font-size: 12px; color: #666;">${composition}</span>` : ''}
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(item.unit_price * item.quantity)}</td>
+        </tr>
+      `;
+    }).join('');
 
     const deliveryText = deliveryOption === "ciudad" 
       ? "Ciudad Universitaria (Envío gratuito)" 
@@ -66,17 +77,11 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; color: #000;">⚡ Moovimiento</h1>
-                <p style="margin: 5px 0 0 0; color: #000;">Mixs de Frutos Secos</p>
+                <h1 style="margin: 0; color: #000;">Mixs de ⚡ Frutos Secos</h1>
               </div>
               <div class="content">
-                <h2>¡Hola! 👋</h2>
+                <h2>¡Hola${name ? ` ${name}` : ''}! 👋</h2>
                 <p>Gracias por armar tu mix personalizado con nosotros. Acá te dejamos el resumen de tu pedido:</p>
-                
-                <div class="warning">
-                  <strong>⚠️ Último paso: completá el pago</strong><br>
-                  Tu pedido está reservado. Para confirmarlo, solo falta que completes el pago en Mercado Pago.
-                </div>
 
                 <h3>Detalle del pedido:</h3>
                 <table>
@@ -93,7 +98,7 @@ export async function POST(request: NextRequest) {
                 </table>
 
                 <p><strong>Total de mixs:</strong> ${totalMixQty}</p>
-                <p><strong>Energía acumulada:</strong> ${totalMixQty} ⚡</p>
+                <p><strong>Gramos:</strong> ${totalMixQty * 220}g ⚡</p>
                 
                 <h3>Información de entrega:</h3>
                 <p><strong>Opción:</strong> ${deliveryText}</p>
@@ -103,7 +108,12 @@ export async function POST(request: NextRequest) {
                   <p>Total a pagar: ${currency.format(totalPrice)}</p>
                 </div>
 
-                <p style="margin-top: 30px; font-size: 14px; color: #666;">
+                <div class="warning">
+                  <strong>⚠️ Último paso</strong><br>
+                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, completá el pago en Mercado Pago haciendo click en el link que te enviamos.</p>
+                </div>
+
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">
                   Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega. 📦
                 </p>
 
