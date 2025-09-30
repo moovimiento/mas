@@ -12,11 +12,11 @@ const MAX_PER_INGREDIENT = 88;
 const MIN_NONZERO = 22;
 
 const INGREDIENTS = [
+  { id: "banana", name: "Banana chips" },
   { id: "pera", name: "Pera deshidratada" },
   { id: "almendras", name: "Almendras" },
   { id: "nueces", name: "Nueces" },
   { id: "uva", name: "Uva deshidratada" },
-  { id: "banana", name: "Banana chips" },
 ] as const;
 
 type IngredientId = typeof INGREDIENTS[number]["id"];
@@ -44,6 +44,7 @@ export function MixBuilder() {
   const [email, setEmail] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shakeRemaining, setShakeRemaining] = useState(false);
+  const [hoveredIngredient, setHoveredIngredient] = useState<IngredientId | null>(null);
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
@@ -196,10 +197,16 @@ export function MixBuilder() {
             <div className="flex items-center justify-between gap-3">
               <CardTitle>Ingredientes</CardTitle>
               <div className="flex items-center gap-2">
-                <Badge variant={remaining === 0 ? "default" : "secondary"}>Total: {total}g</Badge>
+                <Badge 
+                  variant={remaining === 0 ? "default" : "secondary"}
+                  title={remaining > 0 ? `Agregá ${remaining}g más para completar tu mix` : "Mix completo - listo para agregar al carrito"}
+                >
+                  Total: {total}g
+                </Badge>
                 <Badge 
                   variant={remaining === 0 ? "secondary" : "default"}
                   className={shakeRemaining ? "animate-shake" : ""}
+                  title={remaining > 0 ? `Agregá ${remaining}g más para completar tu mix` : "Mix completo - listo para agregar al carrito"}
                 >
                   Restan: {remaining}g
                 </Badge>
@@ -278,7 +285,6 @@ export function MixBuilder() {
 
             <div className="flex items-center justify-center pt-2">
               <Button
-                disabled={!isValid}
                 onClick={() => {
                   if (!isValid) {
                     setShakeRemaining(true);
@@ -305,8 +311,12 @@ export function MixBuilder() {
                     setDeliveryOption("envio");
                   }
                 }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
+                className={cn(
+                  "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500",
+                  !isValid && "opacity-50"
+                )}
                 title={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : ""}
+                aria-label={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : "Agregar al carrito"}
               >
                 Agregar al carrito
               </Button>
@@ -321,43 +331,88 @@ export function MixBuilder() {
           <CardContent className="space-y-6 flex-1 flex flex-col items-center justify-center">
             {/** Pie chart usando conic-gradient dinámico **/}
             {(() => {
-              // Paletas por tipo
+              // Escala de celestes
               const colorById: Record<IngredientId, string> = {
-                // Frutas deshidratadas (celestes)
-                pera: "#38bdf8",    // sky-400
-                uva: "#0ea5e9",     // sky-500
-                banana: "#93c5fd",  // blue-300
-                // Frutos secos (amarillos)
-                almendras: "#f59e0b", // amber-500
-                nueces: "#fbbf24",    // amber-400
+                banana: "#7dd3fc",    // sky-300
+                pera: "#38bdf8",      // sky-400
+                almendras: "#0ea5e9", // sky-500
+                nueces: "#0284c7",    // sky-600
+                uva: "#0369a1",       // sky-700
               }
 
               const parts = (INGREDIENTS as readonly {id: IngredientId; name: string}[]).map((ing) => ({
+                id: ing.id,
                 name: ing.name,
                 percent: percentages[ing.id] ?? 0,
                 color: colorById[ing.id],
               }))
               let acc = 0
-              const stops = parts.map(p => {
+              const partsWithAngles = parts.map(p => {
                 const start = acc
                 const end = acc + p.percent
                 acc = end
-                return `${p.color} ${start}% ${end}%`
+                return { ...p, startAngle: start * 3.6, endAngle: end * 3.6 }
+              })
+              const stops = partsWithAngles.map(p => {
+                // Amarillo si está seleccionado (por hover o por selectedId), celeste normal si no
+                const isSelected = hoveredIngredient ? p.id === hoveredIngredient : p.id === selectedId
+                const color = isSelected ? '#fbbf24' : p.color // amarillo (amber-400) para seleccionado
+                return `${color} ${p.startAngle / 3.6}% ${p.endAngle / 3.6}%`
               }).join(", ")
               const bg = `conic-gradient(${stops})`
+              
               return (
                 <div className="flex flex-col items-center gap-4">
-                  <div
-                    className="size-48 rounded-full shadow-sm border"
-                    style={{ background: bg }}
-                    aria-label="Gráfico de torta de ingredientes"
-                  />
+                  <div 
+                    className="relative size-48"
+                    onMouseLeave={() => setHoveredIngredient(null)}
+                  >
+                    <div
+                      className="size-48 rounded-full shadow-sm border"
+                      style={{ background: bg }}
+                      aria-label="Gráfico de torta de ingredientes"
+                    />
+                    {/* Segmentos invisibles para detectar hover */}
+                    <svg className="absolute inset-0 size-48" viewBox="0 0 100 100">
+                      {partsWithAngles.filter(p => p.percent > 0).map((p, i) => {
+                        const startRad = (p.startAngle - 90) * Math.PI / 180
+                        const endRad = (p.endAngle - 90) * Math.PI / 180
+                        const largeArc = p.percent > 50 ? 1 : 0
+                        const x1 = 50 + 50 * Math.cos(startRad)
+                        const y1 = 50 + 50 * Math.sin(startRad)
+                        const x2 = 50 + 50 * Math.cos(endRad)
+                        const y2 = 50 + 50 * Math.sin(endRad)
+                        
+                        return (
+                          <path
+                            key={i}
+                            d={`M 50 50 L ${x1} ${y1} A 50 50 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                            fill="transparent"
+                            className="cursor-pointer hover:opacity-80"
+                            onMouseEnter={() => {
+                              setHoveredIngredient(p.id);
+                              setSelectedId(p.id);
+                            }}
+                            onClick={() => setSelectedId(p.id)}
+                          />
+                        )
+                      })}
+                    </svg>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     {parts.map((p, i) => (
-                      <div key={i} className="flex items-center gap-2">
+                      <div 
+                        key={i} 
+                        className={cn(
+                          "flex items-center gap-2 cursor-pointer transition-colors",
+                          p.id === selectedId && "text-yellow-600"
+                        )}
+                        onMouseEnter={() => setSelectedId(p.id)}
+                        onClick={() => setSelectedId(p.id)}
+                      >
                         <span className="inline-block size-3 rounded-sm" style={{ backgroundColor: p.color }} />
-                        <span className="text-muted-foreground">{p.name}</span>
-                        <span className="ml-auto font-medium">{p.percent}%</span>
+                        <span className={cn("text-muted-foreground", p.id === selectedId && "text-yellow-600 font-medium")}>{p.name}</span>
+                        <span className={cn("ml-auto", p.id === selectedId && "font-bold")}>{p.percent}%</span>
                       </div>
                     ))}
                   </div>
