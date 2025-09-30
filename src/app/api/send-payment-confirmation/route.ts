@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
               .header { background-color: #10b981; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
               .content { background-color: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
               .success-box { background-color: #d1fae5; border-left: 4px solid #10b981; padding: 16px; margin: 20px 0; border-radius: 4px; }
-              .whatsapp-btn { display: inline-block; background-color: #25D366; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 16px 0; }
-              .whatsapp-btn:hover { background-color: #128C7E; }
+              .whatsapp-btn { display: inline-block; background-color: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 16px 0; }
+              .whatsapp-btn:hover { background-color: #059669; }
             </style>
           </head>
           <body>
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                 <h2 style="margin: 0; color: white; font-size: 24px;">✅ ¡Pago Confirmado!</h2>
               </div>
               <div class="content">
-                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 🎉</h1>
+                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 🤝</h1>
                 
                 <div class="success-box">
                   <p style="margin: 0; font-size: 16px;">

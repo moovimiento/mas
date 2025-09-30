@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
-      subject: "¡Tu pedido de Frutos Secos está casi listo! 🎉",
+      subject: "🎉 ¡Tu pedido de Frutos Secos está casi listo!",
       html: `
         <!DOCTYPE html>
         <html>
@@ -69,18 +69,20 @@ export async function POST(request: NextRequest) {
             <style>
               body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background-color: #fbbf24; padding: 20px; text-center; border-radius: 8px 8px 0 0; }
+              .header { background-color: #fbbf24; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
               .content { background-color: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
-              .warning { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin: 20px 0; }
-              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              .warning-box { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px; }
+              .info-box { background-color: #fff; border: 1px solid #e5e7eb; padding: 16px; margin: 20px 0; border-radius: 4px; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; background-color: white; border-radius: 4px; overflow: hidden; }
               th { background-color: #f3f4f6; padding: 12px; text-align: left; }
-              .total { font-size: 18px; font-weight: bold; margin-top: 20px; }
+              .payment-btn { display: inline-block; background-color: #fbbf24; color: #000; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 16px 0; }
+              .payment-btn:hover { background-color: #f59e0b; }
             </style>
           </head>
           <body>
             <div class="container">
               <div class="header">
-                <h2 style="margin: 0; color: #000; font-size: 18px;">Mixs de ⚡ Moovimiento</h2>
+                <h2 style="margin: 0; color: white; font-size: 24px;">⚡ Pedido casi listo</h2>
               </div>
               <div class="content">
                 <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 👋</h1>
@@ -100,31 +102,37 @@ export async function POST(request: NextRequest) {
                   </tbody>
                 </table>
 
-                <p><strong>Total de mixs:</strong> ${totalMixQty}</p>
-                <p><strong>Gramos:</strong> ${totalMixQty * 220}g ⚡</p>
+                <div class="info-box">
+                  <p style="margin: 0 0 8px 0;"><strong>Total de mixs:</strong> ${totalMixQty} 📦</p>
+                  <p style="margin: 0;"><strong>Gramos:</strong> ${totalMixQty * 220}g ⚡</p>
+                </div>
                 
                 <h3>Información de entrega:</h3>
-                <p><strong>Opción:</strong> ${deliveryText}</p>
-                <p><strong>Dirección:</strong> ${deliveryAddress || "No especificada"}</p>
-                <p><strong>Celular:</strong> ${phone}</p>
-
-                <div class="total">
-                  <p>Total a pagar: ${currency.format(totalPrice)}</p>
+                <div class="info-box">
+                  <p style="margin: 0 0 8px 0;"><strong>Opción:</strong> ${deliveryText}</p>
+                  <p style="margin: 0 0 8px 0;"><strong>Dirección:</strong> ${deliveryAddress || "No especificada"}</p>
+                  <p style="margin: 0;"><strong>Celular:</strong> ${phone}</p>
                 </div>
 
-                <div class="warning">
-                  <strong>⚠️ Último paso: completá el pago</strong><br>
-                  <p style="margin: 8px 0 0 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo <strong>si todavía no lo hiciste</strong>:</p>
+                <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
+                  <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar: ${currency.format(totalPrice)}</p>
+                </div>
+
+                <div class="warning-box">
+                  <p style="margin: 0 0 8px 0; font-size: 16px;">
+                    <strong>⚠️ Último paso: completá el pago</strong>
+                  </p>
+                  <p style="margin: 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo <strong>si todavía no lo hiciste</strong>:</p>
                   ${paymentLink ? `
                     <div style="text-align: center; margin-top: 16px;">
-                      <a href="${paymentLink}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                        Pagar con Mercado Pago
+                      <a href="${paymentLink}" class="payment-btn">
+                        💳 Pagar con Mercado Pago
                       </a>
                     </div>
                   ` : ''}
                 </div>
 
-                <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                <p style="margin-top: 30px; font-size: 14px; color: #666;">
                   Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega. 📦
                 </p>
 
