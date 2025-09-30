@@ -14,21 +14,19 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:cursor-pointer shrink-0" aria-label="Ir a moovimiento.com">
             {/* Logo - un solo contenedor para ambos temas */}
-            <div className="relative h-8">
+            <div className="relative h-8 w-8">
               <Image
                 src="/moovimiento.png"
                 alt="Moovimiento"
-                width={128}
-                height={32}
-                className="block dark:hidden h-8 w-auto object-contain"
+                fill
+                className="block dark:hidden object-contain"
                 priority
               />
               <Image
                 src="/moovimiento-white.png"
                 alt="Moovimiento"
-                width={128}
-                height={32}
-                className="hidden dark:block h-8 w-auto object-contain"
+                fill
+                className="hidden dark:block object-contain"
                 priority
               />
             </div>
