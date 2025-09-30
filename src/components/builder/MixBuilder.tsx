@@ -41,6 +41,7 @@ export function MixBuilder() {
   const [selectedId, setSelectedId] = useState<IngredientId>("pera");
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">("ciudad");
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shakeRemaining, setShakeRemaining] = useState(false);
 
@@ -81,6 +82,11 @@ export function MixBuilder() {
   const totalMixQty = useMemo(() => {
     return cartItems.reduce((sum, item) => sum + item.quantity, 0);
   }, [cartItems]);
+
+  const isValidEmail = useMemo(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }, [email]);
 
   const pricing = useMemo(() => {
     const basePrice = computePrice(totalMixQty);
@@ -457,7 +463,7 @@ export function MixBuilder() {
           {/* Campo de dirección de entrega */}
           <div>
             <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
-              {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"}
+              {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"} <span className="text-red-500">*</span>
             </label>
             <Input
               id="delivery-address"
@@ -466,6 +472,23 @@ export function MixBuilder() {
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
               className="w-full"
+              required
+            />
+          </div>
+
+          {/* Campo de email */}
+          <div>
+            <label htmlFor="email" className="text-sm text-muted-foreground block mb-1">
+              Email (para recibir el resumen de la compra) <span className="text-red-500">*</span>
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full"
+              required
             />
           </div>
 
@@ -505,7 +528,7 @@ export function MixBuilder() {
 
           <div className="flex items-center justify-center">
             <Button
-              disabled={cartItems.length === 0}
+              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !isValidEmail}
               onClick={async () => {
                 try {
                   // Preparar items para Mercado Pago
@@ -532,6 +555,20 @@ export function MixBuilder() {
                     });
                   }
 
+                  // Enviar email con resumen
+                  await fetch("/api/send-order-email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email,
+                      items: mixItems,
+                      deliveryOption,
+                      deliveryAddress,
+                      totalPrice: pricing.price,
+                      totalMixQty,
+                    }),
+                  });
+
                   // Llamar a la API para crear la preferencia
                   const response = await fetch("/api/checkout", {
                     method: "POST",
@@ -540,6 +577,7 @@ export function MixBuilder() {
                       items,
                       deliveryOption,
                       deliveryAddress,
+                      email,
                     }),
                   });
 

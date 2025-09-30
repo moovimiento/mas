@@ -3622,7 +3622,7 @@ __metadata:
     react: "npm:19.1.0"
     react-dom: "npm:19.1.0"
     react-hook-form: "npm:^7.63.0"
-    resend: "npm:^6.1.0"
+    resend: "npm:^6.1.1"
     sonner: "npm:^2.0.7"
     tailwind-merge: "npm:^3.3.1"
     tailwindcss: "npm:^4"
@@ -4175,15 +4175,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resend@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "resend@npm:6.1.0"
+"resend@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "resend@npm:6.1.1"
   peerDependencies:
     "@react-email/render": ^1.1.0
   peerDependenciesMeta:
     "@react-email/render":
       optional: true
-  checksum: 10c0/cfa07559407a811af3844d4eacca4e96ae7d530e8a6577998d6a42133498e36a5cbb373ad65da834cee7da9b633ecef123526d3952c637436e967affbb28051a
+  checksum: 10c0/a3881efffc502344a3d789fff6a8acf0fa34fd8cea26e1eb92c6d50462f8b0d0f40700b1bb7a0e4d560ad3cc600e6d284ec9fad79d1dc8573d4a731eb022e82f
   languageName: node
   linkType: hard
 
