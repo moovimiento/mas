@@ -272,7 +272,7 @@ export function MixBuilder() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
         <div className="text-sm text-muted-foreground whitespace-normal flex flex-col md:flex-row md:gap-4">
-          <span>Mínimo por ingrediente: <span className="font-medium">0g ↔ 22g</span></span>
+          <span>Mínimo por ingrediente: <span className="font-medium">22g o nada</span></span>
           <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
         </div>
       </div>
@@ -301,9 +301,9 @@ export function MixBuilder() {
           </CardHeader>
           <CardContent className="space-y-4 flex-1">
             {INGREDIENTS.map((ing) => (
-              <div key={ing.id} className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] items-start sm:items-center gap-2 sm:gap-3">
-                <div className={cn("font-medium", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
-                <div className={cn("flex items-center gap-2 rounded-md w-full sm:w-auto justify-end")}
+              <div key={ing.id} className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] items-center gap-2 sm:gap-3">
+                <div className={cn("font-medium text-center sm:text-left w-full sm:w-auto", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
+                <div className={cn("flex items-center gap-2 rounded-md w-full sm:w-auto justify-center sm:justify-end")}
                 >
                   <Button
                     variant="outline"
@@ -586,7 +586,7 @@ export function MixBuilder() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <div className="text-muted-foreground">Cantidad</div>
             <div className="text-right font-medium">{promoBreakdown} 📦</div>
             <div className="text-muted-foreground">Gramos</div>
@@ -595,15 +595,15 @@ export function MixBuilder() {
             <div className="text-right flex items-center justify-end gap-2">
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
-                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer"
+                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Opción anterior de delivery"
               >
                 ←
               </button>
-              <span>{deliveryOption === "ciudad" ? "Ciudad Universitaria (gratis)" : "Córdoba ($1000 de envío)"}</span>
+              <span className="whitespace-nowrap">{deliveryOption === "ciudad" ? "Ciudad Universitaria (gratis)" : "Córdoba ($1000 de envío)"}</span>
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
-                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer"
+                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Siguiente opción de delivery"
               >
                 →
