@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #eee;">
             <strong>${productName}</strong>
-            ${composition ? `<br><span style="font-size: 12px; color: #666;">${composition}</span>` : ''}
+            ${composition ? `<br><span style="font-size: 13px; color: #666; line-height: 1.6;">${composition}</span>` : ''}
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(item.unit_price * item.quantity)}</td>
@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; color: #000;">Mixs de ⚡ Frutos Secos</h1>
+                <h2 style="margin: 0; color: #000; font-size: 18px;">Mixs de ⚡ Moovimiento</h2>
               </div>
               <div class="content">
-                <h2>¡Hola${name ? ` ${name}` : ''}! 👋</h2>
+                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 👋</h1>
                 <p>Gracias por armar tu mix personalizado con nosotros. Acá te dejamos el resumen de tu pedido:</p>
 
                 <h3>Detalle del pedido:</h3>
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                  ¡Gracias por confiar en Moovimiento! ⚡<br>
+                  ¡Gracias por confiar en nosotros! ⚡<br>
                   Gonza
                 </p>
               </div>
