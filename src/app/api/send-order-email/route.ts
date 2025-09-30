@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface OrderItem {
   title: string;
   quantity: number;
@@ -22,6 +20,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
     const { email, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty } = body;
+
+    // Inicializar Resend solo cuando se necesita
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const currency = new Intl.NumberFormat("es-AR", { 
       style: "currency", 
@@ -43,9 +44,9 @@ export async function POST(request: NextRequest) {
       : `Córdoba (${currency.format(1000)})`;
 
     await resend.emails.send({
-      from: "Moovimiento <pedidos@moovimiento.com>",
+      from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
-      subject: "Resumen de tu pedido - Moovimiento",
+      subject: "¡Tu pedido de Frutos Secos está casi listo! 🎉",
       html: `
         <!DOCTYPE html>
         <html>
@@ -69,11 +70,12 @@ export async function POST(request: NextRequest) {
                 <p style="margin: 5px 0 0 0; color: #000;">Mixs de Frutos Secos</p>
               </div>
               <div class="content">
-                <h2>Resumen de tu pedido</h2>
+                <h2>¡Hola! 👋</h2>
+                <p>Gracias por armar tu mix personalizado con nosotros. Acá te dejamos el resumen de tu pedido:</p>
                 
                 <div class="warning">
-                  <strong>⚠️ Pedido pendiente de pago</strong><br>
-                  Este es un resumen de tu pedido. Para confirmar la compra, completá el pago en Mercado Pago.
+                  <strong>⚠️ Último paso: completá el pago</strong><br>
+                  Tu pedido está reservado. Para confirmarlo, solo falta que completes el pago en Mercado Pago.
                 </div>
 
                 <h3>Detalle del pedido:</h3>
@@ -102,11 +104,16 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                  Una vez confirmado el pago, recibirás un email con la confirmación y el seguimiento de tu pedido.
+                  Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega. 📦
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                  ¿Tenés dudas? Visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+                </p>
+
+                <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                  ¡Gracias por confiar en Moovimiento! ⚡<br>
+                  Gonza
                 </p>
               </div>
             </div>

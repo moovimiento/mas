@@ -280,6 +280,11 @@ export function MixBuilder() {
               <Button
                 disabled={!isValid}
                 onClick={() => {
+                  if (!isValid) {
+                    setShakeRemaining(true);
+                    setTimeout(() => setShakeRemaining(false), 500);
+                    return;
+                  }
                   const existingIndex = cartItems.findIndex(
                     (item) => JSON.stringify(item.mix) === JSON.stringify(mix)
                   );
@@ -301,6 +306,7 @@ export function MixBuilder() {
                   }
                 }}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
+                title={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : ""}
               >
                 Agregar al carrito
               </Button>
