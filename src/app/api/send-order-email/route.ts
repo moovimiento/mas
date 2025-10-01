@@ -82,11 +82,11 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <img src="https://moovimiento.com/moovimiento-logo.png" alt="Moovimiento" style="width: 80px; height: 80px; margin-bottom: 12px;" />
-                <h2 style="margin: 0; color: #000; font-size: 18px;">Mixs de ⚡ Moovimiento</h2>
+                <h2 style="margin: 0; color: white; font-size: 20px; text-align: left;">⚡ Moovimiento</h2>
               </div>
               <div class="content">
-                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 👋</h1>
+                <h1 style="font-size: 28px; color: #fbbf24;">🤩 ¡Pedido casi listo!</h1>
+                <p style="font-size: 18px;">¡Hola${name ? ` ${name}` : ''}! 👋</p>
                 <p>Gracias por armar tu mix personalizado con nosotros. Acá te dejamos el resumen de tu pedido:</p>
 
                 <h3>Detalle del pedido:</h3>
