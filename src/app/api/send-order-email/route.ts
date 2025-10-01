@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h2 style="margin: 0; color: white; font-size: 24px;">⚡ Pedido casi listo</h2>
+                <img src="https://moovimiento.com/moovimiento-logo.png" alt="Moovimiento" style="width: 80px; height: 80px; margin-bottom: 12px;" />
+                <h2 style="margin: 0; color: #000; font-size: 18px;">Mixs de ⚡ Moovimiento</h2>
               </div>
               <div class="content">
                 <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 👋</h1>
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
                 
                 <h3>Información de entrega:</h3>
                 <div class="info-box">
-                  <p style="margin: 0 0 8px 0;"><strong>Opción:</strong> ${deliveryText}</p>
+                  <p style="margin: 0 0 8px 0;"><strong>Delivery en:</strong> ${deliveryText}</p>
                   <p style="margin: 0 0 8px 0;"><strong>Dirección:</strong> ${deliveryAddress || "No especificada"}</p>
                   <p style="margin: 0;"><strong>Celular:</strong> ${phone}</p>
                 </div>
@@ -133,11 +134,11 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                  Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega. 📦
+                  Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega 📦
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a>, <a href="https://wa.me/5493513239624">por WhatsApp</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">

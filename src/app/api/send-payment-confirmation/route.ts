@@ -45,10 +45,11 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h2 style="margin: 0; color: white; font-size: 24px;">✅ ¡Pago Confirmado!</h2>
+                <img src="https://moovimiento.com/moovimiento-logo.png" alt="Moovimiento" style="width: 80px; height: 80px; margin-bottom: 12px;" />
+                <h2 style="margin: 0; color: white; font-size: 24px;">🤝 ¡Pago confirmado!</h2>
               </div>
               <div class="content">
-                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! 🤝</h1>
+                <h1 style="font-size: 28px;">¡Hola${name ? ` ${name}` : ''}! ⚡</h1>
                 
                 <div class="success-box">
                   <p style="margin: 0; font-size: 16px;">
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
                 </p>
 
                 <h3>Información de entrega:</h3>
-                <p><strong>Opción:</strong> ${deliveryText}</p>
+                <p><strong>Delivery en:</strong> ${deliveryText}</p>
                 <p><strong>Dirección:</strong> ${deliveryAddress}</p>
                 <p><strong>Celular de contacto:</strong> ${phone}</p>
 
@@ -78,11 +79,11 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o por WhatsApp al <a href="https://wa.me/5493513239624">351 323 9624</a>
+                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o a <a href="https://wa.me/5493513239624">WhatsApp</a>
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                  ¡Gracias por confiar en Moovimiento! ⚡<br>
+                  ¡Gracias por confiar en nosotros! ⚡<br>
                   Gonza
                 </p>
               </div>
