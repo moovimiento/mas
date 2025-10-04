@@ -76,6 +76,23 @@ export function MixBuilder() {
     }
     return "";
   });
+  const [discountCode, setDiscountCode] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('moovimiento_discountCode') || "";
+    }
+    return "";
+  });
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    code: string;
+    type: 'percentage' | 'fixed';
+    value: number;
+  } | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('moovimiento_appliedDiscount');
+      return saved ? JSON.parse(saved) : null;
+    }
+    return null;
+  });
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_cartItems');
@@ -146,6 +163,72 @@ export function MixBuilder() {
     return emailRegex.test(email);
   }, [email]);
 
+  // Función para validar códigos de descuento
+  const validateDiscountCode = (code: string) => {
+    const upperCode = code.toUpperCase();
+    
+    // Obtener códigos válidos desde variables de entorno
+    const validCodesEnv = process.env.NEXT_PUBLIC_DISCOUNT_CODES || '';
+    const validCodes = validCodesEnv.split(',').map(c => c.trim()).filter(c => c);
+    
+    // Verificar si el código está en la lista de códigos válidos
+    if (!validCodes.includes(upperCode)) {
+      return null;
+    }
+    
+    // Extraer número del nombre del código
+    const numberMatch = upperCode.match(/(\d+)$/);
+    if (numberMatch) {
+      const number = parseInt(numberMatch[1]);
+      const digits = numberMatch[1].length;
+      
+      // Si tiene 1-2 dígitos: porcentaje
+      if (digits <= 2 && number > 0 && number <= 100) {
+        return {
+          type: 'percentage' as const,
+          value: number,
+          description: `${number}% de descuento`
+        };
+      }
+      
+      // Si tiene 3-5 dígitos: descuento fijo en pesos
+      if (digits >= 3 && digits <= 5 && number > 0) {
+        return {
+          type: 'fixed' as const,
+          value: number,
+          description: `$${number.toLocaleString('es-AR')} de descuento`
+        };
+      }
+    }
+    
+    // Si no tiene número válido, el código no es válido
+    return null;
+  };
+
+  const handleApplyDiscount = () => {
+    if (!discountCode.trim()) {
+      alert('Por favor ingresa un código de descuento');
+      return;
+    }
+
+    const discount = validateDiscountCode(discountCode);
+    if (discount) {
+      setAppliedDiscount({
+        code: discountCode.toUpperCase(),
+        type: discount.type,
+        value: discount.value,
+      });
+      alert(`¡Código aplicado! ${discount.description}`);
+    } else {
+      alert('Código de descuento inválido');
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCode("");
+  };
+
   // Guardar en localStorage cuando cambien los valores
   useEffect(() => {
     localStorage.setItem('moovimiento_mix', JSON.stringify(mix));
@@ -175,15 +258,39 @@ export function MixBuilder() {
     localStorage.setItem('moovimiento_email', email);
   }, [email]);
 
+  useEffect(() => {
+    localStorage.setItem('moovimiento_discountCode', discountCode);
+  }, [discountCode]);
+
+  useEffect(() => {
+    localStorage.setItem('moovimiento_appliedDiscount', JSON.stringify(appliedDiscount));
+  }, [appliedDiscount]);
+
   const pricing = useMemo(() => {
     const basePrice = computePrice(totalMixQty);
     const deliveryCost = deliveryOption === "envio" ? DELIVERY_COST : 0;
+    let subtotal = basePrice.price + deliveryCost;
+    
+    // Aplicar descuento si existe
+    let discountAmount = 0;
+    if (appliedDiscount) {
+      if (appliedDiscount.type === 'percentage') {
+        discountAmount = (subtotal * appliedDiscount.value) / 100;
+      } else if (appliedDiscount.type === 'fixed') {
+        discountAmount = Math.min(appliedDiscount.value, subtotal);
+      }
+    }
+    
+    const finalPrice = Math.max(0, subtotal - discountAmount);
+    
     return {
       ...basePrice,
-      price: basePrice.price + deliveryCost,
+      price: finalPrice,
       deliveryCost,
+      discountAmount,
+      subtotal,
     };
-  }, [totalMixQty, deliveryOption]);
+  }, [totalMixQty, deliveryOption, appliedDiscount]);
 
   function setGram(id: IngredientId, grams: number) {
     // Set grams for a single ingredient, ensuring the overall total never exceeds TOTAL_GRAMS
@@ -679,38 +786,85 @@ export function MixBuilder() {
             </div>
           </div>
 
+          {/* Campo de código de descuento */}
+          <div className="space-y-1">
+            <label className="text-sm text-muted-foreground block">
+              Descuento (opcional)
+            </label>
+            <div className="flex items-center gap-2 w-full md:w-1/2 md:pr-2">
+              <Input
+                type="text"
+                placeholder="Tu código de descuento"
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+                className="flex-1"
+                disabled={!!appliedDiscount}
+              />
+              {!appliedDiscount ? (
+                <Button
+                  variant="outline"
+                  onClick={handleApplyDiscount}
+                  disabled={!discountCode.trim()}
+                  className="whitespace-nowrap"
+                >
+                  Aplicar
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={handleRemoveDiscount}
+                  className="whitespace-nowrap text-red-600 hover:text-red-700"
+                >
+                  Quitar
+                </Button>
+              )}
+            </div>
+            {appliedDiscount && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <span>✓</span>
+                <span>
+                  Código {appliedDiscount.code} aplicado: 
+                  {appliedDiscount.type === 'percentage' 
+                    ? ` ${appliedDiscount.value}% de descuento`
+                    : ` $${appliedDiscount.value} de descuento`
+                  }
+                </span>
+              </div>
+            )}
+          </div>
+
           {/* Precios */}
           <div className="space-y-1 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal (sin promo)</span>
-              <span className={(pricing.discount > 0 || deliveryOption === "ciudad") ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
+              <span className={(pricing.discount > 0 || deliveryOption === "ciudad" || pricing.discountAmount > 0) ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
                 {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
             {(pricing.discount > 0 || deliveryOption === "ciudad") && (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Ahorro acumulado</span>
-                  <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">
-                    {deliveryOption === "ciudad" && pricing.discount > 0
-                      ? "Total (con promo y envío gratis)"
-                      : deliveryOption === "ciudad"
-                      ? "Total (con envío gratis)"
-                      : "Total (con promo)"}
-                  </span>
-                  <span className="font-semibold">{currency.format(pricing.price)}</span>
-                </div>
-              </>
-            )}
-            {pricing.discount === 0 && deliveryOption === "envio" && (
               <div className="flex items-center justify-between">
-                <span className="font-medium">Total (sin promo)</span>
-                <span className="font-semibold">{currency.format(pricing.price)}</span>
+                <span className="text-muted-foreground">Ahorro por promos</span>
+                <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
               </div>
             )}
+            {pricing.discountAmount > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Descuento por código</span>
+                <span className="text-green-600">-{currency.format(pricing.discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                {deliveryOption === "ciudad" && (pricing.discount > 0 || pricing.discountAmount > 0)
+                  ? "Total (con promos y envío gratis)"
+                  : deliveryOption === "ciudad"
+                  ? "Total (con envío gratis)"
+                  : (pricing.discount > 0 || pricing.discountAmount > 0)
+                  ? "Total (con descuentos)"
+                  : "Total"}
+              </span>
+              <span className="font-semibold">{currency.format(pricing.price)}</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-center">
@@ -757,6 +911,8 @@ export function MixBuilder() {
                       email,
                       name,
                       phone,
+                      discountCode: appliedDiscount?.code || null,
+                      discountAmount: pricing.discountAmount,
                     }),
                   });
 
@@ -783,6 +939,8 @@ export function MixBuilder() {
                         totalPrice: pricing.price,
                         totalMixQty,
                         paymentLink: data.init_point,
+                        discountCode: appliedDiscount?.code || null,
+                        discountAmount: pricing.discountAmount,
                       }),
                     });
 

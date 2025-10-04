@@ -19,6 +19,8 @@ interface CheckoutBody {
   email: string;
   name?: string;
   phone?: string;
+  discountCode?: string | null;
+  discountAmount?: number;
 }
 
 interface PreferenceData {
@@ -51,21 +53,36 @@ interface PreferenceData {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as CheckoutBody;
-    const { items, deliveryOption, deliveryAddress, email, name, phone } = body;
+    const { items, deliveryOption, deliveryAddress, email, name, phone, discountCode, discountAmount } = body;
 
     console.log("Creating preference with items:", items);
+    console.log("Discount info:", { discountCode, discountAmount });
 
     // Crear preferencia de pago
     const preference = new Preference(client);
 
-    const preferenceData: PreferenceData = {
-      items: items.map((item, index) => ({
-        id: `item-${index}`,
-        title: item.title,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
+    // Mapear items existentes
+    const preferenceItems = items.map((item, index) => ({
+      id: `item-${index}`,
+      title: item.title,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      currency_id: "ARS",
+    }));
+
+    // Agregar descuento como item negativo si existe
+    if (discountCode && discountAmount && discountAmount > 0) {
+      preferenceItems.push({
+        id: `discount-${discountCode}`,
+        title: `Descuento (${discountCode})`,
+        quantity: 1,
+        unit_price: -discountAmount, // Precio negativo para descuento
         currency_id: "ARS",
-      })),
+      });
+    }
+
+    const preferenceData: PreferenceData = {
+      items: preferenceItems,
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
@@ -80,6 +97,8 @@ export async function POST(request: NextRequest) {
         name,
         email,
         phone,
+        discountCode,
+        discountAmount,
         timestamp: Date.now(),
       }),
       payer: {

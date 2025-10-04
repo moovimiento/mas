@@ -17,12 +17,14 @@ interface EmailBody {
   totalPrice: number;
   totalMixQty: number;
   paymentLink?: string;
+  discountCode?: string | null;
+  discountAmount?: number;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
-    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink } = body;
+    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink, discountCode, discountAmount } = body;
 
     // Inicializar Resend solo cuando se necesita
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -114,6 +116,14 @@ export async function POST(request: NextRequest) {
                   <p style="margin: 0 0 8px 0;"><strong>Dirección:</strong> ${deliveryAddress || "No especificada"}</p>
                   <p style="margin: 0;"><strong>Celular:</strong> ${phone}</p>
                 </div>
+
+                ${discountCode && discountAmount && discountAmount > 0 ? `
+                <h3>Descuento aplicado:</h3>
+                <div class="info-box" style="background-color: #f0fdf4; border-color: #22c55e;">
+                  <p style="margin: 0; color: #16a34a;"><strong>🎉 Código ${discountCode}</strong></p>
+                  <p style="margin: 0; color: #16a34a;">Descuento: ${currency.format(discountAmount)}</p>
+                </div>
+                ` : ''}
 
                 <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
                   <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar: ${currency.format(totalPrice)}</p>
