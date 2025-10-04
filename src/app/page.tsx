@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Source_Sans_3 } from "next/font/google";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MixBuilder } from "@/components/builder/MixBuilder";

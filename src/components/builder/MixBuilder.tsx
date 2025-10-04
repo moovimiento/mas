@@ -269,7 +269,7 @@ export function MixBuilder() {
   const pricing = useMemo(() => {
     const basePrice = computePrice(totalMixQty);
     const deliveryCost = deliveryOption === "envio" ? DELIVERY_COST : 0;
-    let subtotal = basePrice.price + deliveryCost;
+    const subtotal = basePrice.price + deliveryCost;
     
     // Aplicar descuento si existe
     let discountAmount = 0;
