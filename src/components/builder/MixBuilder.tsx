@@ -860,18 +860,10 @@ export function MixBuilder() {
                 >
                   Aplicar
                 </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  onClick={handleRemoveDiscount}
-                  className="whitespace-nowrap text-red-600 hover:text-red-700"
-                >
-                  Quitar
-                </Button>
               )}
             </div>
             {appliedDiscount && (
-              <div className="flex items-center gap-2 text-sm text-green-600">
+              <div className="flex items-center gap-2 text-sm text-white">
                 <span>✓</span>
                 <span>
                   Código {appliedDiscount.code} aplicado: 
@@ -906,7 +898,10 @@ export function MixBuilder() {
             {pricing.discountAmount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600">
-                  Descuento por código{appliedDiscount?.type === 'percentage' ? ` (${appliedDiscount.value}%)` : ''}
+                  {appliedDiscount?.type === 'percentage' 
+                    ? `Descuento del ${appliedDiscount.value}% por código`
+                    : 'Descuento por código'
+                  }
                 </span>
                 <span className="text-green-600">-{currency.format(pricing.discountAmount)}</span>
               </div>
