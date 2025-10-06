@@ -68,12 +68,84 @@ export async function POST(request: NextRequest) {
       maximumFractionDigits: 0 
     });
 
+    // Función para detectar ingredientes que difieren entre mixes
+    const getIngredientDifferences = (items: OrderItem[]) => {
+      const differences = new Map<number, Set<string>>();
+      
+      items.forEach((item, index) => {
+        const match = item.title.match(/^(.*?)\s*\((.*)\)$/);
+        if (!match) return;
+        
+        const composition = match[2];
+        const currentIngredients = new Map<string, number>();
+        
+        // Parsear ingredientes del mix actual
+        composition.split(',').forEach(ing => {
+          const ingMatch = ing.trim().match(/^(.+?)\s+(\d+)%$/);
+          if (ingMatch) {
+            currentIngredients.set(ingMatch[1].trim(), parseInt(ingMatch[2]));
+          }
+        });
+        
+        const itemDifferences = new Set<string>();
+        
+        // Comparar con otros mixes
+        items.forEach((otherItem, otherIndex) => {
+          if (otherIndex !== index) {
+            const otherMatch = otherItem.title.match(/^(.*?)\s*\((.*)\)$/);
+            if (!otherMatch) return;
+            
+            const otherComposition = otherMatch[2];
+            const otherIngredients = new Map<string, number>();
+            
+            // Parsear ingredientes del otro mix
+            otherComposition.split(',').forEach(ing => {
+              const ingMatch = ing.trim().match(/^(.+?)\s+(\d+)%$/);
+              if (ingMatch) {
+                otherIngredients.set(ingMatch[1].trim(), parseInt(ingMatch[2]));
+              }
+            });
+            
+            // Comparar ingredientes
+            currentIngredients.forEach((percent, ingredient) => {
+              const otherPercent = otherIngredients.get(ingredient);
+              if (otherPercent !== undefined && percent !== otherPercent) {
+                itemDifferences.add(ingredient);
+              }
+            });
+          }
+        });
+        
+        differences.set(index, itemDifferences);
+      });
+      
+      return differences;
+    };
+
+    const ingredientDifferences = getIngredientDifferences(items);
+
     // Generar HTML del resumen
-    const itemsHTML = items.map(item => {
+    const itemsHTML = items.map((item, index) => {
       // Extraer composición del título (ej: "Mix personalizado (Pera 20%, ...)")
       const match = item.title.match(/^(.*?)\s*\((.*)\)$/);
       const productName = match ? match[1] : item.title;
-      const composition = match ? match[2] : '';
+      let composition = match ? match[2] : '';
+      
+      // Destacar ingredientes que difieren
+      if (composition && ingredientDifferences.has(index)) {
+        const differentIngredients = ingredientDifferences.get(index)!;
+        composition = composition.split(',').map(ing => {
+          const ingMatch = ing.trim().match(/^(.+?)\s+(\d+)%$/);
+          if (ingMatch) {
+            const ingredient = ingMatch[1].trim();
+            const percent = ingMatch[2];
+            if (differentIngredients.has(ingredient)) {
+              return `<strong style="color: #fbbf24;">${ingredient} ${percent}%</strong>`;
+            }
+          }
+          return ing.trim();
+        }).join(', ');
+      }
       
       // Para mixs personalizados, mostrar precio original sin promos
       let displayPrice = item.unit_price * item.quantity;

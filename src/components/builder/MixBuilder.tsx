@@ -389,7 +389,7 @@ export function MixBuilder() {
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal flex flex-row justify-between gap-8">
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-8">
           <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
           <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
         </div>
@@ -674,15 +674,48 @@ export function MixBuilder() {
               <>
                 {cartItems.map((item, index) => {
                   const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+                  
+                  // Función para determinar si un ingrediente difiere de otros mixes
+                  const getIngredientDifferences = () => {
+                    const differences = new Set<string>();
+                    
+                    // Comparar con todos los otros mixes
+                    cartItems.forEach((otherItem, otherIndex) => {
+                      if (otherIndex !== index) {
+                        const otherTotal = Object.values(otherItem.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+                        
+                        INGREDIENTS.forEach((ing) => {
+                          const currentPercent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
+                          const otherPercent = otherTotal > 0 ? Math.round(((otherItem.mix[ing.id] ?? 0) / otherTotal) * 100) : 0;
+                          
+                          if (currentPercent !== otherPercent) {
+                            differences.add(ing.id);
+                          }
+                        });
+                      }
+                    });
+                    
+                    return differences;
+                  };
+                  
+                  const differentIngredients = getIngredientDifferences();
+                  
                   return (
-                    <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
+                    <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0 last:border-b-0">
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix de {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                           .map((ing) => {
                             const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
-                            return `${ing.name} ${percent}%`;
+                            const isDifferent = differentIngredients.has(ing.id);
+                            return (
+                              <span key={ing.id}>
+                                {isDifferent ? <strong className="text-yellow-400">{ing.name} {percent}%</strong> : `${ing.name} ${percent}%`}
+                              </span>
+                            );
                           })
-                          .join(", ")}</div>
+                          .reduce((acc, curr, idx, array) => {
+                            return idx === 0 ? [curr] : [...acc, ', ', curr];
+                          }, [] as React.ReactNode[])}</div>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
@@ -727,7 +760,7 @@ export function MixBuilder() {
                     </div>
                   );
                 })}
-                <div className="pt-2 w-full">
+                <div className="pt-2 pb-3 border-b w-full" style={{ paddingBottom: '1.25rem' }}>
                   <button 
                     onClick={() => {
                       const mixTitle = document.querySelector('h2');
@@ -758,7 +791,7 @@ export function MixBuilder() {
               >
                 ←
               </button>
-              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? "Ciudad Universitaria (free)" : "Córdoba ($1000 de envío)"}</span>
+              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? "Ciudad Universitaria ($0)" : "Córdoba Capital ($1000)"}</span>
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
                 className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
@@ -937,7 +970,7 @@ export function MixBuilder() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
