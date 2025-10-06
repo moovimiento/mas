@@ -892,21 +892,27 @@ export function MixBuilder() {
                 {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
-            {(pricing.discount > 0 || deliveryOption === "ciudad") && (
+            {deliveryOption === "ciudad" && (
               <div className="flex items-center justify-between">
-                <span className="text-green-600">Ahorro por las promos</span>
-                <span className="text-green-600">- {currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
+                <span className="text-green-600">Ahorro por envío gratuito</span>
+                <span className="text-green-600">- {currency.format(DELIVERY_COST)}</span>
               </div>
             )}
             {pricing.discountAmount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600">
                   {appliedDiscount?.type === 'percentage' 
-                    ? `Descuento del ${appliedDiscount.value}%`
-                    : 'Descuento por código'
+                    ? `Ahorro por descuento del ${appliedDiscount.value}%`
+                    : 'Ahorro por descuento por código'
                   }
                 </span>
                 <span className="text-green-600">- {currency.format(pricing.discountAmount)}</span>
+              </div>
+            )}
+            {pricing.discount > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-green-600">Ahorro por las promos</span>
+                <span className="text-green-600">- {currency.format(pricing.discount)}</span>
               </div>
             )}
             <div className="flex items-center justify-between pt-2 border-t border-gray-200">
