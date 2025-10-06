@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>
               <div style="text-align: center; margin-top: 16px;">
                 <a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                  💬 Coordinar ahora por WhatsApp
+                  Coordinar ahora por WhatsApp
                 </a>
               </div>
             </div>
