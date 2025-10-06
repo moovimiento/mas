@@ -330,23 +330,30 @@ export function MixBuilder() {
         setTimeout(() => setShakeRemaining(false), 500);
       }
       
-      // Apply 0 <-> 22 jump logic
-      if (delta > 0) {
-        if (current === 0 && nextVal > 0) {
-          // Jump to MIN_NONZERO only if there's enough space
-          nextVal = maxAllowedEven >= MIN_NONZERO ? MIN_NONZERO : 0;
-          if (nextVal === 0) {
-            setShakeRemaining(true);
-            setTimeout(() => setShakeRemaining(false), 500);
-          }
-        }
-        if (nextVal > 0 && nextVal < MIN_NONZERO) nextVal = MIN_NONZERO;
-      } else if (delta < 0) {
-        if (current <= MIN_NONZERO && nextVal < current) nextVal = 0;
-      }
+      // Round to nearest multiple of 11
+      nextVal = Math.round(nextVal / 11) * 11;
       return { ...prev, [id]: nextVal } as Mix;
     });
   }
+
+
+  function setClassicMix() {
+    setMix({
+      pera: 44,
+      almendras: 44,
+      nueces: 44,
+      uva: 44,
+      banana: 44,
+    });
+    // Quitar focus de cualquier input activo
+    if (document.activeElement && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }
+
+  const isClassicMix = useMemo(() => {
+    return Object.values(mix).every(value => value === 44);
+  }, [mix]);
 
   // Press-and-hold support for +/- buttons
   const holdTimer = useRef<NodeJS.Timeout | null>(null)
@@ -378,39 +385,44 @@ export function MixBuilder() {
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col md:flex-row md:gap-4">
-          <span>Mínimo por ingrediente: <span className="font-medium">22g o nada</span></span>
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-row justify-between gap-12">
+          <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
           <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-        <Card className="h-full flex flex-col">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <Card className="h-full flex flex-col" data-card="ingredients">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <CardTitle>Ingredientes</CardTitle>
               <div className="flex items-center gap-2">
-                <Badge 
-                  variant={remaining === 0 ? "default" : "secondary"}
-                  title={remaining > 0 ? `Agregá ${remaining}g más para completar tu mix` : "Mix completo - listo para agregar al carrito"}
-                >
-                  Total: {total}g
-                </Badge>
-                <Badge 
-                  variant={remaining === 0 ? "secondary" : "default"}
-                  className={shakeRemaining ? "animate-shake" : ""}
-                  title={remaining > 0 ? `Agregá ${remaining}g más para completar tu mix` : "Mix completo - listo para agregar al carrito"}
-                >
-                  Restan: {remaining}g
-                </Badge>
+                <div className="relative">
+                  <div className="w-24 h-6 bg-gray-300 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-300 ease-out"
+                      style={{ 
+                        width: `${Math.min((total / 220) * 100, 100)}%`,
+                        background: total === 220 ? 'linear-gradient(to right, #22c55e, #16a34a)' : // verde total solo en 220g
+                                   total < 55 ? 'linear-gradient(to right, #ef4444, #f97316)' : // rojo a naranja (0-25%)
+                                   total < 110 ? 'linear-gradient(to right, #f97316, #eab308)' : // naranja a amarillo (25-50%)
+                                   total < 165 ? 'linear-gradient(to right, #eab308, #facc15)' : // amarillo más intenso (50-75%)
+                                   'linear-gradient(to right, #eab308, #22c55e)' // amarillo a verde (75-99%)
+                      }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-700">
+                    {total}/220g
+                  </div>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 flex-1">
             {INGREDIENTS.map((ing) => (
-              <div key={ing.id} className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] items-center gap-2 sm:gap-3">
-                <div className={cn("font-medium text-center sm:text-left w-full sm:w-auto", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
-                <div className={cn("flex items-center gap-2 rounded-md w-full sm:w-auto justify-center sm:justify-end")}
+              <div key={ing.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] items-center gap-2 lg:gap-3">
+                <div className={cn("font-medium text-center lg:text-left w-full lg:w-auto", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
+                <div className={cn("flex items-center gap-1 rounded-md w-full lg:w-auto justify-center lg:justify-end")}
                 >
                   <Button
                     variant="outline"
@@ -418,17 +430,17 @@ export function MixBuilder() {
                     className="h-8 w-8 cursor-pointer flex-shrink-0"
                     onMouseDown={() => {
                       setSelectedId(ing.id);
-                      startHold(ing.id, -2);
+                      startHold(ing.id, -11);
                     }}
                     onMouseUp={stopHold}
                     onMouseLeave={stopHold}
                     onTouchStart={() => {
                       setSelectedId(ing.id);
-                      startHold(ing.id, -2);
+                      startHold(ing.id, -11);
                     }}
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
-                    aria-label={`Restar 2 gramos a ${ing.name}`}
+                    aria-label={`Restar 11 gramos a ${ing.name}`}
                     disabled={(mix[ing.id] ?? 0) <= 0}
                   >
                     -
@@ -457,17 +469,17 @@ export function MixBuilder() {
                     className="h-8 w-8 cursor-pointer flex-shrink-0"
                     onMouseDown={() => {
                       setSelectedId(ing.id);
-                      startHold(ing.id, +2);
+                      startHold(ing.id, +11);
                     }}
                     onMouseUp={stopHold}
                     onMouseLeave={stopHold}
                     onTouchStart={() => {
                       setSelectedId(ing.id);
-                      startHold(ing.id, +2);
+                      startHold(ing.id, +11);
                     }}
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
-                    aria-label={`Sumar 2 gramos a ${ing.name}`}
+                    aria-label={`Sumar 11 gramos a ${ing.name}`}
                     disabled={remaining <= 0}
                   >
                     +
@@ -476,7 +488,20 @@ export function MixBuilder() {
               </div>
             ))}
 
-            <div className="flex items-center justify-center pt-2">
+            <div className="flex items-center justify-between pt-2">
+              <Button
+                variant="outline"
+                onClick={setClassicMix}
+                disabled={isClassicMix}
+                className={cn(
+                  "!bg-transparent !border-gray-200 !text-white hover:!bg-white/20 hover:!border-gray-300",
+                  isClassicMix && "opacity-50 cursor-not-allowed"
+                )}
+                title={isClassicMix ? "Ya es mix clásico" : "Poner todos los ingredientes en 44g"}
+                aria-label="Mix clásico (44g cada ingrediente)"
+              >
+                Mix clásico (≡)
+              </Button>
               <Button
                 onClick={() => {
                   if (!isValid) {
@@ -501,7 +526,7 @@ export function MixBuilder() {
                     setCartItems((prev) => [...prev, { mix, quantity: 1 }]);
                   }
                   if (cartItems.length === 0) {
-                    setDeliveryOption("envio");
+                    setDeliveryOption("ciudad");
                   }
                   // Scroll al carrito después de agregar
                   setTimeout(() => {
@@ -628,7 +653,19 @@ export function MixBuilder() {
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
-              <div className="text-muted-foreground pb-4">No hay mixs en el carrito. Armalo arriba y agregalo.</div>
+              <div className="text-muted-foreground py-6">
+                No hay mixs en el carrito 🛒 <button 
+                  onClick={() => {
+                    const mixTitle = document.querySelector('h2');
+                    if (mixTitle) {
+                      mixTitle.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="text-white hover:text-gray-200 cursor-pointer"
+                >
+                  Armalo arriba y agregalo
+                </button>
+              </div>
             ) : (
               <>
                 {cartItems.map((item, index) => {
@@ -636,12 +673,17 @@ export function MixBuilder() {
                   return (
                     <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="font-medium">Mix (220 g)</div>
+                        <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix de {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                          .map((ing) => {
+                            const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
+                            return `${ing.name} ${percent}%`;
+                          })
+                          .join(", ")}</div>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8 cursor-pointer"
+                            className="h-8 w-8 cursor-pointer text-yellow-500 hover:text-yellow-600 transition-colors border border-yellow-500 rounded"
                             onClick={() => {
                               setCartItems((prev) =>
                                 prev
@@ -660,11 +702,11 @@ export function MixBuilder() {
                           >
                             -
                           </Button>
-                          <span className="min-w-6 text-center">{item.quantity}</span>
+                          <span className="min-w-6 text-center text-yellow-600 font-medium">x {item.quantity}</span>
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8 cursor-pointer"
+                            className="h-8 w-8 cursor-pointer text-yellow-500 hover:text-yellow-600 transition-colors border border-yellow-500 rounded"
                             onClick={() =>
                               setCartItems((prev) =>
                                 prev.map((cartItem, i) =>
@@ -678,17 +720,22 @@ export function MixBuilder() {
                           </Button>
                         </div>
                       </div>
-                      <div className="text-muted-foreground">
-                        ({INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
-                          .map((ing) => {
-                            const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
-                            return `${ing.name} ${percent}%`;
-                          })
-                          .join(", ")})
-                      </div>
                     </div>
                   );
                 })}
+                <div className="pt-2 w-full">
+                  <button 
+                    onClick={() => {
+                      const mixTitle = document.querySelector('h2');
+                      if (mixTitle) {
+                        mixTitle.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                    className="text-white hover:text-gray-200 cursor-pointer text-sm text-left w-full block"
+                  >
+                    ↑ Volver arriba para agregar un mix con otros ingredientes
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -702,15 +749,15 @@ export function MixBuilder() {
             <div className="text-right flex items-center justify-end gap-2">
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
-                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer flex-shrink-0"
+                className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Opción anterior de delivery"
               >
                 ←
               </button>
-              <span className="whitespace-nowrap">{deliveryOption === "ciudad" ? "Ciudad Universitaria (free)" : "Córdoba ($1000 de envío)"}</span>
+              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? "Ciudad Universitaria (free)" : "Córdoba ($1000 de envío)"}</span>
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
-                className="text-muted-foreground hover:text-foreground transition-colors border border-border rounded px-1 cursor-pointer flex-shrink-0"
+                className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Siguiente opción de delivery"
               >
                 →
@@ -843,7 +890,7 @@ export function MixBuilder() {
             </div>
             {(pricing.discount > 0 || deliveryOption === "ciudad") && (
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Ahorro por promos</span>
+                <span className="text-green-600">Ahorro por las promos</span>
                 <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
               </div>
             )}
