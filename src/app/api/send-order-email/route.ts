@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>
               <div style="text-align: center; margin-top: 16px;">
                 <a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                  💬 Hablar por WhatsApp
+                  💬 Coordinar ahora por WhatsApp
                 </a>
               </div>
             </div>
@@ -163,11 +163,11 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0 0 8px 0; font-size: 16px;">
                 <strong>⚠️ Último paso: completá el pago</strong>
               </p>
-              <p style="margin: 0;">Tu pedido está reservado. Para confirmarlo, hacé click en el botón de abajo <strong>si todavía no lo hiciste</strong>:</p>
+              <p style="margin: 0;">Tu pedido está reservado. <strong>Si todavía no lo abonaste</strong> hacé click en el botón de abajo:</p>
               ${paymentLink ? `
                 <div style="text-align: center; margin-top: 16px;">
                   <a href="${paymentLink}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    💳 Pagar con Mercado Pago
+                    💳 Abonar ahora con Mercado Pago
                   </a>
                 </div>
               ` : ''}
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
             </p>
             ` : `
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
-              ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a>, <a href="https://wa.me/5493513239624">por WhatsApp</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+              ¿Tenés alguna duda? Escribinos a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
             </p>
             `}
 
