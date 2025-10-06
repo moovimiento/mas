@@ -903,7 +903,7 @@ export function MixBuilder() {
                 <span className="text-green-600">
                   {appliedDiscount?.type === 'percentage' 
                     ? `Ahorro por descuento del ${appliedDiscount.value}%`
-                    : 'Ahorro por descuento por código'
+                    : 'Ahorro por código de descuento'
                   }
                 </span>
                 <span className="text-green-600">- {currency.format(pricing.discountAmount)}</span>
@@ -917,12 +917,20 @@ export function MixBuilder() {
             )}
             <div className="flex items-center justify-between pt-2 border-t border-gray-200">
               <span className="font-medium">
-                {deliveryOption === "ciudad" && (pricing.discount > 0 || pricing.discountAmount > 0)
-                  ? "Total (con promos y envío gratis)"
+                {deliveryOption === "ciudad" && pricing.discount > 0 && pricing.discountAmount > 0
+                  ? "Total (con promo, descuento y envío gratis)"
+                  : deliveryOption === "ciudad" && pricing.discount > 0
+                  ? "Total (con promo y envío gratis)"
+                  : deliveryOption === "ciudad" && pricing.discountAmount > 0
+                  ? "Total (con descuento y envío gratis)"
                   : deliveryOption === "ciudad"
                   ? "Total (con envío gratis)"
-                  : (pricing.discount > 0 || pricing.discountAmount > 0)
-                  ? "Total (con descuentos)"
+                  : pricing.discount > 0 && pricing.discountAmount > 0
+                  ? "Total (con promo y descuento)"
+                  : pricing.discount > 0
+                  ? "Total (con promo)"
+                  : pricing.discountAmount > 0
+                  ? "Total (con descuento)"
                   : "Total"}
               </span>
               <span className="font-semibold">{currency.format(pricing.price)}</span>
@@ -995,6 +1003,10 @@ export function MixBuilder() {
                     setShowSuccessModal(true);
                     // Limpiar carrito después del envío exitoso
                     setCartItems([]);
+                    // Limpiar descuento aplicado
+                    setAppliedDiscount(null);
+                    setDiscountCode("");
+                    setDiscountError("");
                     // Setear mix clásico
                     setMix({
                       pera: 44,
@@ -1027,6 +1039,18 @@ export function MixBuilder() {
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
                 try {
+                  // Calcular precio con promos aplicadas
+                  const totalMixQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+                  let precioConPromo = totalMixQty * PRICE_SINGLE;
+                  
+                  if (totalMixQty >= 15) {
+                    precioConPromo = 53000; // 15 mixs por $53.000
+                  } else if (totalMixQty >= 5) {
+                    precioConPromo = 18000; // 5 mixs por $18.000
+                  }
+                  
+                  const precioUnitarioConPromo = totalMixQty > 0 ? precioConPromo / totalMixQty : PRICE_SINGLE;
+
                   // Preparar items para Mercado Pago
                   const mixItems = cartItems.map((item) => {
                     const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
@@ -1041,7 +1065,7 @@ export function MixBuilder() {
                     return {
                       title: `Mix personalizado (${ingredients})`,
                       quantity: item.quantity,
-                      unit_price: PRICE_SINGLE,
+                      unit_price: precioUnitarioConPromo,
                     };
                   });
 
@@ -1149,6 +1173,10 @@ export function MixBuilder() {
                 setShowSuccessModal(false);
                 // Limpiar carrito y setear mix clásico
                 setCartItems([]);
+                // Limpiar descuento aplicado
+                setAppliedDiscount(null);
+                setDiscountCode("");
+                setDiscountError("");
                 setMix({
                   pera: 44,
                   almendras: 44,
