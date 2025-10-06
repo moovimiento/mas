@@ -93,6 +93,7 @@ export function MixBuilder() {
     }
     return null;
   });
+  const [discountError, setDiscountError] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_cartItems');
@@ -207,7 +208,7 @@ export function MixBuilder() {
 
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
-      alert('Por favor ingresa un código de descuento');
+      setDiscountError("Por favor ingrese un código de descuento válido");
       return;
     }
 
@@ -218,9 +219,9 @@ export function MixBuilder() {
         type: discount.type,
         value: discount.value,
       });
-      alert(`¡Código aplicado! ${discount.description}`);
+      setDiscountError("");
     } else {
-      alert('Código de descuento inválido');
+      setDiscountError("Por favor ingrese un código de descuento válido");
     }
   };
 
@@ -385,7 +386,7 @@ export function MixBuilder() {
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal flex flex-row justify-between gap-12">
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-row justify-between gap-8">
           <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
           <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
         </div>
@@ -843,7 +844,10 @@ export function MixBuilder() {
                 type="text"
                 placeholder="Tu código de descuento"
                 value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
+                onChange={(e) => {
+                  setDiscountCode(e.target.value);
+                  setDiscountError("");
+                }}
                 className="flex-1"
                 disabled={!!appliedDiscount}
               />
@@ -878,6 +882,11 @@ export function MixBuilder() {
                 </span>
               </div>
             )}
+            {discountError && (
+              <div className="text-sm text-white">
+                {discountError}
+              </div>
+            )}
           </div>
 
           {/* Precios */}
@@ -896,7 +905,9 @@ export function MixBuilder() {
             )}
             {pricing.discountAmount > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Descuento por código</span>
+                <span className="text-green-600">
+                  Descuento por código{appliedDiscount?.type === 'percentage' ? ` (${appliedDiscount.value}%)` : ''}
+                </span>
                 <span className="text-green-600">-{currency.format(pricing.discountAmount)}</span>
               </div>
             )}
