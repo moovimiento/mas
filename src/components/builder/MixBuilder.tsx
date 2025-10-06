@@ -964,11 +964,11 @@ export function MixBuilder() {
                   } else {
                     const errorData = await emailResponse.json();
                     console.error('Error del servidor:', errorData);
-                    setErrorMessage(`Error al enviar el email: ${errorData.error || 'Error desconocido'}`);
+                    setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
                   }
                 } catch (error) {
                   console.error('Error al procesar el pedido:', error);
-                  setErrorMessage("Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.");
+                  setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
                 }
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
@@ -1027,7 +1027,7 @@ export function MixBuilder() {
 
                   if (data.error) {
                     console.error("API Error:", data.error);
-                    setErrorMessage(`Error: ${data.error}`);
+                    setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
                     return;
                   }
 
@@ -1057,11 +1057,11 @@ export function MixBuilder() {
                     checkoutUrl.searchParams.set('locale', 'es-AR');
                     window.location.href = checkoutUrl.toString();
                   } else {
-                    setErrorMessage("Error al crear el checkout");
+                    setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
                   }
                 } catch (error) {
                   console.error("Error:", error);
-                  setErrorMessage("Error al procesar el checkout");
+                  setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
                 }
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
@@ -1072,7 +1072,7 @@ export function MixBuilder() {
           
           {/* Mensaje de error */}
           {errorMessage && (
-            <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className="mt-4 p-3 bg-transparent border border-red-400 text-red-700 rounded">
               {errorMessage}
               <button
                 onClick={() => setErrorMessage("")}

@@ -24,10 +24,31 @@ interface EmailBody {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("Iniciando envío de email...");
     const body = await request.json() as EmailBody;
     const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink, paymentMethod, discountCode, discountAmount } = body;
+    
+    console.log("Datos recibidos:", { 
+      email, 
+      name, 
+      phone, 
+      itemsCount: items.length, 
+      deliveryOption, 
+      paymentMethod,
+      totalPrice 
+    });
+
+    // Verificar que la API key de Resend esté configurada
+    if (!process.env.RESEND_API_KEY) {
+      console.error("RESEND_API_KEY no está configurada");
+      return NextResponse.json(
+        { error: "Hubo un error: Por favor intente nuevamente más tarde" },
+        { status: 500 }
+      );
+    }
 
     // Inicializar Resend solo cuando se necesita
+    console.log("Inicializando Resend...");
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const currency = new Intl.NumberFormat("es-AR", { 
@@ -59,7 +80,8 @@ export async function POST(request: NextRequest) {
       ? "Ciudad Universitaria (Envío gratuito)" 
       : `Córdoba (${currency.format(1000)})`;
 
-    await resend.emails.send({
+    console.log("Enviando email...");
+    const result = await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
@@ -176,11 +198,13 @@ export async function POST(request: NextRequest) {
       `,
     });
 
+    console.log("Email enviado exitosamente:", result);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error sending email:", error);
+    
     return NextResponse.json(
-      { error: "Error al enviar el email" },
+      { error: "Hubo un error: Por favor intente nuevamente más tarde" },
       { status: 500 }
     );
   }
