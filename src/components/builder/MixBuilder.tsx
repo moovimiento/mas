@@ -940,11 +940,21 @@ export function MixBuilder() {
                       .join(", ");
                     
                     return {
-                      mix: item.mix,
+                      title: `Mix personalizado (${ingredients})`,
                       quantity: item.quantity,
-                      ingredients
+                      unit_price: PRICE_SINGLE,
                     };
                   });
+
+                  // Agregar delivery si corresponde
+                  const items = [...mixItems];
+                  if (deliveryOption === "envio") {
+                    items.push({
+                      title: "Envío a Córdoba",
+                      quantity: 1,
+                      unit_price: DELIVERY_COST,
+                    });
+                  }
 
                   // Enviar email de confirmación para pago en efectivo
                   const emailResponse = await fetch('/api/send-order-email', {
@@ -956,7 +966,7 @@ export function MixBuilder() {
                       name,
                       email,
                       phone,
-                      items: mixItems,
+                      items: items,
                       deliveryOption,
                       deliveryAddress,
                       totalPrice: pricing.price,
