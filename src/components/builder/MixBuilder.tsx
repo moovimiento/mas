@@ -127,10 +127,10 @@ export function MixBuilder() {
     ) as Record<IngredientId, number>;
   }, [mix, total]);
 
-  // Pricing (ARS): base 4000 per mix; promos -> 5 for 18000, 15 for 48000
+  // Pricing (ARS): base 4000 per mix; promos -> 5 for 18000, 15 for 53000
   const PRICE_SINGLE = 4000;
   const PRICE_PACK5 = 18000;  // per 5
-  const PRICE_PACK15 = 48000; // per 15
+  const PRICE_PACK15 = 53000; // per 15
   const DELIVERY_COST = 1000;
 
   const currency = useMemo(() => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }), []);

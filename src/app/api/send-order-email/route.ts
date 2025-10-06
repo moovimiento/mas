@@ -121,6 +121,15 @@ export async function POST(request: NextRequest) {
               </thead>
               <tbody>
                 ${itemsHTML}
+                ${deliveryOption === "ciudad" ? `
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #eee;">
+                    <strong>Envío a Córdoba</strong>
+                  </td>
+                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">1</td>
+                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(1000)}</td>
+                </tr>
+                ` : ''}
               </tbody>
             </table>
 
@@ -148,6 +157,7 @@ export async function POST(request: NextRequest) {
               // Calcular descuento por promos
               const precioUnitario = 4000;
               const precioSinPromo = totalMixQty * precioUnitario;
+              const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
               
               // Calcular precio con promos aplicadas
               let precioConPromo = precioSinPromo;
@@ -158,13 +168,18 @@ export async function POST(request: NextRequest) {
               }
               
               const descuentoPromo = precioSinPromo - precioConPromo;
+              const ahorroTotal = descuentoPromo + costoEnvio;
               
-              if (descuentoPromo > 0) {
+              if (ahorroTotal > 0) {
+                const textoPromo = deliveryOption === "ciudad" 
+                  ? `🎉 Promo por cantidad (${totalMixQty} mixs) + Envío gratuito a Ciudad Universitaria`
+                  : `🎉 Promo por cantidad (${totalMixQty} mixs)`;
+                
                 return `
                 <h3>Ahorro por promos:</h3>
                 <div style="background-color: #f0fdf4; border: 1px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 4px;">
-                  <p style="margin: 0; color: #16a34a;"><strong>🎉 Promo por cantidad (${totalMixQty} mixs)</strong></p>
-                  <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(descuentoPromo)}</p>
+                  <p style="margin: 0; color: #16a34a;"><strong>${textoPromo}</strong></p>
+                  <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(ahorroTotal)}</p>
                 </div>
                 `;
               }
