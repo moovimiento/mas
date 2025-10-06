@@ -851,7 +851,7 @@ export function MixBuilder() {
                 className="flex-1"
                 disabled={!!appliedDiscount}
               />
-              {!appliedDiscount ? (
+              {!appliedDiscount && (
                 <Button
                   variant="outline"
                   onClick={handleApplyDiscount}
