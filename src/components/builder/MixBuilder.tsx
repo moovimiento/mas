@@ -389,7 +389,7 @@ export function MixBuilder() {
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-8">
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-8 pt-2">
           <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
           <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
         </div>
@@ -652,12 +652,12 @@ export function MixBuilder() {
       {/* Carrito debajo del builder */}
       <Card ref={cartRef}>
         <CardHeader>
-          <CardTitle>Carrito</CardTitle>
+          <CardTitle>Carrito de Compra</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
-              <div className="text-muted-foreground py-6">
+              <div className="text-muted-foreground py-5 border-t border-b border-gray-200/10">
                 No hay mixs en el carrito 🛒 <button 
                   onClick={() => {
                     const mixTitle = document.querySelector('h2');
@@ -667,7 +667,7 @@ export function MixBuilder() {
                   }}
                   className="text-white hover:text-gray-200 cursor-pointer"
                 >
-                  Armalo arriba y agregalo
+                  Armalo arriba y agregalo ↑
                 </button>
               </div>
             ) : (
@@ -770,7 +770,7 @@ export function MixBuilder() {
                     }}
                     className="text-white hover:text-gray-200 cursor-pointer text-sm text-left w-full block"
                   >
-                    ↑ Volver arriba para agregar un mix con otros ingredientes
+                    Volver arriba para agregar un mix con otros ingredientes ↑
                   </button>
                 </div>
               </>
@@ -948,7 +948,7 @@ export function MixBuilder() {
                 <span className="text-green-600">- {currency.format(pricing.discount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+            <div className="flex items-center justify-between pt-2 mt-3 border-t border-gray-200/70">
               <span className="font-medium">
                 {deliveryOption === "ciudad" && pricing.discount > 0 && pricing.discountAmount > 0
                   ? "Total (con promo, descuento y envío gratis)"

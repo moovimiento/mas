@@ -47,7 +47,7 @@ export default function Home() {
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-4 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos a tu manera</h1>
-            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados.<br /><span className="hidden md:inline">Delivery gratuito a Ciudad Universitaria.</span></p>
+            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados<br /><span className="hidden lg:inline">Delivery gratuito en Ciudad Universitaria</span></p>
           </div>
           <div className="flex justify-center">
             <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block rounded-lg overflow-hidden shadow-sm">
