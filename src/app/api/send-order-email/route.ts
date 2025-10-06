@@ -38,6 +38,15 @@ export async function POST(request: NextRequest) {
       totalPrice 
     });
 
+    // Validar datos requeridos
+    if (!email || !phone || !items || items.length === 0) {
+      console.error("Datos faltantes:", { email: !!email, phone: !!phone, items: items?.length });
+      return NextResponse.json(
+        { error: "Hubo un error: Por favor intente nuevamente más tarde" },
+        { status: 400 }
+      );
+    }
+
     // Verificar que la API key de Resend esté configurada
     if (!process.env.RESEND_API_KEY) {
       console.error("RESEND_API_KEY no está configurada");
@@ -81,7 +90,10 @@ export async function POST(request: NextRequest) {
       : `Córdoba (${currency.format(1000)})`;
 
     console.log("Enviando email...");
-    const result = await resend.emails.send({
+    
+    let result;
+    try {
+      result = await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
@@ -196,7 +208,11 @@ export async function POST(request: NextRequest) {
           </body>
         </html>
       `,
-    });
+      });
+    } catch (resendError) {
+      console.error("Error específico de Resend:", resendError);
+      throw resendError;
+    }
 
     console.log("Email enviado exitosamente:", result);
     return NextResponse.json({ success: true });

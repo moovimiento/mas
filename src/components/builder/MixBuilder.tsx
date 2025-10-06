@@ -85,6 +85,24 @@ export function MixBuilder() {
   const [discountError, setDiscountError] = useState<string>("");
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // Función helper para hacer requests con timeout
+  const fetchWithTimeout = async (url: string, options: RequestInit, timeout = 10000) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  };
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_cartItems');
@@ -968,7 +986,13 @@ export function MixBuilder() {
                   }
                 } catch (error) {
                   console.error('Error al procesar el pedido:', error);
-                  setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
+                  
+                  // Detectar errores de red específicos
+                  if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    setErrorMessage("Error de conexión. Verifica tu internet e intenta nuevamente.");
+                  } else {
+                    setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
+                  }
                 }
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
@@ -1061,7 +1085,13 @@ export function MixBuilder() {
                   }
                 } catch (error) {
                   console.error("Error:", error);
-                  setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
+                  
+                  // Detectar errores de red específicos
+                  if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    setErrorMessage("Error de conexión. Verifica tu internet e intenta nuevamente.");
+                  } else {
+                    setErrorMessage("Hubo un error: Por favor intente nuevamente más tarde");
+                  }
                 }
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
@@ -1101,6 +1131,7 @@ export function MixBuilder() {
             <Button
               onClick={() => {
                 setShowSuccessModal(false);
+                window.scrollTo(0, 0);
                 window.location.reload();
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white"
