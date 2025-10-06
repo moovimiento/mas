@@ -76,23 +76,12 @@ export function MixBuilder() {
     }
     return "";
   });
-  const [discountCode, setDiscountCode] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('moovimiento_discountCode') || "";
-    }
-    return "";
-  });
+  const [discountCode, setDiscountCode] = useState<string>("");
   const [appliedDiscount, setAppliedDiscount] = useState<{
     code: string;
     type: 'percentage' | 'fixed';
     value: number;
-  } | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('moovimiento_appliedDiscount');
-      return saved ? JSON.parse(saved) : null;
-    }
-    return null;
-  });
+  } | null>(null);
   const [discountError, setDiscountError] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
@@ -259,13 +248,7 @@ export function MixBuilder() {
     localStorage.setItem('moovimiento_email', email);
   }, [email]);
 
-  useEffect(() => {
-    localStorage.setItem('moovimiento_discountCode', discountCode);
-  }, [discountCode]);
 
-  useEffect(() => {
-    localStorage.setItem('moovimiento_appliedDiscount', JSON.stringify(appliedDiscount));
-  }, [appliedDiscount]);
 
   const pricing = useMemo(() => {
     const basePrice = computePrice(totalMixQty);
@@ -899,7 +882,7 @@ export function MixBuilder() {
               <div className="flex items-center justify-between">
                 <span className="text-green-600">
                   {appliedDiscount?.type === 'percentage' 
-                    ? `Descuento del ${appliedDiscount.value}% por código`
+                    ? `Descuento del ${appliedDiscount.value}%`
                     : 'Descuento por código'
                   }
                 </span>
