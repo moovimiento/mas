@@ -143,20 +143,21 @@ export async function POST(request: NextRequest) {
             ` : ''}
 
             <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar: ${currency.format(totalPrice)}</p>
+              <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar en efectivo: ${currency.format(totalPrice)}</p>
             </div>
 
             ${paymentMethod === 'efectivo' ? `
             <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
               <p style="margin: 0 0 8px 0; font-size: 16px;">
-                <strong>📱 ¡Pedido confirmado! Te contactaremos por WhatsApp</strong>
+                <strong>📱 ¡Te contactaremos por WhatsApp!</strong>
               </p>
-              <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar por WhatsApp para coordinar la entrega y el pago en efectivo.</p>
+              <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>
+              <div style="text-align: center; margin-top: 16px;">
+                <a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                  💬 Hablar por WhatsApp
+                </a>
+              </div>
             </div>
-
-            <p style="margin-top: 30px; font-size: 14px; color: #666;">
-              Te contactaremos pronto por WhatsApp para coordinar la entrega y el pago en efectivo 📦💵
-            </p>
             ` : `
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">
               <p style="margin: 0 0 8px 0; font-size: 16px;">
@@ -177,9 +178,15 @@ export async function POST(request: NextRequest) {
             </p>
             `}
 
+            ${paymentMethod === 'efectivo' ? `
+            <p style="margin-top: 20px; font-size: 14px; color: #666;">
+              ¿Tenés alguna duda? Escribinos a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+            </p>
+            ` : `
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
               ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a>, <a href="https://wa.me/5493513239624">por WhatsApp</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
             </p>
+            `}
 
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
               ¡Gracias por confiar en nosotros! ⚡<br>
