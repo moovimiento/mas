@@ -83,6 +83,8 @@ export function MixBuilder() {
     value: number;
   } | null>(null);
   const [discountError, setDiscountError] = useState<string>("");
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_cartItems');
@@ -903,7 +905,7 @@ export function MixBuilder() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between sm:justify-end sm:gap-3">
+          <div className="flex items-center justify-between">
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
@@ -948,7 +950,8 @@ export function MixBuilder() {
                   });
 
                   if (emailResponse.ok) {
-                    alert("¡Pedido confirmado! Te contactaremos por WhatsApp para coordinar la entrega y el pago en efectivo.");
+                    setErrorMessage(""); // Limpiar errores previos
+                    setShowSuccessModal(true);
                     // Limpiar carrito después del envío exitoso
                     setCartItems([]);
                     setMix({
@@ -960,11 +963,12 @@ export function MixBuilder() {
                     });
                   } else {
                     const errorData = await emailResponse.json();
-                    alert(`Error: ${errorData.error}`);
+                    console.error('Error del servidor:', errorData);
+                    setErrorMessage(`Error al enviar el email: ${errorData.error || 'Error desconocido'}`);
                   }
                 } catch (error) {
                   console.error('Error al procesar el pedido:', error);
-                  alert("Error al procesar el pedido");
+                  setErrorMessage("Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.");
                 }
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
@@ -1023,11 +1027,12 @@ export function MixBuilder() {
 
                   if (data.error) {
                     console.error("API Error:", data.error);
-                    alert(`Error: ${data.error}`);
+                    setErrorMessage(`Error: ${data.error}`);
                     return;
                   }
 
                   if (data.init_point) {
+                    setErrorMessage(""); // Limpiar errores previos
                     // Enviar email con resumen y link de pago
                     await fetch("/api/send-order-email", {
                       method: "POST",
@@ -1052,11 +1057,11 @@ export function MixBuilder() {
                     checkoutUrl.searchParams.set('locale', 'es-AR');
                     window.location.href = checkoutUrl.toString();
                   } else {
-                    alert("Error al crear el checkout");
+                    setErrorMessage("Error al crear el checkout");
                   }
                 } catch (error) {
                   console.error("Error:", error);
-                  alert("Error al procesar el checkout");
+                  setErrorMessage("Error al procesar el checkout");
                 }
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
@@ -1064,8 +1069,47 @@ export function MixBuilder() {
               Abonar con Mercado Pago
             </Button>
           </div>
+          
+          {/* Mensaje de error */}
+          {errorMessage && (
+            <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {errorMessage}
+              <button
+                onClick={() => setErrorMessage("")}
+                className="ml-2 text-red-500 hover:text-red-700 font-bold"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Modal de éxito para pago en efectivo */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              ¡Pedido confirmado!
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Te contactaremos por WhatsApp para coordinar la entrega y el pago en efectivo.
+              <br />
+              <strong>Revisá tu email para más detalles.</strong>
+            </p>
+            <Button
+              onClick={() => {
+                setShowSuccessModal(false);
+                window.location.reload();
+              }}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white"
+            >
+              Cerrar
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
