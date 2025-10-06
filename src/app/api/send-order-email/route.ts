@@ -75,6 +75,12 @@ export async function POST(request: NextRequest) {
       const productName = match ? match[1] : item.title;
       const composition = match ? match[2] : '';
       
+      // Para mixs personalizados, mostrar precio original sin promos
+      let displayPrice = item.unit_price * item.quantity;
+      if (productName.includes('Mix personalizado')) {
+        displayPrice = 4000 * item.quantity; // Precio original sin promos
+      }
+      
       return `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #eee;">
@@ -82,10 +88,67 @@ export async function POST(request: NextRequest) {
             ${composition ? `<br><span style="font-size: 13px; color: #666; line-height: 1.6;">${composition}</span>` : ''}
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(item.unit_price * item.quantity)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(displayPrice)}</td>
         </tr>
       `;
     }).join('');
+
+    // Calcular ahorros para mostrar en la tabla
+    const precioUnitario = 4000;
+    const precioSinPromo = totalMixQty * precioUnitario;
+    const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
+    
+    // Calcular precio con promos aplicadas
+    let precioConPromo = precioSinPromo;
+    if (totalMixQty >= 15) {
+      precioConPromo = 53000; // 15 mixs por $53.000 (ahorro de $7.000)
+    } else if (totalMixQty >= 5) {
+      precioConPromo = 18000; // 5 mixs por $18.000 (ahorro de $2.000)
+    }
+    
+    const descuentoPromo = precioSinPromo - precioConPromo;
+    
+    // Generar filas de ahorros
+    let ahorrosHTML = '';
+    
+    // Ahorro por envío gratuito
+    if (costoEnvio > 0) {
+      ahorrosHTML += `
+        <tr style="background-color: #f0fdf4;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+            <strong>🚚 Ahorro por envío gratuito</strong>
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(costoEnvio)}</td>
+        </tr>
+      `;
+    }
+    
+    // Ahorro por descuento por código
+    if (discountCode && discountAmount && discountAmount > 0) {
+      ahorrosHTML += `
+        <tr style="background-color: #f0fdf4;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+            <strong>🎉 Ahorro por código de descuento</strong>
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(discountAmount)}</td>
+        </tr>
+      `;
+    }
+    
+    // Ahorro por promos
+    if (descuentoPromo > 0) {
+      ahorrosHTML += `
+        <tr style="background-color: #f0fdf4;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+            <strong>🎉 Ahorro por promos</strong>
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(descuentoPromo)}</td>
+        </tr>
+      `;
+    }
 
     const deliveryText = deliveryOption === "ciudad" 
       ? "Ciudad Universitaria (Envío gratuito)" 
@@ -130,6 +193,7 @@ export async function POST(request: NextRequest) {
                   <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(1000)}</td>
                 </tr>
                 ` : ''}
+                ${ahorrosHTML}
               </tbody>
             </table>
 
