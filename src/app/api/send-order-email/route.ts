@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
       itemsCount: items.length, 
       deliveryOption, 
       paymentMethod,
-      totalPrice 
+      totalPrice,
+      discountCode,
+      discountAmount
     });
 
     // Validar datos requeridos
@@ -141,6 +143,24 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0; color: #16a34a;">Descuento: ${currency.format(discountAmount)}</p>
             </div>
             ` : ''}
+
+            ${(() => {
+              // Calcular descuento por promos
+              const precioUnitario = 4000;
+              const precioSinPromo = totalMixQty * precioUnitario;
+              const descuentoPromo = precioSinPromo - totalPrice;
+              
+              if (descuentoPromo > 0) {
+                return `
+                <h3>Ahorro por promos:</h3>
+                <div style="background-color: #f0fdf4; border: 1px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 4px;">
+                  <p style="margin: 0; color: #16a34a;"><strong>🎉 Promo por cantidad (${totalMixQty} mixs)</strong></p>
+                  <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(descuentoPromo)}</p>
+                </div>
+                `;
+              }
+              return '';
+            })()}
 
             <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
               <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar en efectivo: ${currency.format(totalPrice)}</p>

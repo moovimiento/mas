@@ -956,6 +956,13 @@ export function MixBuilder() {
                     });
                   }
 
+                  // Debug: verificar datos de descuento
+                  console.log('Datos de descuento:', {
+                    appliedDiscount,
+                    discountAmount: pricing.discountAmount,
+                    discountCode: appliedDiscount?.code
+                  });
+
                   // Enviar email de confirmación para pago en efectivo
                   const emailResponse = await fetch('/api/send-order-email', {
                     method: 'POST',
@@ -1164,7 +1171,7 @@ export function MixBuilder() {
             
             {/* Botón principal de WhatsApp */}
             <a
-              href="https://wa.me/5493513239624?text=Hola!%20Confirmo%20mi%20pedido%20personalizado%20de%20Mix%20de%20Frutos%20Secos%20y%20quiero%20coordinar%20la%20entrega%20y%20pago%20en%20efectivo.%20Gracias!"
+              href="https://wa.me/5493513239624?text=Hola!%20Confirmo%20mi%20pedido%20personalizado%20de%20Mix(s)%20de%20Frutos%20Secos%20y%20quiero%20coordinar%20la%20entrega%20y%20pago%20en%20efectivo.%20Gracias!"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors mb-4"
