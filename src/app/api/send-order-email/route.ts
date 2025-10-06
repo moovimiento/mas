@@ -148,7 +148,16 @@ export async function POST(request: NextRequest) {
               // Calcular descuento por promos
               const precioUnitario = 4000;
               const precioSinPromo = totalMixQty * precioUnitario;
-              const descuentoPromo = precioSinPromo - totalPrice;
+              
+              // Calcular precio con promos aplicadas
+              let precioConPromo = precioSinPromo;
+              if (totalMixQty >= 15) {
+                precioConPromo = 53000; // 15 mixs por $53.000 (ahorro de $7.000)
+              } else if (totalMixQty >= 5) {
+                precioConPromo = 18000; // 5 mixs por $18.000 (ahorro de $2.000)
+              }
+              
+              const descuentoPromo = precioSinPromo - precioConPromo;
               
               if (descuentoPromo > 0) {
                 return `
