@@ -17,6 +17,7 @@ interface EmailBody {
   totalPrice: number;
   totalMixQty: number;
   paymentLink?: string;
+  paymentMethod?: string;
   discountCode?: string | null;
   discountAmount?: number;
 }
@@ -24,7 +25,7 @@ interface EmailBody {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as EmailBody;
-    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink, discountCode, discountAmount } = body;
+    const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink, paymentMethod, discountCode, discountAmount } = body;
 
     // Inicializar Resend solo cuando se necesita
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
-      subject: "🎉 ¡Tu pedido de Frutos Secos está casi listo!",
+      subject: paymentMethod === 'efectivo' ? "📱 ¡Tu pedido está confirmado! Te contactaremos por WhatsApp" : "🎉 ¡Tu pedido de Frutos Secos está casi listo!",
       html: `
         <!DOCTYPE html>
         <html>
@@ -129,6 +130,18 @@ export async function POST(request: NextRequest) {
                   <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar: ${currency.format(totalPrice)}</p>
                 </div>
 
+                ${paymentMethod === 'efectivo' ? `
+                <div class="warning-box" style="background-color: #dbeafe; border-left-color: #3b82f6;">
+                  <p style="margin: 0 0 8px 0; font-size: 16px;">
+                    <strong>📱 ¡Pedido confirmado! Te contactaremos por WhatsApp</strong>
+                  </p>
+                  <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar por WhatsApp para coordinar la entrega y el pago en efectivo.</p>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 14px; color: #666;">
+                  Te contactaremos pronto por WhatsApp para coordinar la entrega y el pago en efectivo 📦💵
+                </p>
+                ` : `
                 <div class="warning-box">
                   <p style="margin: 0 0 8px 0; font-size: 16px;">
                     <strong>⚠️ Último paso: completá el pago</strong>
@@ -146,6 +159,7 @@ export async function POST(request: NextRequest) {
                 <p style="margin-top: 30px; font-size: 14px; color: #666;">
                   Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega 📦
                 </p>
+                `}
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
                   ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a>, <a href="https://wa.me/5493513239624">por WhatsApp</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>

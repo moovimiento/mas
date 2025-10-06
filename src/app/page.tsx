@@ -73,7 +73,7 @@ export default function Home() {
               href="https://catsulecorp.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline-offset-4 hover:underline text-sky-500 hover:text-sky-600 cursor-pointer"
+              className="text-muted-foreground hover:text-sky-600 cursor-pointer"
             >
               Catsule Corp
             </a>

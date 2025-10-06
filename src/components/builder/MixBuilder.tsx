@@ -875,7 +875,7 @@ export function MixBuilder() {
             {(pricing.discount > 0 || deliveryOption === "ciudad") && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600">Ahorro por las promos</span>
-                <span className="text-green-600">{currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
+                <span className="text-green-600">- {currency.format(pricing.discount + (deliveryOption === "ciudad" ? DELIVERY_COST : 0))}</span>
               </div>
             )}
             {pricing.discountAmount > 0 && (
@@ -886,10 +886,10 @@ export function MixBuilder() {
                     : 'Descuento por código'
                   }
                 </span>
-                <span className="text-green-600">-{currency.format(pricing.discountAmount)}</span>
+                <span className="text-green-600">- {currency.format(pricing.discountAmount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pt-2 border-t border-gray-200">
               <span className="font-medium">
                 {deliveryOption === "ciudad" && (pricing.discount > 0 || pricing.discountAmount > 0)
                   ? "Total (con promos y envío gratis)"
@@ -903,7 +903,74 @@ export function MixBuilder() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-between sm:justify-end sm:gap-3">
+            <Button
+              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              onClick={async () => {
+                try {
+                  // Preparar items para el email
+                  const mixItems = cartItems.map((item) => {
+                    const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+                    const ingredients = INGREDIENTS
+                      .filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                      .map((ing) => {
+                        const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
+                        return `${ing.name} ${percent}%`;
+                      })
+                      .join(", ");
+                    
+                    return {
+                      mix: item.mix,
+                      quantity: item.quantity,
+                      ingredients
+                    };
+                  });
+
+                  // Enviar email de confirmación para pago en efectivo
+                  const emailResponse = await fetch('/api/send-order-email', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      name,
+                      email,
+                      phone,
+                      items: mixItems,
+                      deliveryOption,
+                      deliveryAddress,
+                      totalPrice: pricing.price,
+                      totalMixQty: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+                      paymentMethod: 'efectivo',
+                      discountCode: appliedDiscount?.code || null,
+                      discountAmount: pricing.discountAmount || 0,
+                    }),
+                  });
+
+                  if (emailResponse.ok) {
+                    alert("¡Pedido confirmado! Te contactaremos por WhatsApp para coordinar la entrega y el pago en efectivo.");
+                    // Limpiar carrito después del envío exitoso
+                    setCartItems([]);
+                    setMix({
+                      pera: 0,
+                      almendras: 0,
+                      nueces: 0,
+                      uva: 0,
+                      banana: 0,
+                    });
+                  } else {
+                    const errorData = await emailResponse.json();
+                    alert(`Error: ${errorData.error}`);
+                  }
+                } catch (error) {
+                  console.error('Error al procesar el pedido:', error);
+                  alert("Error al procesar el pedido");
+                }
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
+            >
+              Abonar en efectivo
+            </Button>
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
@@ -994,7 +1061,7 @@ export function MixBuilder() {
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
             >
-              Ir al checkout
+              Abonar con Mercado Pago
             </Button>
           </div>
         </CardContent>
