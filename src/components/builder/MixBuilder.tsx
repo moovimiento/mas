@@ -911,7 +911,7 @@ export function MixBuilder() {
               )}
             </div>
             {appliedDiscount && (
-              <div className="flex items-center gap-2 text-sm text-white">
+              <div className="flex items-center gap-2 text-sm text-foreground">
                 <span>✓</span>
                 <span>
                   Código {appliedDiscount.code} aplicado: 
