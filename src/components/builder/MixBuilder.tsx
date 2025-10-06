@@ -401,7 +401,14 @@ export function MixBuilder() {
             <div className="flex items-center justify-between gap-3">
               <CardTitle>Ingredientes</CardTitle>
               <div className="flex items-center gap-2">
-                <div className="relative">
+                <div 
+                  className="relative cursor-pointer"
+                  onClick={() => {
+                    if (total < 220) {
+                      setClassicMix();
+                    }
+                  }}
+                >
                   <div className="w-24 h-6 bg-gray-300 rounded-full overflow-hidden">
                     <div 
                       className="h-full transition-all duration-300 ease-out"
@@ -425,7 +432,12 @@ export function MixBuilder() {
           <CardContent className="space-y-4 flex-1">
             {INGREDIENTS.map((ing) => (
               <div key={ing.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] items-center gap-2 lg:gap-3">
-                <div className={cn("font-medium text-center lg:text-left w-full lg:w-auto", ing.id === selectedId && "text-yellow-600")}>{ing.name}</div>
+                <div 
+                  className={cn("font-medium text-center lg:text-left w-full lg:w-auto cursor-pointer transition-colors", ing.id === selectedId && "text-yellow-600")}
+                  onClick={() => setSelectedId(ing.id)}
+                >
+                  {ing.name}
+                </div>
                 <div className={cn("flex items-center gap-1 rounded-md w-full lg:w-auto justify-center lg:justify-end")}
                 >
                   <Button
@@ -498,7 +510,7 @@ export function MixBuilder() {
                 onClick={setClassicMix}
                 disabled={isClassicMix}
                 className={cn(
-                  "!bg-transparent !border-gray-200 !text-white hover:!bg-white/20 hover:!border-gray-300",
+                  "!bg-transparent !border-gray-200 !text-foreground hover:!bg-muted/20 hover:!border-gray-300",
                   isClassicMix && "opacity-50 cursor-not-allowed"
                 )}
                 title={isClassicMix ? "Ya es mix clásico" : "Poner todos los ingredientes en 44g"}
@@ -657,7 +669,7 @@ export function MixBuilder() {
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
-              <div className="text-muted-foreground py-5 border-t border-b border-gray-200/10">
+              <div className="text-muted-foreground py-5 border-t border-b border-border/80">
                 No hay mixs en el carrito 🛒 <button 
                   onClick={() => {
                     const mixTitle = document.querySelector('h2');
@@ -665,7 +677,7 @@ export function MixBuilder() {
                       mixTitle.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="text-white hover:text-gray-200 cursor-pointer"
+                  className="text-foreground hover:text-muted-foreground cursor-pointer"
                 >
                   Armalo arriba y agregalo ↑
                 </button>
@@ -768,7 +780,7 @@ export function MixBuilder() {
                         mixTitle.scrollIntoView({ behavior: 'smooth' });
                       }
                     }}
-                    className="text-white hover:text-gray-200 cursor-pointer text-sm text-left w-full block"
+                    className="text-foreground hover:text-muted-foreground cursor-pointer text-sm text-left w-full block"
                   >
                     Volver arriba para agregar un mix con otros ingredientes ↑
                   </button>
@@ -948,7 +960,7 @@ export function MixBuilder() {
                 <span className="text-green-600">- {currency.format(pricing.discount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between pt-2 mt-3 border-t border-gray-200/70">
+            <div className="flex items-center justify-between pt-2 mt-3 border-t-2 border-border">
               <span className="font-medium">
                 {deliveryOption === "ciudad" && pricing.discount > 0 && pricing.discountAmount > 0
                   ? "Total (con promo, descuento y envío gratis)"
