@@ -148,4 +148,16 @@
   .animate-shake {
     animation: shake 0.3s ease-in-out;
   }
+
+  /* Wiggle animation for add to cart button */
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-3deg) scale(1.08); }
+    50% { transform: rotate(0deg) scale(1.08); }
+    75% { transform: rotate(3deg) scale(1.08); }
+  }
+  
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
 }

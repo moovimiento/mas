@@ -12,11 +12,11 @@ const MAX_PER_INGREDIENT = 88;
 const MIN_NONZERO = 22;
 
 const INGREDIENTS = [
-  { id: "banana", name: "Banana chips" },
-  { id: "pera", name: "Pera deshidratada" },
-  { id: "almendras", name: "Almendras" },
-  { id: "nueces", name: "Nueces" },
-  { id: "uva", name: "Uva deshidratada" },
+  { id: "banana", name: "Banana chips", color: "#a8d8ea" },    // celeste claro argentino
+  { id: "pera", name: "Pera deshidratada", color: "#75c9e0" },      // celeste medio claro
+  { id: "almendras", name: "Almendras", color: "#4fb3d4" }, // celeste argentino
+  { id: "nueces", name: "Nueces", color: "#2a9cc0" },    // celeste medio oscuro
+  { id: "uva", name: "Uva deshidratada", color: "#1a7fa0" },       // celeste oscuro
 ] as const;
 
 type IngredientId = typeof INGREDIENTS[number]["id"];
@@ -111,6 +111,8 @@ export function MixBuilder() {
     return [];
   });
   const [shakeRemaining, setShakeRemaining] = useState(false);
+  const [shakeAddToCart, setShakeAddToCart] = useState(false);
+  const [shakeClassicMix, setShakeClassicMix] = useState(false);
   const [hoveredIngredient, setHoveredIngredient] = useState<IngredientId | null>(null);
   const cartRef = useRef<HTMLDivElement>(null);
 
@@ -385,6 +387,30 @@ export function MixBuilder() {
     return () => stopHold()
   }, [])
 
+  // Efecto para shake del botón "Agregar al carrito" cuando está válido
+  useEffect(() => {
+    if (isValid && !shakeAddToCart) {
+      const shakeInterval = setInterval(() => {
+        setShakeAddToCart(true);
+        setTimeout(() => setShakeAddToCart(false), 500);
+      }, 5000); // Shake cada 5 segundos
+
+      return () => clearInterval(shakeInterval);
+    }
+  }, [isValid, shakeAddToCart]);
+
+  // Efecto para shake del botón "Mix clásico" cuando está habilitado y agregar al carrito no
+  useEffect(() => {
+    if (!isClassicMix && !isValid && !shakeClassicMix) {
+      const shakeInterval = setInterval(() => {
+        setShakeClassicMix(true);
+        setTimeout(() => setShakeClassicMix(false), 500);
+      }, 5000); // Shake cada 5 segundos
+
+      return () => clearInterval(shakeInterval);
+    }
+  }, [isClassicMix, isValid, shakeClassicMix]);
+
   return (
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
@@ -433,7 +459,13 @@ export function MixBuilder() {
             {INGREDIENTS.map((ing) => (
               <div key={ing.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] items-center gap-2 lg:gap-3">
                 <div 
-                  className={cn("font-medium text-center lg:text-left w-full lg:w-auto cursor-pointer transition-colors", ing.id === selectedId && "text-yellow-600")}
+                  className={cn(
+                    "font-medium text-center lg:text-left w-full lg:w-auto cursor-pointer transition-all",
+                    (mix[ing.id] ?? 0) === 0 && "opacity-40"
+                  )}
+                  style={{
+                    color: (mix[ing.id] ?? 0) === 0 ? undefined : (ing.id === selectedId ? '#eab308' : ing.color)
+                  }}
                   onClick={() => setSelectedId(ing.id)}
                 >
                   {ing.name}
@@ -443,7 +475,10 @@ export function MixBuilder() {
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8 cursor-pointer flex-shrink-0"
+                    className={cn(
+                      "h-8 w-8 cursor-pointer flex-shrink-0 transition-all",
+                      (mix[ing.id] ?? 0) === 0 && "opacity-40"
+                    )}
                     onMouseDown={() => {
                       setSelectedId(ing.id);
                       startHold(ing.id, -11);
@@ -461,7 +496,10 @@ export function MixBuilder() {
                   >
                     -
                   </Button>
-                  <div className="relative flex-shrink-0">
+                  <div className={cn(
+                    "relative flex-shrink-0 transition-opacity",
+                    (mix[ing.id] ?? 0) === 0 && "opacity-40"
+                  )}>
                     <Input
                       inputMode="numeric"
                       pattern="[0-9]*"
@@ -471,18 +509,22 @@ export function MixBuilder() {
                       value={mix[ing.id] ?? 0}
                       onChange={(e) => setGram(ing.id, Number(e.target.value))}
                       onFocus={() => setSelectedId(ing.id)}
-                      className={cn(
-                        "w-24 pr-6 text-right",
-                        ing.id === selectedId &&
-                          "border-yellow-500 focus-visible:ring-yellow-500 text-yellow-700"
-                      )}
+                      readOnly
+                      className="w-24 pr-6 text-right cursor-default"
                     />
                     <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">g</span>
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8 cursor-pointer flex-shrink-0"
+                    className={cn(
+                      "h-8 w-8 cursor-pointer flex-shrink-0 transition-colors"
+                    )}
+                    style={remaining > 0 && (mix[ing.id] ?? 0) < MAX_PER_INGREDIENT ? {
+                      borderColor: '#eab308',
+                      color: '#eab308',
+                      backgroundColor: '#eab30815'
+                    } : undefined}
                     onMouseDown={() => {
                       setSelectedId(ing.id);
                       startHold(ing.id, +11);
@@ -496,7 +538,7 @@ export function MixBuilder() {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Sumar 11 gramos a ${ing.name}`}
-                    disabled={remaining <= 0}
+                    disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT}
                   >
                     +
                   </Button>
@@ -511,7 +553,8 @@ export function MixBuilder() {
                 disabled={isClassicMix}
                 className={cn(
                   "!bg-transparent !border-gray-200 !text-foreground hover:!bg-muted/20 hover:!border-gray-300",
-                  isClassicMix && "opacity-50 cursor-not-allowed"
+                  isClassicMix && "opacity-50 cursor-not-allowed",
+                  shakeClassicMix && "animate-wiggle"
                 )}
                 title={isClassicMix ? "Ya es mix clásico" : "Poner todos los ingredientes en 44g"}
                 aria-label="Mix clásico (44g cada ingrediente)"
@@ -550,8 +593,9 @@ export function MixBuilder() {
                   }, 100);
                 }}
                 className={cn(
-                  "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500",
-                  !isValid && "opacity-50"
+                  "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 lg:mr-3",
+                  !isValid && "opacity-50",
+                  shakeAddToCart && isValid && "animate-wiggle"
                 )}
                 title={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : ""}
                 aria-label={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : "Agregar al carrito"}
@@ -569,14 +613,10 @@ export function MixBuilder() {
           <CardContent className="space-y-6 flex-1 flex flex-col items-center justify-center">
             {/** Pie chart usando conic-gradient dinámico **/}
             {(() => {
-              // Escala de celestes
-              const colorById: Record<IngredientId, string> = {
-                banana: "#7dd3fc",    // sky-300
-                pera: "#38bdf8",      // sky-400
-                almendras: "#0ea5e9", // sky-500
-                nueces: "#0284c7",    // sky-600
-                uva: "#0369a1",       // sky-700
-              }
+              // Usar colores de INGREDIENTS
+              const colorById: Record<IngredientId, string> = Object.fromEntries(
+                INGREDIENTS.map(ing => [ing.id, ing.color])
+              ) as Record<IngredientId, string>
 
               const parts = (INGREDIENTS as readonly {id: IngredientId; name: string}[]).map((ing) => ({
                 id: ing.id,
@@ -592,9 +632,8 @@ export function MixBuilder() {
                 return { ...p, startAngle: start * 3.6, endAngle: end * 3.6 }
               })
               const stops = partsWithAngles.map(p => {
-                // Amarillo si está seleccionado (por hover o por selectedId), celeste normal si no
                 const isSelected = hoveredIngredient ? p.id === hoveredIngredient : p.id === selectedId
-                const color = isSelected ? '#fbbf24' : p.color // amarillo (amber-400) para seleccionado
+                const color = isSelected ? '#eab308' : p.color
                 return `${color} ${p.startAngle / 3.6}% ${p.endAngle / 3.6}%`
               }).join(", ")
               const bg = `conic-gradient(${stops})`
@@ -637,20 +676,32 @@ export function MixBuilder() {
                       })}
                     </svg>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                     {parts.map((p, i) => (
                       <div 
                         key={i} 
                         className={cn(
-                          "flex items-center gap-2 cursor-pointer transition-colors",
-                          p.id === selectedId && "text-yellow-600"
+                          "flex items-center gap-2 cursor-pointer transition-all"
                         )}
                         onMouseEnter={() => setSelectedId(p.id)}
                         onClick={() => setSelectedId(p.id)}
                       >
-                        <span className="inline-block size-3 rounded-sm" style={{ backgroundColor: p.color }} />
-                        <span className={cn("text-muted-foreground", p.id === selectedId && "text-yellow-600 font-medium")}>{p.name}</span>
-                        <span className={cn("ml-auto", p.id === selectedId && "font-bold")}>{p.percent}%</span>
+                        <span 
+                          className={cn("inline-block size-3 rounded-sm flex-shrink-0", (mix[p.id] ?? 0) === 0 && "opacity-40 bg-muted-foreground")} 
+                          style={(mix[p.id] ?? 0) > 0 ? { backgroundColor: p.id === selectedId ? '#eab308' : p.color } : undefined} 
+                        />
+                        <span 
+                          className={cn("flex-1 whitespace-nowrap", (mix[p.id] ?? 0) === 0 && "text-muted-foreground opacity-40")}
+                          style={(mix[p.id] ?? 0) > 0 ? { color: p.id === selectedId ? '#eab308' : p.color } : undefined}
+                        >
+                          {p.name}
+                        </span>
+                        <span 
+                          className={cn("ml-2 min-w-[2.5rem] text-right flex-shrink-0", (mix[p.id] ?? 0) === 0 && "text-muted-foreground opacity-40")}
+                          style={(mix[p.id] ?? 0) > 0 ? { color: p.id === selectedId ? '#eab308' : p.color } : undefined}
+                        >
+                          {p.percent}%
+                        </span>
                       </div>
                     ))}
                   </div>
