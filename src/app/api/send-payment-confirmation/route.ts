@@ -22,11 +22,13 @@ export async function POST(request: NextRequest) {
 
     const whatsappLink = `https://wa.me/5493513239624?text=${encodeURIComponent(`Hola! Soy ${name || 'un cliente'}, acabo de confirmar mi pago y quiero coordinar la entrega.`)}`;
 
+    const emailSubject = `✅ ¡Pago confirmado ${name}! Ya nos ponemos en contacto`;
+
     await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
-      subject: "✅ ¡Pago confirmado! Ya nos ponemos en contacto",
+      subject: emailSubject,
       html: `
         <!DOCTYPE html>
         <html>
@@ -79,7 +81,7 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o a <a href="https://wa.me/5493513239624">WhatsApp</a>
+                  ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
                 </p>
 
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">

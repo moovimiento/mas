@@ -766,18 +766,19 @@ export function MixBuilder() {
                   return (
                     <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0 last:border-b-0">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix de {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                        <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix compuesto por {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                           .map((ing) => {
                             const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
                             const isDifferent = differentIngredients.has(ing.id);
+                            const text = `${percent}% de ${ing.name}`;
                             return (
                               <span key={ing.id}>
-                                {isDifferent ? <strong className="text-yellow-400">{ing.name} {percent}%</strong> : `${ing.name} ${percent}%`}
+                                {isDifferent ? <strong className="text-yellow-400">{text}</strong> : text}
                               </span>
                             );
                           })
                           .reduce((acc, curr, idx, array) => {
-                            return idx === 0 ? [curr] : [...acc, ', ', curr];
+                            return idx === 0 ? [curr] : [...acc, ' + ', curr];
                           }, [] as React.ReactNode[])}</div>
                         <div className="flex items-center gap-2">
                           <Button
@@ -1045,9 +1046,10 @@ export function MixBuilder() {
                       .filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                       .map((ing) => {
                         const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
-                        return `${ing.name} ${percent}%`;
+                        const grams = Math.round((percent / 100) * TOTAL_GRAMS);
+                        return `${percent}% de ${ing.name} (${grams}g)`;
                       })
-                      .join(", ");
+                      .join(" + ");
                     
                     return {
                       title: `Mix personalizado (${ingredients})`,
@@ -1154,9 +1156,10 @@ export function MixBuilder() {
                       .filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                       .map((ing) => {
                         const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
-                        return `${ing.name} ${percent}%`;
+                        const grams = Math.round((percent / 100) * TOTAL_GRAMS);
+                        return `${percent}% de ${ing.name} (${grams}g)`;
                       })
-                      .join(", ");
+                      .join(" + ");
                     
                     return {
                       title: `Mix personalizado (${ingredients})`,

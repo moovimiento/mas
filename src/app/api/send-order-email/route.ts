@@ -170,14 +170,13 @@ export async function POST(request: NextRequest) {
     const precioSinPromo = totalMixQty * precioUnitario;
     const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
     
-    // Calcular precio con promos aplicadas
-    let precioConPromo = precioSinPromo;
-    if (totalMixQty >= 15) {
-      precioConPromo = 53000; // 15 mixs por $53.000 (ahorro de $7.000)
-    } else if (totalMixQty >= 5) {
-      precioConPromo = 18000; // 5 mixs por $18.000 (ahorro de $2.000)
-    }
-    
+    // Calcular precio con promos aplicadas (packs de 15, packs de 5, y unidades sueltas)
+    const n15 = Math.floor(totalMixQty / 15);
+    let remAfter15 = totalMixQty - n15 * 15;
+    const n5 = Math.floor(remAfter15 / 5);
+    const n1 = remAfter15 - n5 * 5;
+
+    const precioConPromo = n15 * 53000 + n5 * 18000 + n1 * precioUnitario;
     const descuentoPromo = precioSinPromo - precioConPromo;
     
     // Generar filas de ahorros
@@ -201,7 +200,7 @@ export async function POST(request: NextRequest) {
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
           <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
-            <strong>🎉 Ahorro por código de descuento</strong>
+            <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(discountAmount)}</td>
@@ -209,12 +208,17 @@ export async function POST(request: NextRequest) {
       `;
     }
     
-    // Ahorro por promos
+    // Ahorro por promos (desglose por packs de 15 y de 5)
     if (descuentoPromo > 0) {
+      const promoParts: string[] = [];
+      if (n15 > 0) promoParts.push(`${n15} de 15 Mixs`);
+      if (n5 > 0) promoParts.push(`${n5} de 5 Mixs`);
+      const promoLabel = promoParts.length > 0 ? ` (${promoParts.join(' + ')})` : '';
+
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
           <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
-            <strong>🎉 Ahorro por promos</strong>
+            <strong>🎉 Ahorro por promos${promoLabel}</strong>
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(descuentoPromo)}</td>
@@ -230,11 +234,15 @@ export async function POST(request: NextRequest) {
     
     let result;
     try {
+      const emailSubject = paymentMethod === 'efectivo'
+        ? `📱 ¡${name ? name + ', ' : ''}tu pedido está confirmado! Te contactaremos por WhatsApp`
+        : `🎉 ¡${name ? name + ', ' : ''}tu pedido de Frutos Secos está casi listo!`;
+
       result = await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
       bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
-      subject: paymentMethod === 'efectivo' ? "📱 ¡Tu pedido está confirmado! Te contactaremos por WhatsApp" : "🎉 ¡Tu pedido de Frutos Secos está casi listo!",
+      subject: emailSubject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background-color: #fbbf24; padding: 20px; border-radius: 8px 8px 0 0;">
@@ -281,13 +289,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0;"><strong>Celular:</strong> ${phone}</p>
             </div>
 
-            ${discountCode && discountAmount && discountAmount > 0 ? `
-            <h3>Ahorro por descuento aplicado:</h3>
-            <div style="background-color: #f0fdf4; border: 1px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0; color: #16a34a;"><strong>🎉 Código ${discountCode}</strong></p>
-              <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(discountAmount)}</p>
-            </div>
-            ` : ''}
+            
 
             ${(() => {
               // Calcular descuento por promos
@@ -307,27 +309,9 @@ export async function POST(request: NextRequest) {
               
               let html = '';
               
-              // Mostrar envío gratuito por separado (si aplica)
-              if (costoEnvio > 0) {
-                html += `
-                <h3>Ahorro por envío gratuito:</h3>
-                <div style="background-color: #f0fdf4; border: 1px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 4px;">
-                  <p style="margin: 0; color: #16a34a;"><strong>🚚 Envío gratuito a Ciudad Universitaria</strong></p>
-                  <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(costoEnvio)}</p>
-                </div>
-                `;
-              }
+              // Shipping and discount rows are shown in the order table (ahorrosHTML), so no separate blocks here.
               
-              // Mostrar ahorro por promos de cantidad (si aplica)
-              if (descuentoPromo > 0) {
-                html += `
-                <h3>Ahorro por promos:</h3>
-                <div style="background-color: #f0fdf4; border: 1px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 4px;">
-                  <p style="margin: 0; color: #16a34a;"><strong>🎉 Promo por cantidad (${totalMixQty} mixs)</strong></p>
-                  <p style="margin: 0; color: #16a34a;">Ahorro: ${currency.format(descuentoPromo)}</p>
-                </div>
-                `;
-              }
+              // Las filas de ahorro (envío, código y promos) ya se muestran en la tabla de resumen (ahorrosHTML).
               
               return html;
             })()}
@@ -370,11 +354,11 @@ export async function POST(request: NextRequest) {
 
             ${paymentMethod === 'efectivo' ? `
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
-              ¿Tenés alguna duda? Escribinos a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+              ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
             </p>
             ` : `
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
-              ¿Tenés alguna duda? Escribinos a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
+              ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
             </p>
             `}
 
