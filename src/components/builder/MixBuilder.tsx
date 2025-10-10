@@ -4,7 +4,6 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const TOTAL_GRAMS = 220;
@@ -86,23 +85,7 @@ export function MixBuilder() {
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Función helper para hacer requests con timeout
-  const fetchWithTimeout = async (url: string, options: RequestInit, timeout = 10000) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
-    }
-  };
+  // fetchWithTimeout removed (not used)
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_cartItems');
@@ -236,10 +219,7 @@ export function MixBuilder() {
     }
   };
 
-  const handleRemoveDiscount = () => {
-    setAppliedDiscount(null);
-    setDiscountCode("");
-  };
+  // handleRemoveDiscount removed (not used)
 
   // Guardar en localStorage cuando cambien los valores
   useEffect(() => {
@@ -764,7 +744,7 @@ export function MixBuilder() {
                   const differentIngredients = getIngredientDifferences();
                   
                   return (
-                    <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0 last:border-b-0">
+                    <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix compuesto por {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                           .map((ing) => {
@@ -777,9 +757,8 @@ export function MixBuilder() {
                               </span>
                             );
                           })
-                          .reduce((acc, curr, idx, array) => {
-                            return idx === 0 ? [curr] : [...acc, ' + ', curr];
-                          }, [] as React.ReactNode[])}</div>
+                          .map((node, i) => (i === 0 ? node : [' + ', node]))
+                          .flat() as React.ReactNode[]}</div>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"

@@ -171,8 +171,8 @@ export async function POST(request: NextRequest) {
     const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
     
     // Calcular precio con promos aplicadas (packs de 15, packs de 5, y unidades sueltas)
-    const n15 = Math.floor(totalMixQty / 15);
-    let remAfter15 = totalMixQty - n15 * 15;
+  const n15 = Math.floor(totalMixQty / 15);
+  const remAfter15 = totalMixQty - n15 * 15;
     const n5 = Math.floor(remAfter15 / 5);
     const n1 = remAfter15 - n5 * 5;
 
@@ -291,30 +291,7 @@ export async function POST(request: NextRequest) {
 
             
 
-            ${(() => {
-              // Calcular descuento por promos
-              const precioUnitario = 4000;
-              const precioSinPromo = totalMixQty * precioUnitario;
-              const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
-              
-              // Calcular precio con promos aplicadas
-              let precioConPromo = precioSinPromo;
-              if (totalMixQty >= 15) {
-                precioConPromo = 53000; // 15 mixs por $53.000 (ahorro de $7.000)
-              } else if (totalMixQty >= 5) {
-                precioConPromo = 18000; // 5 mixs por $18.000 (ahorro de $2.000)
-              }
-              
-              const descuentoPromo = precioSinPromo - precioConPromo;
-              
-              let html = '';
-              
-              // Shipping and discount rows are shown in the order table (ahorrosHTML), so no separate blocks here.
-              
-              // Las filas de ahorro (envío, código y promos) ya se muestran en la tabla de resumen (ahorrosHTML).
-              
-              return html;
-            })()}
+            
 
             <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
               <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar en efectivo: ${currency.format(totalPrice)}</p>
