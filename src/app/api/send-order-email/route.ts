@@ -186,10 +186,11 @@ export async function POST(request: NextRequest) {
     if (costoEnvio > 0) {
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
             <strong>🚚 Ahorro por envío gratuito</strong>
-            <span style="white-space:nowrap;">- ${currency.format(costoEnvio)}</span>
           </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${currency.format(costoEnvio)}</td>
         </tr>
       `;
     }
@@ -198,10 +199,11 @@ export async function POST(request: NextRequest) {
     if (discountCode && discountAmount && discountAmount > 0) {
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
             <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
-            <span style="white-space:nowrap;">- ${currency.format(discountAmount)}</span>
           </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${currency.format(discountAmount)}</td>
         </tr>
       `;
     }
@@ -215,10 +217,11 @@ export async function POST(request: NextRequest) {
 
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
             <strong>🎉 Ahorro por promos${promoLabel}</strong>
-            <span style="white-space:nowrap;">- ${currency.format(descuentoPromo)}</span>
           </td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${currency.format(descuentoPromo)}</td>
         </tr>
       `;
     }
@@ -263,10 +266,11 @@ export async function POST(request: NextRequest) {
                 ${itemsHTML}
                 ${deliveryOption === "ciudad" ? `
                 <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between;">
+                  <td style="padding: 8px; border-bottom: 1px solid #eee;">
                     <strong>Envío a Córdoba</strong>
-                    <span style="white-space:nowrap;">${currency.format(1000)}</span>
                   </td>
+                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">1</td>
+                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; white-space:nowrap;">${currency.format(1000)}</td>
                 </tr>
                 ` : ''}
                 ${ahorrosHTML}
@@ -289,9 +293,14 @@ export async function POST(request: NextRequest) {
 
             
 
-            <div style="background-color: #f3f4f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0; font-size: 20px; font-weight: bold;">Total a pagar en efectivo: ${currency.format(totalPrice)}</p>
-            </div>
+            <table style="width:100%; background-color: #f3f4f6; padding: 12px; margin: 20px 0; border-radius: 4px; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 12px; vertical-align: middle;">
+                  <strong style="font-size: 20px;">${paymentMethod === 'efectivo' ? 'Total a pagar en efectivo:' : 'Total a pagar:'}</strong>
+                </td>
+                <td style="padding: 12px; text-align: right; vertical-align: middle; white-space:nowrap; font-size: 20px; font-weight: bold;">${currency.format(totalPrice)}</td>
+              </tr>
+            </table>
 
             ${paymentMethod === 'efectivo' ? `
             <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
