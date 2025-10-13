@@ -41,6 +41,7 @@ export async function GET() {
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
           pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
         },
+        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
       },
     });
 

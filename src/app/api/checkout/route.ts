@@ -36,6 +36,8 @@ interface PreferenceData {
     failure: string;
     pending: string;
   };
+  // URL to receive Mercado Pago webhooks
+  notification_url?: string;
   auto_return: string;
   statement_descriptor: string;
   external_reference: string;
@@ -88,6 +90,9 @@ export async function POST(request: NextRequest) {
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
+      // URL donde Mercado Pago enviará las notificaciones (webhooks)
+      // Asegúrate de configurar NEXT_PUBLIC_BASE_URL en el entorno.
+      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
       auto_return: "approved",
       statement_descriptor: "MOOVIMIENTO",
       locale: "es-AR",
