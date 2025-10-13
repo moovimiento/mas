@@ -84,6 +84,7 @@ export function MixBuilder() {
   const [discountError, setDiscountError] = useState<string>("");
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"efectivo" | "mercadopago" | null>(null);
 
   // fetchWithTimeout removed (not used)
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -1013,10 +1014,28 @@ export function MixBuilder() {
             </div>
           </div>
 
+          {/* Fila del total: texto a la izquierda, monto a la derecha */}
+          <div className="w-full mb-3">
+            <div className="flex items-center justify-between px-2">
+              <span className="font-medium">
+                {selectedPaymentMethod === 'efectivo'
+                  ? 'Total a pagar en efectivo:'
+                  : selectedPaymentMethod === 'mercadopago'
+                  ? 'Total a pagar:'
+                  : 'Total a pagar:'}
+              </span>
+              <span className="font-semibold">{currency.format(pricing.price)}</span>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
+                // Mostrar total en la UI para pago en efectivo
+                setSelectedPaymentMethod('efectivo');
+                // pequeña espera para que el usuario vea la UI actualizada (opcional)
+                await new Promise((r) => setTimeout(r, 20));
                 try {
                   // Preparar items para el email
                   const mixItems = cartItems.map((item) => {
@@ -1115,6 +1134,9 @@ export function MixBuilder() {
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
               onClick={async () => {
+                // Mostrar total en la UI para Mercado Pago
+                setSelectedPaymentMethod('mercadopago');
+                await new Promise((r) => setTimeout(r, 20));
                 try {
                   // Calcular precio con promos aplicadas
                   const totalMixQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
