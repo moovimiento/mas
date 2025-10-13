@@ -186,11 +186,10 @@ export async function POST(request: NextRequest) {
     if (costoEnvio > 0) {
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
             <strong>🚚 Ahorro por envío gratuito</strong>
+            <span style="white-space:nowrap;">- ${currency.format(costoEnvio)}</span>
           </td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(costoEnvio)}</td>
         </tr>
       `;
     }
@@ -199,11 +198,10 @@ export async function POST(request: NextRequest) {
     if (discountCode && discountAmount && discountAmount > 0) {
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
             <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
+            <span style="white-space:nowrap;">- ${currency.format(discountAmount)}</span>
           </td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(discountAmount)}</td>
         </tr>
       `;
     }
@@ -217,11 +215,10 @@ export async function POST(request: NextRequest) {
 
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
-          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a; display:flex; justify-content:space-between;">
             <strong>🎉 Ahorro por promos${promoLabel}</strong>
+            <span style="white-space:nowrap;">- ${currency.format(descuentoPromo)}</span>
           </td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a;">- ${currency.format(descuentoPromo)}</td>
         </tr>
       `;
     }
@@ -266,11 +263,10 @@ export async function POST(request: NextRequest) {
                 ${itemsHTML}
                 ${deliveryOption === "ciudad" ? `
                 <tr>
-                  <td style="padding: 8px; border-bottom: 1px solid #eee;">
+                  <td style="padding: 8px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between;">
                     <strong>Envío a Córdoba</strong>
+                    <span style="white-space:nowrap;">${currency.format(1000)}</span>
                   </td>
-                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">1</td>
-                  <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(1000)}</td>
                 </tr>
                 ` : ''}
                 ${ahorrosHTML}

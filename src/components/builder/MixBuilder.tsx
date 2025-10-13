@@ -971,8 +971,8 @@ export function MixBuilder() {
             </div>
             {deliveryOption === "ciudad" && (
               <div className="flex items-center justify-between">
-                <span className="text-green-600">Ahorro por envío gratuito</span>
-                <span className="text-green-600">- {currency.format(DELIVERY_COST)}</span>
+                <span className="text-green-600 whitespace-nowrap">Ahorro por envío gratuito</span>
+                <span className="text-green-600 whitespace-nowrap">- {currency.format(DELIVERY_COST)}</span>
               </div>
             )}
             {pricing.discountAmount > 0 && (
@@ -983,13 +983,13 @@ export function MixBuilder() {
                     : 'Ahorro por código de descuento'
                   }
                 </span>
-                <span className="text-green-600">- {currency.format(pricing.discountAmount)}</span>
+                <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discountAmount)}</span>
               </div>
             )}
             {pricing.discount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600">Ahorro por las promos</span>
-                <span className="text-green-600">- {currency.format(pricing.discount)}</span>
+                <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discount)}</span>
               </div>
             )}
             <div className="flex items-center justify-between pt-2 mt-3 border-t-2 border-border">
