@@ -10,6 +10,9 @@ interface CheckoutItem {
   title: string;
   quantity: number;
   unit_price: number;
+  // Opcional: categoría y descripción para mejorar la tasa de aprobación de Mercado Pago
+  category_id?: string;
+  description?: string;
 }
 
 interface CheckoutBody {
@@ -30,6 +33,8 @@ interface PreferenceData {
     quantity: number;
     unit_price: number;
     currency_id: string;
+    category_id?: string;
+    description?: string;
   }>;
   back_urls: {
     success: string;
@@ -70,6 +75,9 @@ export async function POST(request: NextRequest) {
       quantity: item.quantity,
       unit_price: item.unit_price,
       currency_id: "ARS",
+      // Enviar category_id y description si están disponibles para mejorar la aprobación
+      category_id: item.category_id,
+      description: item.description,
     }));
 
     // Agregar descuento como item negativo si existe
@@ -80,6 +88,8 @@ export async function POST(request: NextRequest) {
         quantity: 1,
         unit_price: -discountAmount, // Precio negativo para descuento
         currency_id: "ARS",
+        category_id: undefined,
+        description: `Descuento aplicado: ${discountCode}`,
       });
     }
 

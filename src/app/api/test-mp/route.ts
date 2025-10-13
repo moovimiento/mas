@@ -30,6 +30,8 @@ export async function GET() {
             title: "Test Item",
             quantity: 1,
             unit_price: 100,
+            category_id: "general",
+            description: "Preferencia de prueba - Test Item",
             currency_id: "ARS",
           },
         ],
