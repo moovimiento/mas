@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 const TOTAL_GRAMS = 220;
-const MAX_PER_INGREDIENT = 88;
+const MAX_PER_INGREDIENT = 66;
 const MIN_NONZERO = 22;
 
 const INGREDIENTS = [
