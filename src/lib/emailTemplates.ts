@@ -1,5 +1,5 @@
-export function buildGenericEmailHtml(opts: { title?: string; name?: string; contentHtml: string; }) {
-  const { title, name, contentHtml } = opts;
+export function buildGenericEmailHtml(opts: { title?: string; name?: string; contentHtml: string; headerImageHtml?: string }) {
+  const { title, name, contentHtml, headerImageHtml } = opts;
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -9,6 +9,8 @@ export function buildGenericEmailHtml(opts: { title?: string; name?: string; con
       <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px;">
         ${title ? `<h1 style="font-size: 24px; color: #fbbf24; margin-bottom: 4px;">${title}</h1>` : ''}
         <p style="font-size: 16px; margin: 0 0 12px 0;">Hola${name ? ` ${name}` : ''}! 👋</p>
+
+        ${headerImageHtml ? headerImageHtml : ''}
 
         <div style="background-color: #fff; border: 1px solid #e5e7eb; padding: 16px; margin: 10px 0 20px 0; border-radius: 4px;">
           ${contentHtml}

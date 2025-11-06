@@ -37,7 +37,9 @@ export default function AdminPage() {
   const [promoHtml, setPromoHtml] = useState('');
   const [promoEmailsText, setPromoEmailsText] = useState('');
   const [promoEmails, setPromoEmails] = useState<string[]>([]);
+  const [promoCoverDataUrl, setPromoCoverDataUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const coverInputRef = useRef<HTMLInputElement | null>(null);
   const [personalTarget, setPersonalTarget] = useState<Order | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
@@ -194,7 +196,7 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/send-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
-        body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, html: promoHtml }),
+        body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, html: promoHtml, headerImage: promoCoverDataUrl }),
       });
       const j = await res.json();
       if (res.ok) {
@@ -750,10 +752,10 @@ export default function AdminPage() {
 
       {promoOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4" onClick={() => { setPromoOpen(false); setPersonalTarget(null); }}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <Card className="w-full max-w-6xl min-w-[720px]">
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-6xl max-h-[90vh] overflow-auto">
+            <Card className="w-full min-w-[720px] max-h-[86vh] overflow-auto">
               <CardHeader>
-                <CardTitle>Enviar promo {personalTarget ? `a ${personalTarget.email}` : ''}</CardTitle>
+                <CardTitle>{personalTarget ? 'Enviar mail personalizado' : 'Enviar promo'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -774,8 +776,8 @@ export default function AdminPage() {
                       </div>
                     </div>
                   )}
-                  <div className="pt-3">
-                    <Label>Importar lista de mails (CSV o texto, uno por línea o separados por comas)</Label>
+                    <div className="pt-3 pb-2">
+                    <Label className='pb-3'>Importar lista de mails (CSV o texto, uno por línea o separados por comas):</Label>
                     <div className="flex gap-2 items-start mt-2">
                       <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
                         const f = (e.target as HTMLInputElement).files?.[0];
@@ -791,14 +793,41 @@ export default function AdminPage() {
                         }
                       }} />
                       <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
-                      <div className="flex-1">
-                        <Label className="mt-2">O pegar mails</Label>
-                        <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
-                          const v = (e.target as HTMLTextAreaElement).value;
-                          setPromoEmailsText(v);
-                          const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
-                          setPromoEmails(parsed);
-                        }} />
+                    </div>
+
+                    {/* Move paste textarea to its own row and change label text */}
+                    <div className="mt-3">
+                      <Label className="mb-1">O directamente pegar mails:</Label>
+                      <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
+                        const v = (e.target as HTMLTextAreaElement).value;
+                        setPromoEmailsText(v);
+                        const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
+                        setPromoEmails(parsed);
+                      }} />
+                    </div>
+
+                    {/* Cover image upload for promo (optional) */}
+                    <div className="mt-4">
+                      <Label>Foto de portada (opcional)</Label>
+                      <div className="flex items-center gap-2 mt-2">
+                        <input ref={coverInputRef} type="file" accept="image/*" onChange={async (e) => {
+                          const f = (e.target as HTMLInputElement).files?.[0];
+                          if (!f) return;
+                          try {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              const res = reader.result as string | null;
+                              if (res) setPromoCoverDataUrl(res);
+                            };
+                            reader.readAsDataURL(f);
+                          } catch (err) {
+                            console.error('Error reading image', err);
+                          }
+                        }} style={{ display: 'none' }} />
+                        <Button variant="outline" onClick={() => { if (coverInputRef.current) coverInputRef.current.click(); }}>Subir foto</Button>
+                        {promoCoverDataUrl && (
+                          <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded ml-3 border" />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -829,8 +858,8 @@ export default function AdminPage() {
 
       {detailOpen && detailOrder && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4" onClick={() => { setDetailOpen(false); setDetailOrder(null); }}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <Card className="w-full max-w-2xl">
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl max-h-[90vh] overflow-auto">
+            <Card className="w-full max-w-2xl max-h-[86vh] overflow-auto">
               <CardHeader>
                 <CardTitle>Pedido {detailOrder.id} — {detailOrder.name || detailOrder.email}</CardTitle>
               </CardHeader>
