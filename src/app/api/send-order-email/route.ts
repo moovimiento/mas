@@ -290,26 +290,28 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Build action block (WhatsApp + optional Mercado Pago button) with matching heights, icon, and spacing
-      // WhatsApp button with official icon (SVG) and both buttons as inline-flex to match height
+      // Build action block (WhatsApp + optional Mercado Pago button) with matching heights, icon from public and spacing
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '') : '';
+      const wspImgSrc = baseUrl ? `${baseUrl}/wsp.png` : '/wsp.png';
+
+      // WhatsApp button uses the repository `public/wsp.png` image and centers content vertically
       const whatsappButton = `
-        <a href="https://wa.me/5493513239624" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; background-color: #25d366; color: white; padding: 0 18px; text-decoration: none; border-radius: 8px; font-weight: 700;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M20.52 3.48A11.9 11.9 0 0 0 12 0C5.373 0 .233 5.14.007 11.765.005 11.84 0 12.107 0 12.16c0 .09.04.174.107.234L2.3 14.6c.055.047.126.072.198.068.694-.04 1.95-.235 2.78-.4.577-.11 1.05.1 1.3.28.662.483 1.896 1.37 2.29 1.636.142.1.31.153.482.153.214 0 .428-.08.594-.233l2.16-1.964c.06-.053.09-.12.09-.193 0-1.06-.145-2.14-.423-3.148C20.438 7.87 21 5.987 21 4.02c0-.18-.013-.36-.04-.537z" fill="white"/>
-          </svg>
-          <span>Coordinar ahora por WhatsApp</span>
+        <a href="https://wa.me/5493513239624" style="display: inline-flex; align-items: center; gap: 8px; height: 48px; background-color: #25d366; color: white; padding: 0 14px; text-decoration: none; border-radius: 8px; font-weight: 700;">
+          <img src="${wspImgSrc}" alt="WhatsApp" style="width:20px;height:20px;display:inline-block;vertical-align:middle;" />
+          <span style="line-height:1;">Coordinar ahora por WhatsApp</span>
         </a>
       `;
 
       // If we have a direct paymentLink prefer it; otherwise use pay token link that will create/redirect on-demand
       const payHref = paymentLink ? paymentLink : (paymentToken && process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '')}/pay/${paymentToken}` : '');
       const payButton = payHref ? (`
-        <a href="${payHref}" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; background-color: #fbbf24; color: #000; padding: 0 18px; text-decoration: none; border-radius: 8px; font-weight: 700;">
-          <span>💳 Pagar ahora con Mercado Pago</span>
+        <a href="${payHref}" style="display: inline-flex; align-items: center; gap: 8px; height: 48px; background-color: #fbbf24; color: #000; padding: 0 14px; text-decoration: none; border-radius: 8px; font-weight: 700;">
+          <span style="line-height:1;">💳 Pagar ahora con Mercado Pago</span>
         </a>
       `) : '';
 
-      const buttonsRow = `<div style="display:flex; gap:12px; justify-content:center; align-items:center; margin-top:16px;">${whatsappButton}${payButton ? payButton : ''}</div>`;
+      // Small horizontal gap between buttons (10px) and ensure vertical centering
+      const buttonsRow = `<div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-top:16px;">${whatsappButton}${payButton ? payButton : ''}</div>`;
 
       const mpNote = payButton ? `<p style="text-align:center; margin-top:10px; color:#666; font-size:14px;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
 
