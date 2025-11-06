@@ -35,6 +35,9 @@ export default function AdminPage() {
   const [promoOpen, setPromoOpen] = useState(false);
   const [promoSubject, setPromoSubject] = useState('');
   const [promoHtml, setPromoHtml] = useState('');
+  const [promoEmailsText, setPromoEmailsText] = useState('');
+  const [promoEmails, setPromoEmails] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [personalTarget, setPersonalTarget] = useState<Order | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
@@ -113,6 +116,26 @@ export default function AdminPage() {
     setSelected(prev => ({ ...prev, [id]: !prev[id] }));
   }
 
+  function toggleSelectAllDisplayed() {
+    const ids = displayedOrders.map(o => o.id);
+    const anyUnselected = ids.some(id => !selected[id]);
+    if (anyUnselected) {
+      // select all displayed
+      setSelected(prev => {
+        const next = { ...prev };
+        ids.forEach(id => { next[id] = true; });
+        return next;
+      });
+    } else {
+      // deselect all displayed
+      setSelected(prev => {
+        const next = { ...prev };
+        ids.forEach(id => { delete next[id]; });
+        return next;
+      });
+    }
+  }
+
   async function markDelivered(id: string) {
     setMessage(null);
     try {
@@ -158,8 +181,9 @@ export default function AdminPage() {
   async function sendPromo() {
     setMessage(null);
     const ids = Object.keys(selected).filter(id => selected[id]);
-    if (ids.length === 0) {
-      setMessage('Seleccioná al menos un pedido');
+    const emails = promoEmails || [];
+    if (ids.length === 0 && emails.length === 0 && !personalTarget) {
+      setMessage('Seleccioná al menos un pedido o cargá/pegá al menos un mail');
       return;
     }
     if (!promoSubject || !promoHtml) {
@@ -170,7 +194,7 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/send-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
-        body: JSON.stringify({ orderIds: ids, subject: promoSubject, html: promoHtml }),
+        body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, html: promoHtml }),
       });
       const j = await res.json();
       if (res.ok) {
@@ -181,6 +205,8 @@ export default function AdminPage() {
         setPromoHtml('');
         setSelected({});
         setPersonalTarget(null);
+        setPromoEmails([]);
+        setPromoEmailsText('');
       } else {
         setMessage(j.error || 'Error enviando promos');
       }
@@ -516,10 +542,10 @@ export default function AdminPage() {
               <thead className="bg-slate-900">
                 <tr>
                   <th className="px-12 py-3 text-left text-white w-56 min-w-[180px]">
-                    <div className="flex items-center gap-2">
-                      <span>Sel</span>
+                    <button onClick={(e) => { e.stopPropagation(); toggleSelectAllDisplayed(); }} className="flex items-center gap-2 hover:underline">
+                      <span className="font-medium">Sel</span>
                       <span className="text-sm text-gray-300 whitespace-nowrap">({selectedIds.length})</span>
-                    </div>
+                    </button>
                   </th>
                   {/* ID column moved to the end */}
                   <th className="px-12 py-3 text-left text-white">
@@ -671,7 +697,7 @@ export default function AdminPage() {
       {promoOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4" onClick={() => { setPromoOpen(false); setPersonalTarget(null); }}>
           <div onClick={(e) => e.stopPropagation()}>
-            <Card className="w-full max-w-4xl">
+            <Card className="w-full max-w-6xl min-w-[720px]">
               <CardHeader>
                 <CardTitle>Enviar promo {personalTarget ? `a ${personalTarget.email}` : ''}</CardTitle>
               </CardHeader>
@@ -694,6 +720,34 @@ export default function AdminPage() {
                       </div>
                     </div>
                   )}
+                  <div className="pt-3">
+                    <Label>Importar lista de mails (CSV o texto, uno por línea o separados por comas)</Label>
+                    <div className="flex gap-2 items-start mt-2">
+                      <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
+                        const f = (e.target as HTMLInputElement).files?.[0];
+                        if (!f) return;
+                        try {
+                          const txt = await f.text();
+                          // split by comma or newline
+                          const raw = txt.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
+                          setPromoEmails(raw.filter(r => r.includes('@')));
+                          setPromoEmailsText(raw.filter(r => r.includes('@')).join('\n'));
+                        } catch (err) {
+                          console.error('Error reading file', err);
+                        }
+                      }} />
+                      <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
+                      <div className="flex-1">
+                        <Label className="mt-2">O pegar mails</Label>
+                        <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
+                          const v = (e.target as HTMLTextAreaElement).value;
+                          setPromoEmailsText(v);
+                          const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
+                          setPromoEmails(parsed);
+                        }} />
+                      </div>
+                    </div>
+                  </div>
                   <Label>Asunto</Label>
                   <Input value={promoSubject} onChange={e => setPromoSubject((e.target as HTMLInputElement).value)} />
 
