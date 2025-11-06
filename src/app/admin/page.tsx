@@ -835,11 +835,10 @@ export default function AdminPage() {
                         )}
                       </div>
                     </div>
-                  </div>
                   <Label>Asunto</Label>
                   <Input value={promoSubject} onChange={e => setPromoSubject((e.target as HTMLInputElement).value)} />
 
-                  <Label>HTML (puedes usar {'{{name}}'})</Label>
+                  <Label>HTML (puedes usar {"{{name}}"})</Label>
                   <textarea rows={8} className="w-full border px-3 py-2 rounded" value={promoHtml} onChange={e => setPromoHtml(e.target.value)} />
                 </div>
               </CardContent>
