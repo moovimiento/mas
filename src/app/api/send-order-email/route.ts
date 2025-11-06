@@ -194,13 +194,32 @@ export async function POST(request: NextRequest) {
     
     // Ahorro por descuento por código
     if (discountCode && discountAmount && discountAmount > 0) {
+      // Intentar detectar si el código corresponde a un descuento porcentual
+      let discountLabel = `${currency.format(discountAmount)}`;
+      try {
+        const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
+        if (mapEnv) {
+          const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage' | 'fixed'; value: number }>;
+          const mapped = parsed[(discountCode || '').toUpperCase()];
+          if (mapped) {
+            if (mapped.type === 'percentage') {
+              discountLabel = `${mapped.value}% de descuento`;
+            } else if (mapped.type === 'fixed') {
+              discountLabel = `${currency.format(mapped.value)}`;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore and fall back to currency.format(discountAmount)
+      }
+
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
           <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
             <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${currency.format(discountAmount)}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${discountLabel}</td>
         </tr>
       `;
     }
