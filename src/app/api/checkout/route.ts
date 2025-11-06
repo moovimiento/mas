@@ -232,6 +232,20 @@ export async function POST(request: NextRequest) {
       id: response.id,
       init_point: response.init_point,
       sandbox_init_point: response.sandbox_init_point,
+      // total amount actually sent to Mercado Pago (includes negative discount item)
+      totalAmount: typeof _cappedDiscountAmount !== 'undefined'
+        ? (preferenceData.items || []).reduce((sum, it) => {
+            const item = it as { unit_price?: number; quantity?: number };
+            const up = Number(item.unit_price ?? 0) || 0;
+            const q = Number(item.quantity ?? 0) || 0;
+            return sum + up * q;
+          }, 0)
+        : (preferenceData.items || []).reduce((sum, it) => {
+            const item = it as { unit_price?: number; quantity?: number };
+            const up = Number(item.unit_price ?? 0) || 0;
+            const q = Number(item.quantity ?? 0) || 0;
+            return sum + up * q;
+          }, 0),
     });
   } catch (error) {
     console.error("Error creating preference:", error);
