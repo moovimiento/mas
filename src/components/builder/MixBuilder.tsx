@@ -448,7 +448,7 @@ export function MixBuilder() {
         <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
         <div className="text-sm text-muted-foreground whitespace-normal flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-8 pt-2">
           <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
-          <span>Máximo por ingrediente: <span className="font-medium">88g</span></span>
+          <span>Máximo por ingrediente: <span className="font-medium">66g</span></span>
         </div>
       </div>
 
