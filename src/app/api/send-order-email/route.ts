@@ -290,23 +290,44 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Build action block (WhatsApp + optional Mercado Pago button) safely
-      const whatsappButton = '<a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Coordinar ahora por WhatsApp</a>';
-  // If we have a direct paymentLink prefer it; otherwise use pay token link that will create/redirect on-demand
-  const payHref = paymentLink ? paymentLink : (paymentToken && process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '')}/pay/${paymentToken}` : '');
-  const payButton = payHref ? (`<a href="${payHref}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 Pagar ahora con Mercado Pago</a>`) : '';
+      // Build action block (WhatsApp + optional Mercado Pago button) with matching heights, icon, and spacing
+      // WhatsApp button with official icon (SVG) and both buttons as inline-flex to match height
+      const whatsappButton = `
+        <a href="https://wa.me/5493513239624" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; background-color: #25d366; color: white; padding: 0 18px; text-decoration: none; border-radius: 8px; font-weight: 700;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M20.52 3.48A11.9 11.9 0 0 0 12 0C5.373 0 .233 5.14.007 11.765.005 11.84 0 12.107 0 12.16c0 .09.04.174.107.234L2.3 14.6c.055.047.126.072.198.068.694-.04 1.95-.235 2.78-.4.577-.11 1.05.1 1.3.28.662.483 1.896 1.37 2.29 1.636.142.1.31.153.482.153.214 0 .428-.08.594-.233l2.16-1.964c.06-.053.09-.12.09-.193 0-1.06-.145-2.14-.423-3.148C20.438 7.87 21 5.987 21 4.02c0-.18-.013-.36-.04-.537z" fill="white"/>
+          </svg>
+          <span>Coordinar ahora por WhatsApp</span>
+        </a>
+      `;
 
-      const efectivoBlock = '<div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">'
-        + '<p style="margin: 0 0 8px 0; font-size: 16px;"><strong>📱 ¡Te contactaremos por WhatsApp!</strong></p>'
-        + '<p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>'
-        + '<div style="text-align: center; margin-top: 16px; display:flex; gap:12px; flex-direction:column; align-items:center;">' + whatsappButton + (payButton ? ('<div style="margin-top:8px;">' + payButton + '</div>') : '') + '</div>'
-        + '</div>';
+      // If we have a direct paymentLink prefer it; otherwise use pay token link that will create/redirect on-demand
+      const payHref = paymentLink ? paymentLink : (paymentToken && process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '')}/pay/${paymentToken}` : '');
+      const payButton = payHref ? (`
+        <a href="${payHref}" style="display: inline-flex; align-items: center; gap: 10px; height: 48px; background-color: #fbbf24; color: #000; padding: 0 18px; text-decoration: none; border-radius: 8px; font-weight: 700;">
+          <span>💳 Pagar ahora con Mercado Pago</span>
+        </a>
+      `) : '';
 
-      const nonEfectivoBlock = '<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">'
-        + '<p style="margin: 0 0 8px 0; font-size: 16px;"><strong>⚠️ Último paso: completá el pago</strong></p>'
-        + '<p style="margin: 0;">Tu pedido está reservado. <strong>Si todavía no lo abonaste</strong> hacé click en el botón de abajo:</p>'
-        + (payButton ? ('<div style="text-align: center; margin-top: 16px;">' + payButton + '</div>') : '')
-        + '</div>';
+      const buttonsRow = `<div style="display:flex; gap:12px; justify-content:center; align-items:center; margin-top:16px;">${whatsappButton}${payButton ? payButton : ''}</div>`;
+
+      const mpNote = payButton ? `<p style="text-align:center; margin-top:10px; color:#666; font-size:14px;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
+
+      const efectivoBlock = `
+        <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
+          <p style="margin: 0 0 8px 0; font-size: 16px;"><strong>📱 ¡Te contactaremos por WhatsApp!</strong></p>
+          <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>
+          <div style="text-align: center;">${buttonsRow}${mpNote}</div>
+        </div>
+      `;
+
+      const nonEfectivoBlock = `
+        <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">
+          <p style="margin: 0 0 8px 0; font-size: 16px;"><strong>⚠️ Último paso: completá el pago</strong></p>
+          <p style="margin: 0;">Tu pedido está reservado. <strong>Si todavía no lo abonaste</strong> hacé click en el botón de abajo:</p>
+          <div style="text-align: center;">${buttonsRow}${mpNote}</div>
+        </div>
+      `;
 
       const actionBlock = (paymentMethod === 'efectivo') ? efectivoBlock : nonEfectivoBlock;
 
