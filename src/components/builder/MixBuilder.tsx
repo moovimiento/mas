@@ -285,6 +285,11 @@ export function MixBuilder() {
       } else if (appliedDiscount.type === 'fixed') {
         discountAmount = Math.min(appliedDiscount.value, subtotal);
       }
+      // Aplicar tope máximo para códigos de descuento (ej: 787 -> $787)
+      const DISCOUNT_CAP = 787;
+      if (discountAmount > DISCOUNT_CAP) {
+        discountAmount = DISCOUNT_CAP;
+      }
     }
     
     const finalPrice = Math.max(0, subtotal - discountAmount);

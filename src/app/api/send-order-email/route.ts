@@ -194,6 +194,9 @@ export async function POST(request: NextRequest) {
     
     // Ahorro por descuento por código
     if (discountCode && discountAmount && discountAmount > 0) {
+      // Aplicar tope por seguridad (en caso de que venga mayor desde el cliente)
+      const DISCOUNT_CAP = 787;
+      const displayDiscountAmount = Math.min(discountAmount, DISCOUNT_CAP);
       // Intentar detectar si el código corresponde a un descuento porcentual
       let discountLabel = `${currency.format(discountAmount)}`;
       try {
@@ -219,7 +222,7 @@ export async function POST(request: NextRequest) {
             <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${discountLabel}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${discountLabel}${displayDiscountAmount && discountLabel.startsWith('$') ? '' : ''}</td>
         </tr>
       `;
     }

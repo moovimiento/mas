@@ -81,17 +81,25 @@ export async function POST(request: NextRequest) {
       description: item.description,
     }));
 
-    // Agregar descuento como item negativo si existe
-    if (discountCode && discountAmount && discountAmount > 0) {
+  // Agregar descuento como item negativo si existe
+  let _cappedDiscountAmount: number | undefined;
+  if (discountCode && discountAmount && discountAmount > 0) {
+      // Aplicar tope al descuento para evitar descuentos mayores al permitido
+      const DISCOUNT_CAP = 787;
+      const effectiveDiscount = Math.min(discountAmount, DISCOUNT_CAP);
       preferenceItems.push({
         id: `discount-${discountCode}`,
         title: `Descuento (${discountCode})`,
         quantity: 1,
-        unit_price: -discountAmount, // Precio negativo para descuento
+        unit_price: -effectiveDiscount, // Precio negativo para descuento
         currency_id: "ARS",
         category_id: undefined,
         description: `Descuento aplicado: ${discountCode}`,
       });
+      // Use effectiveDiscount later when persisting the order
+      // (we'll pass it explicitly to saveOrder)
+      // store in outer scoped variable for later
+      _cappedDiscountAmount = effectiveDiscount;
     }
 
     const preferenceData: PreferenceData = {
@@ -154,7 +162,7 @@ export async function POST(request: NextRequest) {
         paymentMethod: 'mercadopago',
         paymentLink: response.init_point,
         discountCode,
-        discountAmount,
+        discountAmount: typeof _cappedDiscountAmount !== 'undefined' ? _cappedDiscountAmount : discountAmount,
       });
     } catch (err) {
       console.error('Error saving order after creating preference:', err);
