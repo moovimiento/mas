@@ -776,35 +776,40 @@ export default function AdminPage() {
                       </div>
                     </div>
                   )}
-                    <div className="pt-3 pb-2">
-                    <Label className='pb-3'>Importar lista de mails (CSV o texto, uno por línea o separados por comas):</Label>
-                    <div className="flex gap-2 items-start mt-2">
-                      <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
-                        const f = (e.target as HTMLInputElement).files?.[0];
-                        if (!f) return;
-                        try {
-                          const txt = await f.text();
-                          // split by comma or newline
-                          const raw = txt.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
-                          setPromoEmails(raw.filter(r => r.includes('@')));
-                          setPromoEmailsText(raw.filter(r => r.includes('@')).join('\n'));
-                        } catch (err) {
-                          console.error('Error reading file', err);
-                        }
-                      }} />
-                      <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
-                    </div>
+                    {!personalTarget && (
+                      <>
+                        <div className="pt-3 pb-2">
+                          <Label className='pb-3'>Importar CSV de mails</Label>
+                          <div className="flex gap-2 items-start mt-2">
+                            <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
+                              const f = (e.target as HTMLInputElement).files?.[0];
+                              if (!f) return;
+                              try {
+                                const txt = await f.text();
+                                // split by comma or newline
+                                const raw = txt.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
+                                setPromoEmails(raw.filter(r => r.includes('@')));
+                                setPromoEmailsText(raw.filter(r => r.includes('@')).join('\n'));
+                              } catch (err) {
+                                console.error('Error reading file', err);
+                              }
+                            }} />
+                            <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
+                          </div>
+                        </div>
 
-                    {/* Move paste textarea to its own row and change label text */}
-                    <div className="mt-3">
-                      <Label className="mb-1">O directamente pegar mails:</Label>
-                      <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
-                        const v = (e.target as HTMLTextAreaElement).value;
-                        setPromoEmailsText(v);
-                        const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
-                        setPromoEmails(parsed);
-                      }} />
-                    </div>
+                        {/* Move paste textarea to its own row and change label text */}
+                        <div className="mt-3">
+                          <Label className="mb-1">O directamente pegarlos uno por linea (o separados por coma)</Label>
+                          <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
+                            const v = (e.target as HTMLTextAreaElement).value;
+                            setPromoEmailsText(v);
+                            const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
+                            setPromoEmails(parsed);
+                          }} />
+                        </div>
+                      </>
+                    )}
 
                     {/* Cover image upload for promo (optional) */}
                     <div className="mt-4">
