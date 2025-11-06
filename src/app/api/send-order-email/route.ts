@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     // Calcular ahorros para mostrar en la tabla
     const precioUnitario = 4000;
     const precioSinPromo = totalMixQty * precioUnitario;
-    const costoEnvio = deliveryOption === "ciudad" ? 1000 : 0;
+    const costoEnvio = deliveryOption === "envio" ? 1000 : 0;
     
     // Calcular precio con promos aplicadas (packs de 15, packs de 5, y unidades sueltas)
   const n15 = Math.floor(totalMixQty / 15);
@@ -307,14 +307,11 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Build action block (WhatsApp + optional Mercado Pago button) with matching heights, icon from public and spacing
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '') : '';
-      const wspImgSrc = baseUrl ? `${baseUrl}/wsp.png` : '/wsp.png';
-
-      // Embed an inline SVG icon and an <img> fallback so the WhatsApp logo has better chances to render in various mail clients
+  // Build action block (WhatsApp + optional Mercado Pago button) with matching heights and spacing
+  // Use an emoji for the WhatsApp button to avoid image-blocking in email clients
       const whatsappButton = `
         <a href="https://wa.me/5493513239624" style="display:inline-block; height:48px; line-height:48px; background-color:#25d366; color:white; padding:0 14px; text-decoration:none; border-radius:8px; font-weight:700; vertical-align:middle;">
-          <span style="display:inline-block; vertical-align:middle; height:20px; width:20px; margin-right:8px;">\n+            <img src="${wspImgSrc}" alt="WhatsApp" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:4px;" />\n            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">\n              <path d="M20.52 3.48A11.9 11.9 0 0 0 12 0C5.373 0 .233 5.14.007 11.765.005 11.84 0 12.107 0 12.16c0 .09.04.174.107.234L2.3 14.6c.055.047.126.072.198.068.694-.04 1.95-.235 2.78-.4.577-.11 1.05.1 1.3.28.662.483 1.896 1.37 2.29 1.636.142.1.31.153.482.153.214 0 .428-.08.594-.233l2.16-1.964c.06-.053.09-.12.09-.193 0-1.06-.145-2.14-.423-3.148C20.438 7.87 21 5.987 21 4.02c0-.18-.013-.36-.04-.537z" fill="white"/>\n            </svg>\n          </span>
+          <span style="display:inline-block; vertical-align:middle; font-size:18px; margin-right:8px;">📱</span>
           <span style="display:inline-block; vertical-align:middle; line-height:1;">Coordinar ahora por WhatsApp</span>
         </a>
       `;
@@ -378,7 +375,7 @@ export async function POST(request: NextRequest) {
               </thead>
               <tbody>
                 ${itemsHTML}
-                ${deliveryOption === "ciudad" ? `
+                ${deliveryOption === "envio" ? `
                 <tr>
                   <td style="padding: 8px; border-bottom: 1px solid #eee;">
                     <strong>Envío a Córdoba</strong>

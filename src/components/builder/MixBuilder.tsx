@@ -1168,16 +1168,11 @@ export function MixBuilder() {
               onClick={async () => {
                 // proceed with Mercado Pago flow
                 try {
-                  // Calcular precio con promos aplicadas
+                  // Calcular precio con promos aplicadas correctamente
                   const totalMixQty = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-                  let precioConPromo = totalMixQty * PRICE_SINGLE;
-                  
-                  if (totalMixQty >= 15) {
-                    precioConPromo = 53000; // 15 mixs por $53.000
-                  } else if (totalMixQty >= 5) {
-                    precioConPromo = 18000; // 5 mixs por $18.000
-                  }
-                  
+                  // Reuse computePrice to calculate promo price per total quantity (handles packs de 15/5 y unidades)
+                  const computed = computePrice(totalMixQty);
+                  const precioConPromo = computed.price;
                   const precioUnitarioConPromo = totalMixQty > 0 ? precioConPromo / totalMixQty : PRICE_SINGLE;
 
                   // Preparar items para Mercado Pago
