@@ -279,16 +279,21 @@ export function MixBuilder() {
     
     // Aplicar descuento si existe
     let discountAmount = 0;
+    let discountCapped = false;
     if (appliedDiscount) {
+      let raw = 0;
       if (appliedDiscount.type === 'percentage') {
-        discountAmount = (subtotal * appliedDiscount.value) / 100;
+        raw = (subtotal * appliedDiscount.value) / 100;
       } else if (appliedDiscount.type === 'fixed') {
-        discountAmount = Math.min(appliedDiscount.value, subtotal);
+        raw = Math.min(appliedDiscount.value, subtotal);
       }
       // Aplicar tope máximo para códigos de descuento (ej: 787 -> $787)
       const DISCOUNT_CAP = 787;
-      if (discountAmount > DISCOUNT_CAP) {
+      if (raw > DISCOUNT_CAP) {
         discountAmount = DISCOUNT_CAP;
+        discountCapped = true;
+      } else {
+        discountAmount = raw;
       }
     }
     
@@ -299,6 +304,7 @@ export function MixBuilder() {
       price: finalPrice,
       deliveryCost,
       discountAmount,
+      discountCapped,
       subtotal,
     };
   }, [totalMixQty, deliveryOption, appliedDiscount]);
@@ -1022,6 +1028,7 @@ export function MixBuilder() {
                     ? `Ahorro por descuento del ${appliedDiscount.value}%`
                     : 'Ahorro por código de descuento'
                   }
+                  {pricing.discountCapped ? ' (tope alcanzado)' : ''}
                 </span>
                 <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discountAmount)}</span>
               </div>
