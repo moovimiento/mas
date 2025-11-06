@@ -486,7 +486,34 @@ export default function AdminPage() {
                 <label className="text-sm text-gray-400">Hasta</label>
                 <input type="date" value={dateTo ?? ''} onChange={(e) => setDateTo(e.target.value || null)} className="bg-slate-800 text-white p-1 rounded" />
               </div>
-              <div>
+              <div className="flex items-center gap-2">
+                {selectedIds.length > 0 && (
+                  <Button variant="destructive" onClick={async (e) => {
+                    e.stopPropagation();
+                    const ok = window.confirm(`Borrar ${selectedIds.length} pedido(s)? Esta acción es irreversible.`);
+                    if (!ok) return;
+                    try {
+                      const res = await fetch('/api/admin/delete-orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+                        body: JSON.stringify({ ids: selectedIds }),
+                      });
+                      const j = await res.json();
+                      if (res.ok) {
+                        setMessage('Pedidos eliminados');
+                        setSelected({});
+                        fetchOrders();
+                      } else {
+                        setMessage(j.error || 'Error al eliminar pedidos');
+                      }
+                    } catch (err) {
+                      console.error('Error deleting orders', err);
+                      setMessage('Error al eliminar pedidos');
+                    }
+                  }}>
+                    Borrar registro
+                  </Button>
+                )}
                 <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
               </div>
             </div>
@@ -527,6 +554,33 @@ export default function AdminPage() {
               <input type="date" value={dateFrom ?? ''} onChange={(e) => setDateFrom(e.target.value || null)} className="bg-slate-800 text-white p-1 rounded" />
               <label className="text-sm text-gray-400">Hasta</label>
               <input type="date" value={dateTo ?? ''} onChange={(e) => setDateTo(e.target.value || null)} className="bg-slate-800 text-white p-1 rounded" />
+              {selectedIds.length > 0 && (
+                <Button variant="destructive" onClick={async (e) => {
+                  e.stopPropagation();
+                  const ok = window.confirm(`Borrar ${selectedIds.length} pedido(s)? Esta acción es irreversible.`);
+                  if (!ok) return;
+                  try {
+                    const res = await fetch('/api/admin/delete-orders', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+                      body: JSON.stringify({ ids: selectedIds }),
+                    });
+                    const j = await res.json();
+                    if (res.ok) {
+                      setMessage('Pedidos eliminados');
+                      setSelected({});
+                      fetchOrders();
+                    } else {
+                      setMessage(j.error || 'Error al eliminar pedidos');
+                    }
+                  } catch (err) {
+                    console.error('Error deleting orders', err);
+                    setMessage('Error al eliminar pedidos');
+                  }
+                }}>
+                  Borrar registro
+                </Button>
+              )}
               <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
             </div>
           </div>

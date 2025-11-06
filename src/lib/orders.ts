@@ -101,3 +101,14 @@ export async function markOrderPending(id: string) {
   }
   return true;
 }
+
+export async function deleteOrders(ids: string[]) {
+  if (!ids || ids.length === 0) return true;
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from('orders').delete().in('id', ids);
+  if (error) {
+    console.error('Error deleting orders:', error);
+    throw error;
+  }
+  return true;
+}
