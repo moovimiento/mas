@@ -60,13 +60,27 @@ export async function GET(_req: Request, { params }: { params: Promise<{ token: 
 
     // If there is a discount amount saved, push as negative item
     if (order.discountAmount && Number(order.discountAmount) > 0) {
-      preferenceItems.push({
-        id: `discount-${order.discountCode || 'disc'}`,
-        title: `Descuento (${order.discountCode || ''})`,
-        quantity: 1,
-        unit_price: -Number(order.discountAmount),
-        currency_id: 'ARS',
+      // Avoid double-applying discount: only add a discount item if the saved items
+      // don't already include a negative item representing the discount.
+      const hasDiscountItem = preferenceItems.some(pi => {
+        const up = Number((pi as Record<string, unknown>).unit_price ?? 0);
+        const id = (pi as Record<string, unknown>).id as string | undefined;
+        const title = (pi as Record<string, unknown>).title as string | undefined;
+        if (up < 0) {
+          if (id && id.toString().toLowerCase().startsWith('discount-')) return true;
+          if (title && title.toLowerCase().includes('descuento')) return true;
+        }
+        return false;
       });
+      if (!hasDiscountItem) {
+        preferenceItems.push({
+          id: `discount-${order.discountCode || 'disc'}`,
+          title: `Descuento (${order.discountCode || ''})`,
+          quantity: 1,
+          unit_price: -Number(order.discountAmount),
+          currency_id: 'ARS',
+        });
+      }
     }
 
     const backBase = process.env.NEXT_PUBLIC_BASE_URL || '';

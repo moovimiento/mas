@@ -1357,6 +1357,16 @@ export function MixBuilder() {
               </svg>
               Coordinar ahora por WhatsApp
             </a>
+            {/* Botón alternativo para abrir Gmail (misma altura/estilo para consistencia) */}
+            <a
+              href={"https://mail.google.com/mail/u/0/#inbox"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors mb-4 ml-3"
+            >
+              <span className="text-lg">✉️</span>
+              Abrir casilla de Gmail
+            </a>
           </div>
         </div>
       )}

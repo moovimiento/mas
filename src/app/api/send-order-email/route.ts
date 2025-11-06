@@ -328,8 +328,8 @@ export async function POST(request: NextRequest) {
       const spacer = payButton ? '<span style="display:inline-block; width:10px; height:1px;"></span>' : '';
       const buttonsRow = `<div style="text-align:center; margin-top:16px;">${whatsappButton}${spacer}${payButton}</div>`;
 
-      // Don't show MP amount explicitly in the email (requested)
-      const mpNote = '';
+  // Small hint shown below buttons when a Mercado Pago button is available
+  const mpNote = payButton ? `<p style="margin-top:8px; font-size:14px; color:#333;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
 
       const efectivoBlock = `
         <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
