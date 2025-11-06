@@ -303,6 +303,26 @@ export function MixBuilder() {
     };
   }, [totalMixQty, deliveryOption, appliedDiscount]);
 
+  // Etiqueta legible para el descuento aplicado (porcentaje o monto), preferimos el mapa explícito si existe
+  const appliedDiscountLabel = useMemo(() => {
+    if (!appliedDiscount) return '';
+    const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
+    if (mapEnv) {
+      try {
+        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage'|'fixed'; value: number }>;
+        const mapped = parsed[appliedDiscount.code.toUpperCase()];
+        if (mapped) {
+          if (mapped.type === 'percentage') return `${mapped.value}% de descuento`;
+          if (mapped.type === 'fixed') return `$${mapped.value.toLocaleString('es-AR')} de descuento`;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    // fallback al valor tal cual
+    return appliedDiscount.type === 'percentage' ? `${appliedDiscount.value}% de descuento` : `$${appliedDiscount.value} de descuento`;
+  }, [appliedDiscount]);
+
   function setGram(id: IngredientId, grams: number) {
     // Set grams for a single ingredient, ensuring the overall total never exceeds TOTAL_GRAMS
     setMix((prev) => {
