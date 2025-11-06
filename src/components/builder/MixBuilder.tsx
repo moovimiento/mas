@@ -164,22 +164,39 @@ export function MixBuilder() {
   // Función para validar códigos de descuento
   const validateDiscountCode = (code: string) => {
     const upperCode = code.toUpperCase();
-    
     // Obtener códigos válidos desde variables de entorno
     const validCodesEnv = process.env.NEXT_PUBLIC_DISCOUNT_CODES || '';
     const validCodes = validCodesEnv.split(',').map(c => c.trim()).filter(c => c);
-    
-    // Verificar si el código está en la lista de códigos válidos
+
+    // Si el código no está en la lista, no es válido
     if (!validCodes.includes(upperCode)) {
       return null;
     }
-    
-    // Extraer número del nombre del código
+
+    // Primero, intentar mapa explícito (NEXT_PUBLIC_DISCOUNT_MAP) para casos especiales
+    const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
+    if (mapEnv) {
+      try {
+        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage'|'fixed'; value: number }>;
+        const mapped = parsed[upperCode];
+        if (mapped && (mapped.type === 'percentage' || mapped.type === 'fixed') && typeof mapped.value === 'number') {
+          return {
+            type: mapped.type,
+            value: mapped.value,
+            description: mapped.type === 'percentage' ? `${mapped.value}% de descuento` : `$${mapped.value.toLocaleString('es-AR')} de descuento`,
+          } as const;
+        }
+      } catch (e) {
+        // ignore parse errors and fall back to heuristic
+      }
+    }
+
+    // Fallback heurística (como antes): extraer número del final y decidir porcentaje o fijo
     const numberMatch = upperCode.match(/(\d+)$/);
     if (numberMatch) {
       const number = parseInt(numberMatch[1]);
       const digits = numberMatch[1].length;
-      
+
       // Si tiene 1-2 dígitos: porcentaje
       if (digits <= 2 && number > 0 && number <= 100) {
         return {
@@ -188,7 +205,7 @@ export function MixBuilder() {
           description: `${number}% de descuento`
         };
       }
-      
+
       // Si tiene 3-5 dígitos: descuento fijo en pesos
       if (digits >= 3 && digits <= 5 && number > 0) {
         return {
@@ -198,7 +215,7 @@ export function MixBuilder() {
         };
       }
     }
-    
+
     // Si no tiene número válido, el código no es válido
     return null;
   };
