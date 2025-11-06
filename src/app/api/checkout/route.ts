@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Preference } from "mercadopago";
+import { saveOrder, OrderItem } from "@/lib/orders";
 
 // Configurar Mercado Pago
 const client = new MercadoPagoConfig({
@@ -129,6 +130,36 @@ export async function POST(request: NextRequest) {
 
     console.log("Preference created:", response.id);
     console.log("Init point:", response.init_point);
+
+    // Persistir el pedido en Supabase para que los pedidos web queden registrados
+    try {
+      // Calcular totales
+      const totalMixQty = (items || []).reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+      const totalPrice = (preferenceData.items || []).reduce((sum, it) => {
+        const item = it as { unit_price?: number; quantity?: number };
+        const up = Number(item.unit_price ?? 0) || 0;
+        const q = Number(item.quantity ?? 0) || 0;
+        return sum + up * q;
+      }, 0);
+
+      await saveOrder({
+        name,
+        email,
+        phone: phone ?? '',
+        items: items as unknown as OrderItem[],
+        deliveryOption,
+        deliveryAddress,
+        totalPrice,
+        totalMixQty,
+        paymentMethod: 'mercadopago',
+        paymentLink: response.init_point,
+        discountCode,
+        discountAmount,
+      });
+    } catch (err) {
+      console.error('Error saving order after creating preference:', err);
+      // No interrumpimos la respuesta al cliente; la preferencia ya fue creada.
+    }
 
     return NextResponse.json({
       id: response.id,

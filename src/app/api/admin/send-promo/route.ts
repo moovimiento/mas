@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { createClient as createSupabaseServerClient } from '@/lib/supabase/server';
+import buildGenericEmailHtml from '@/lib/emailTemplates';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,13 +35,14 @@ export async function POST(request: NextRequest) {
 
     for (const row of data || []) {
       const to = row.email;
-      const personalizedHtml = (html || '').replace(/{{\s*name\s*}}/gi, row.name || '');
+      const personalizedBody = (html || '').replace(/{{\s*name\s*}}/gi, row.name || '');
+      const wrapped = buildGenericEmailHtml({ title: subject, name: row.name || undefined, contentHtml: personalizedBody });
       try {
         await resend.emails.send({
           from: 'Gonza de Moovimiento <gonza@moovimiento.com>',
           to,
           subject,
-          html: personalizedHtml,
+          html: wrapped,
         });
         results.push({ id: row.id, email: to, ok: true });
       } catch (err) {
