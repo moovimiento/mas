@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import type { OrderItem } from '@/lib/orders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+
 
 type Order = {
   id: string;
   name?: string;
   email: string;
   phone: string;
-  items: any[];
+  items: OrderItem[];
   deliveryOption: string;
   deliveryAddress?: string;
   totalPrice: number;
@@ -58,9 +60,30 @@ export default function AdminPage() {
     );
   }
 
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const res = await fetch('/api/admin/orders', { headers: { 'x-admin-password': password } });
+      if (res.status === 401) {
+        setAuthed(false);
+        setMessage('Contraseña inválida');
+        setOrders([]);
+        return;
+      }
+      const data = await res.json();
+      setOrders(data.orders || []);
+    } catch (err) {
+      console.error(err);
+      setMessage('Error cargando pedidos');
+    } finally {
+      setLoading(false);
+    }
+  }, [password]);
+
   useEffect(() => {
     if (authed) fetchOrders();
-  }, [authed]);
+  }, [authed, fetchOrders]);
 
   // Close filter dropdown when clicking outside
   useEffect(() => {
@@ -84,26 +107,7 @@ export default function AdminPage() {
     fetchOrders();
   }
 
-  async function fetchOrders() {
-    setLoading(true);
-    setMessage(null);
-    try {
-      const res = await fetch('/api/admin/orders', { headers: { 'x-admin-password': password } });
-      if (res.status === 401) {
-        setAuthed(false);
-        setMessage('Contraseña inválida');
-        setOrders([]);
-        return;
-      }
-      const data = await res.json();
-      setOrders(data.orders || []);
-    } catch (err) {
-      console.error(err);
-      setMessage('Error cargando pedidos');
-    } finally {
-      setLoading(false);
-    }
-  }
+  
 
   function toggleSelect(id: string) {
     setSelected(prev => ({ ...prev, [id]: !prev[id] }));
@@ -226,8 +230,8 @@ export default function AdminPage() {
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return (ta - tb) * direction;
       }
-      const va: any = (a as any)[sortBy as string];
-      const vb: any = (b as any)[sortBy as string];
+  const va: unknown = (a as unknown as Record<string, unknown>)[sortBy as string];
+  const vb: unknown = (b as unknown as Record<string, unknown>)[sortBy as string];
       // handle numbers
       if (typeof va === 'number' && typeof vb === 'number') {
         return (va - vb) * direction;
@@ -389,7 +393,6 @@ export default function AdminPage() {
                   <div className="w-full bg-slate-900 p-2 rounded">
                     <svg viewBox={`0 0 ${lastNDays * 18} 48`} width="100%" height={48} preserveAspectRatio="none">
                       {(() => {
-                        const width = lastNDays * 18;
                         const height = 48;
                         const max = Math.max(...dayBuckets.map(d => d.revenue), 1);
                         return dayBuckets.map((d, i) => {
@@ -432,7 +435,7 @@ export default function AdminPage() {
                     <div className="flex flex-col gap-3">
                       <div>
                         <label className="text-sm block">Estado</label>
-                        <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
+                        <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as 'all' | 'pending' | 'delivered')}>
                           <option value="all">Todos</option>
                           <option value="pending">Pendiente</option>
                           <option value="delivered">Entregado</option>
@@ -440,7 +443,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <label className="text-sm block">Delivery</label>
-                        <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterDelivery} onChange={(e) => setFilterDelivery(e.target.value as any)}>
+                        <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterDelivery} onChange={(e) => setFilterDelivery(e.target.value as 'all' | 'ciudad' | 'cordoba')}>
                           <option value="all">Todos</option>
                           <option value="ciudad">Ciudad (envío)</option>
                           <option value="cordoba">Córdoba</option>
@@ -474,7 +477,7 @@ export default function AdminPage() {
                   <div className="flex flex-col gap-3">
                     <div>
                       <label className="text-sm block">Estado</label>
-                      <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
+                      <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as 'all' | 'pending' | 'delivered')}>
                         <option value="all">Todos</option>
                         <option value="pending">Pendiente</option>
                         <option value="delivered">Entregado</option>
@@ -482,7 +485,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <label className="text-sm block">Delivery</label>
-                      <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterDelivery} onChange={(e) => setFilterDelivery(e.target.value as any)}>
+                      <select className="mt-1 w-full bg-slate-800 text-white border border-slate-700 p-1 rounded" value={filterDelivery} onChange={(e) => setFilterDelivery(e.target.value as 'all' | 'ciudad' | 'cordoba')}>
                         <option value="all">Todos</option>
                         <option value="ciudad">Ciudad (envío)</option>
                         <option value="cordoba">Córdoba</option>
@@ -775,7 +778,7 @@ export default function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {detailOrder.items && detailOrder.items.length > 0 ? detailOrder.items.map((it: any, idx: number) => {
+                          {detailOrder.items && detailOrder.items.length > 0 ? detailOrder.items.map((it: OrderItem, idx: number) => {
                             const match = (it.title || '').match(/^(.*?)\s*\((.*)\)$/);
                             const productName = match ? match[1] : it.title;
                             const composition = match ? match[2] : '';
