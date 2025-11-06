@@ -139,8 +139,9 @@ export async function POST(request: NextRequest) {
     console.log("Preference created:", response.id);
     console.log("Init point:", response.init_point);
 
-    // Persistir el pedido en Supabase para que los pedidos web queden registrados
-    try {
+  // Persistir el pedido en Supabase para que los pedidos web queden registrados
+  let savedOrderId: string | undefined = undefined;
+  try {
       // Calcular totales
       const totalMixQty = (items || []).reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
       const totalPrice = (preferenceData.items || []).reduce((sum, it) => {
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
         return sum + up * q;
       }, 0);
 
-      await saveOrder({
+      savedOrderId = await saveOrder({
         name,
         email,
         phone: phone ?? '',
@@ -167,6 +168,64 @@ export async function POST(request: NextRequest) {
     } catch (err) {
       console.error('Error saving order after creating preference:', err);
       // No interrumpimos la respuesta al cliente; la preferencia ya fue creada.
+    }
+
+    // Enviar automáticamente el email con el link de pago (servidor-side)
+    try {
+      if (response.init_point) {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
+        // Construir el body igual que lo hace el cliente cuando envía el email
+        // Recalcular totales en el servidor (misma lógica usada arriba)
+        const serverTotalMixQty = (items || []).reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+        const serverTotalPrice = (preferenceData.items || []).reduce((sum, it) => {
+          const item = it as { unit_price?: number; quantity?: number };
+          const up = Number(item.unit_price ?? 0) || 0;
+          const q = Number(item.quantity ?? 0) || 0;
+          return sum + up * q;
+        }, 0);
+
+        // Create a pay token for the order and send that in the email; the /pay route will redirect to existing init_point or create a fresh preference
+        let paymentToken: string | undefined = undefined;
+        try {
+          const { createPayToken } = await import('@/lib/payToken');
+            if (savedOrderId) paymentToken = createPayToken(savedOrderId);
+        } catch (err) {
+          console.error('Error creating payment token:', err);
+        }
+
+        const emailBody = {
+          name,
+          email,
+          phone: phone ?? '',
+          items: items,
+          deliveryOption,
+          deliveryAddress,
+          totalPrice: serverTotalPrice,
+          totalMixQty: serverTotalMixQty,
+          paymentMethod: 'mercadopago',
+          paymentLink: response.init_point,
+          paymentToken,
+          discountCode,
+          discountAmount: typeof _cappedDiscountAmount !== 'undefined' ? _cappedDiscountAmount : discountAmount,
+        };
+
+        if (baseUrl) {
+          const sendResp = await fetch(`${baseUrl.replace(/\/$/, '')}/api/send-order-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailBody),
+          });
+          if (!sendResp.ok) {
+            const text = await sendResp.text().catch(() => 'no body');
+            console.error('server send-order-email failed:', sendResp.status, text);
+          }
+        } else {
+          console.warn('NEXT_PUBLIC_BASE_URL not set; skipping server-side send-order-email');
+        }
+      }
+    } catch (err) {
+      console.error('Error sending order email from checkout route:', err);
+      // no throw: prefer no-break the checkout
     }
 
     return NextResponse.json({

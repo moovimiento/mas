@@ -257,9 +257,10 @@ export async function POST(request: NextRequest) {
         ? `📱 ¡${name ? name + ', ' : ''}tu pedido está confirmado! Te contactaremos por WhatsApp`
         : `🎉 ¡${name ? name + ', ' : ''}tu pedido de Frutos Secos está casi listo!`;
 
-      // Persist order to orders datastore (Supabase)
+      // Persist order to orders datastore (Supabase) and generate pay token
+      let savedOrderId: string | null = null;
       try {
-        await saveOrder({
+        const id = await saveOrder({
           name,
           email,
           phone,
@@ -273,13 +274,27 @@ export async function POST(request: NextRequest) {
           discountCode,
           discountAmount,
         });
+        savedOrderId = id;
       } catch (err) {
         console.error('Error persisting order:', err);
       }
 
+      // If no direct paymentLink provided, create a pay token so the email can include /pay/{token}
+      let paymentToken: string | undefined = undefined;
+      if (!paymentLink && savedOrderId) {
+        try {
+          const { createPayToken } = await import('@/lib/payToken');
+          paymentToken = createPayToken(savedOrderId);
+        } catch (err) {
+          console.error('Error creating payment token:', err);
+        }
+      }
+
       // Build action block (WhatsApp + optional Mercado Pago button) safely
       const whatsappButton = '<a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Coordinar ahora por WhatsApp</a>';
-      const payButton = paymentLink ? ('<a href="' + paymentLink + '" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 Pagar ahora con Mercado Pago</a>') : '';
+  // If we have a direct paymentLink prefer it; otherwise use pay token link that will create/redirect on-demand
+  const payHref = paymentLink ? paymentLink : (paymentToken && process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '')}/pay/${paymentToken}` : '');
+  const payButton = payHref ? (`<a href="${payHref}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 Pagar ahora con Mercado Pago</a>`) : '';
 
       const efectivoBlock = '<div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">'
         + '<p style="margin: 0 0 8px 0; font-size: 16px;"><strong>📱 ¡Te contactaremos por WhatsApp!</strong></p>'
