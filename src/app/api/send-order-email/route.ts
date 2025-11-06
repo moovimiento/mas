@@ -255,6 +255,24 @@ export async function POST(request: NextRequest) {
         console.error('Error persisting order:', err);
       }
 
+      // Build action block (WhatsApp + optional Mercado Pago button) safely
+      const whatsappButton = '<a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Coordinar ahora por WhatsApp</a>';
+      const payButton = paymentLink ? ('<a href="' + paymentLink + '" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">💳 Pagar ahora con Mercado Pago</a>') : '';
+
+      const efectivoBlock = '<div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">'
+        + '<p style="margin: 0 0 8px 0; font-size: 16px;"><strong>📱 ¡Te contactaremos por WhatsApp!</strong></p>'
+        + '<p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>'
+        + '<div style="text-align: center; margin-top: 16px; display:flex; gap:12px; flex-direction:column; align-items:center;">' + whatsappButton + (payButton ? ('<div style="margin-top:8px;">' + payButton + '</div>') : '') + '</div>'
+        + '</div>';
+
+      const nonEfectivoBlock = '<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">'
+        + '<p style="margin: 0 0 8px 0; font-size: 16px;"><strong>⚠️ Último paso: completá el pago</strong></p>'
+        + '<p style="margin: 0;">Tu pedido está reservado. <strong>Si todavía no lo abonaste</strong> hacé click en el botón de abajo:</p>'
+        + (payButton ? ('<div style="text-align: center; margin-top: 16px;">' + payButton + '</div>') : '')
+        + '</div>';
+
+      const actionBlock = (paymentMethod === 'efectivo') ? efectivoBlock : nonEfectivoBlock;
+
       result = await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",
       to: email,
@@ -319,50 +337,14 @@ export async function POST(request: NextRequest) {
               </tr>
             </table>
 
-            ${paymentMethod === 'efectivo' ? `
-            <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0 0 8px 0; font-size: 16px;">
-                <strong>📱 ¡Te contactaremos por WhatsApp!</strong>
-              </p>
-              <p style="margin: 0;">Tu pedido está confirmado. Te vamos a contactar para coordinar la entrega y el pago en efectivo. Si querés tomar la iniciativa, podés escribirnos directamente:</p>
-              <div style="text-align: center; margin-top: 16px;">
-                <a href="https://wa.me/5493513239624" style="display: inline-block; background-color: #25d366; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 8px;" aria-hidden="true" focusable="false">
-                    <path fill="#ffffff" d="M20.52 3.48A11.86 11.86 0 0012 .99 11.96 11.96 0 00.99 12c0 2.11.55 4.09 1.51 5.82L.01 24l6.36-1.68A11.93 11.93 0 0012 23.01c6.63 0 11.99-5.36 11.99-11.99 0-3.2-1.25-6.2-3.48-8.54zM12 21.28c-1.35 0-2.68-.36-3.84-1.03l-.27-.16-3.8 1.01 1.02-3.7-.18-.3A9.17 9.17 0 012.79 12 9.21 9.21 0 1112 21.28zM17.18 14.37c-.29-.14-1.7-.84-1.96-.94-.27-.1-.45-.15-.64.16-.19.31-.73 1.02-.89 1.22-.16.2-.32.22-.59.08-.27-.14-1.15-.44-2.19-1.38-.81-.72-1.36-1.61-1.51-1.88-.15-.27-.02-.41.12-.58.11-.12.24-.32.36-.48.11-.16.15-.27.23-.45.07-.18.04-.34-.02-.48-.06-.14-.56-1.54-.77-2.1-.2-.54-.4-.47-.55-.48-.14-.01-.29-.01-.45-.01-.16 0-.42.06-.64.36-.22.3-.84 1.02-.84 2.48 0 1.44.93 2.83 1.06 3.03.13.21 1.85 2.95 4.49 4.14.63.27 1.12.44 1.5.56.57.18 1.09.16 1.5.09.46-.07 1.42-.57 1.62-1.12.2-.55.2-1.03.14-1.12-.07-.1-.24-.16-.47-.28z"/>
-                  </svg>
-                  Coordinar ahora por WhatsApp
-                </a>
-              </div>
-            </div>
-            ` : `
-            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0 0 8px 0; font-size: 16px;">
-                <strong>⚠️ Último paso: completá el pago</strong>
-              </p>
-              <p style="margin: 0;">Tu pedido está reservado. <strong>Si todavía no lo abonaste</strong> hacé click en el botón de abajo:</p>
-              ${paymentLink ? `
-                <div style="text-align: center; margin-top: 16px;">
-                  <a href="${paymentLink}" style="display: inline-block; background-color: #fbbf24; color: #000; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    💳 Abonar ahora con Mercado Pago
-                  </a>
-                </div>
-              ` : ''}
-            </div>
-
+            ${actionBlock}
             <p style="margin-top: 30px; font-size: 14px; color: #666;">
               Una vez que confirmes el pago, te vamos a enviar otro email con todos los detalles de la entrega 📦
             </p>
-            `}
-
-            ${paymentMethod === 'efectivo' ? `
+            
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
               ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
             </p>
-            ` : `
-            <p style="margin-top: 20px; font-size: 14px; color: #666;">
-              ¿Tenés alguna duda? Escribime a <a href="mailto:gonza@moovimiento.com">gonza@moovimiento.com</a> o visitá nuestras <a href="https://www.moovimiento.com/#faq">Preguntas Frecuentes</a>
-            </p>
-            `}
 
             <p style="margin-top: 20px; font-size: 14px; color: #666;">
               ¡Gracias por confiar en nosotros! ⚡<br>
