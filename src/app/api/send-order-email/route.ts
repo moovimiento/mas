@@ -197,8 +197,10 @@ export async function POST(request: NextRequest) {
       // Aplicar tope por seguridad (en caso de que venga mayor desde el cliente)
       const DISCOUNT_CAP = 787;
       const displayDiscountAmount = Math.min(discountAmount, DISCOUNT_CAP);
-      // Intentar detectar si el código corresponde a un descuento porcentual
-      let discountLabel = `${currency.format(discountAmount)}`;
+
+      // Detectar si el descuento es porcentual (para mostrar "(- 7%)") o fijo
+      let discountIsPercentage = false;
+      let discountPercent = 0;
       try {
         const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
         if (mapEnv) {
@@ -206,23 +208,38 @@ export async function POST(request: NextRequest) {
           const mapped = parsed[(discountCode || '').toUpperCase()];
           if (mapped) {
             if (mapped.type === 'percentage') {
-              discountLabel = `${mapped.value}% de descuento`;
-            } else if (mapped.type === 'fixed') {
-              discountLabel = `${currency.format(mapped.value)}`;
+              discountIsPercentage = true;
+              discountPercent = mapped.value;
             }
           }
         }
       } catch {
-        // ignore and fall back to currency.format(discountAmount)
+        // ignore parse errors
       }
+
+      // Fallback heurística si no viene en el mapa
+      if (!discountIsPercentage) {
+        const numberMatch = (discountCode || '').toUpperCase().match(/(\d+)$/);
+        if (numberMatch) {
+          const num = parseInt(numberMatch[1]);
+          if (numberMatch[1].length <= 2 && num > 0 && num <= 100) {
+            discountIsPercentage = true;
+            discountPercent = num;
+          }
+        }
+      }
+
+      const leftLabel = discountIsPercentage
+        ? `🎉 Ahorro por el código de descuento ${discountCode} (- ${discountPercent}%)`
+        : `🎉 Ahorro por el código de descuento ${discountCode}`;
 
       ahorrosHTML += `
         <tr style="background-color: #f0fdf4;">
           <td style="padding: 8px; border-bottom: 1px solid #eee; color: #16a34a;">
-            <strong>🎉 Ahorro por el código de descuento ${discountCode}</strong>
+            <strong>${leftLabel}</strong>
           </td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center; color: #16a34a;">1</td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${discountLabel}${displayDiscountAmount && discountLabel.startsWith('$') ? '' : ''}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right; color: #16a34a; white-space:nowrap;">- ${currency.format(displayDiscountAmount)}</td>
         </tr>
       `;
     }
@@ -291,29 +308,27 @@ export async function POST(request: NextRequest) {
       }
 
       // Build action block (WhatsApp + optional Mercado Pago button) with matching heights, icon from public and spacing
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '') : '';
-      const wspImgSrc = baseUrl ? `${baseUrl}/wsp.png` : '/wsp.png';
-
-      // WhatsApp button uses the repository `public/wsp.png` image and centers content vertically
+      // Embed an inline SVG icon so the WhatsApp logo is visible in most mail clients
       const whatsappButton = `
-        <a href="https://wa.me/5493513239624" style="display: inline-flex; align-items: center; gap: 8px; height: 48px; background-color: #25d366; color: white; padding: 0 14px; text-decoration: none; border-radius: 8px; font-weight: 700;">
-          <img src="${wspImgSrc}" alt="WhatsApp" style="width:20px;height:20px;display:inline-block;vertical-align:middle;" />
-          <span style="line-height:1;">Coordinar ahora por WhatsApp</span>
+        <a href="https://wa.me/5493513239624" style="display:inline-block; height:48px; line-height:48px; background-color:#25d366; color:white; padding:0 14px; text-decoration:none; border-radius:8px; font-weight:700; vertical-align:middle;">
+          <span style="display:inline-block; vertical-align:middle; height:20px; width:20px; margin-right:8px;">\n            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">\n              <path d="M20.52 3.48A11.9 11.9 0 0 0 12 0C5.373 0 .233 5.14.007 11.765.005 11.84 0 12.107 0 12.16c0 .09.04.174.107.234L2.3 14.6c.055.047.126.072.198.068.694-.04 1.95-.235 2.78-.4.577-.11 1.05.1 1.3.28.662.483 1.896 1.37 2.29 1.636.142.1.31.153.482.153.214 0 .428-.08.594-.233l2.16-1.964c.06-.053.09-.12.09-.193 0-1.06-.145-2.14-.423-3.148C20.438 7.87 21 5.987 21 4.02c0-.18-.013-.36-.04-.537z" fill="white"/>\n            </svg>\n          </span>
+          <span style="display:inline-block; vertical-align:middle; line-height:1;">Coordinar ahora por WhatsApp</span>
         </a>
       `;
 
       // If we have a direct paymentLink prefer it; otherwise use pay token link that will create/redirect on-demand
       const payHref = paymentLink ? paymentLink : (paymentToken && process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '')}/pay/${paymentToken}` : '');
       const payButton = payHref ? (`
-        <a href="${payHref}" style="display: inline-flex; align-items: center; gap: 8px; height: 48px; background-color: #fbbf24; color: #000; padding: 0 14px; text-decoration: none; border-radius: 8px; font-weight: 700;">
-          <span style="line-height:1;">💳 Pagar ahora con Mercado Pago</span>
+        <a href="${payHref}" style="display:inline-block; height:48px; line-height:48px; background-color:#fbbf24; color:#000; padding:0 14px; text-decoration:none; border-radius:8px; font-weight:700; vertical-align:middle;">
+          <span style="display:inline-block; vertical-align:middle; line-height:1;">💳 Pagar ahora con Mercado Pago</span>
         </a>
       `) : '';
 
       // Small horizontal gap between buttons (10px) and ensure vertical centering
       const buttonsRow = `<div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-top:16px;">${whatsappButton}${payButton ? payButton : ''}</div>`;
 
-      const mpNote = payButton ? `<p style="text-align:center; margin-top:10px; color:#666; font-size:14px;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
+  // Show expected Mercado Pago amount using totalPrice passed to this endpoint so you can compare with the MP page amount
+  const mpNote = payButton ? `<p style="text-align:center; margin-top:10px; color:#666; font-size:14px;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido). El pago será por <strong>${currency.format(totalPrice)}</strong>.</p>` : '';
 
       const efectivoBlock = `
         <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
