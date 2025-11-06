@@ -186,9 +186,9 @@ export function MixBuilder() {
             description: mapped.type === 'percentage' ? `${mapped.value}% de descuento` : `$${mapped.value.toLocaleString('es-AR')} de descuento`,
           } as const;
         }
-      } catch (e) {
-        // ignore parse errors and fall back to heuristic
-      }
+      } catch {
+          // ignore parse errors and fall back to heuristic
+        }
     }
 
     // Fallback heurística (como antes): extraer número del final y decidir porcentaje o fijo
@@ -321,7 +321,7 @@ export function MixBuilder() {
           if (mapped.type === 'percentage') return `${mapped.value}% de descuento`;
           if (mapped.type === 'fixed') return `$${mapped.value.toLocaleString('es-AR')} de descuento`;
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     }

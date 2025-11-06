@@ -2,15 +2,31 @@ import { NextResponse } from 'next/server';
 import { verifyPayToken } from '@/lib/payToken';
 import { createClient as createSupabaseServerClient } from '@/lib/supabase/server';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { OrderRecord, OrderItem } from '@/lib/orders';
+
+// Small helper to convert snake_case DB rows returned by Supabase into camelCase fields
+function toCamelRow(obj: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(obj)) {
+    const parts = key.split('_');
+    if (parts.length === 1) {
+      out[key] = obj[key];
+      continue;
+    }
+    const camel = parts[0] + parts.slice(1).map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+    out[camel] = obj[key];
+  }
+  return out;
+}
 
 // Mercado Pago client
 const mpClient = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
 });
 
-export async function GET(_req: Request, { params }: { params: { token: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ token: string }> }) {
   try {
-    const token = params.token;
+    const { token } = await params;
     const payload = verifyPayToken(token);
     if (!payload || !payload.orderId) {
       return NextResponse.redirect('/?error=invalid_token');
@@ -23,38 +39,38 @@ export async function GET(_req: Request, { params }: { params: { token: string }
       return NextResponse.redirect('/?error=order_not_found');
     }
 
-    const order = data as Record<string, any>;
+  const order = (toCamelRow(data as Record<string, unknown>) as unknown) as OrderRecord;
 
-    // If we already have a payment_link saved, redirect to it
-    if (order.payment_link) {
-      return NextResponse.redirect(order.payment_link as string);
+    // If we already have a payment link saved, redirect to it
+    if (order.paymentLink) {
+      return NextResponse.redirect(order.paymentLink as string);
     }
 
     // Otherwise create a preference now and persist it
-    const items = (order.items || []) as Array<any>;
+    const items = (order.items || []) as OrderItem[];
     const preference = new Preference(mpClient);
 
-    const preferenceItems = items.map((it: any, idx: number) => ({
+    const preferenceItems = items.map((it: OrderItem, idx: number) => ({
       id: `item-${idx}`,
-      title: it.title,
-      quantity: it.quantity,
-      unit_price: it.unit_price,
+      title: it.title ?? 'Mix',
+      quantity: Number(it.quantity ?? 1),
+      unit_price: Number(it.unit_price ?? 0),
       currency_id: 'ARS',
     }));
 
     // If there is a discount amount saved, push as negative item
-    if (order.discount_amount && Number(order.discount_amount) > 0) {
+    if (order.discountAmount && Number(order.discountAmount) > 0) {
       preferenceItems.push({
-        id: `discount-${order.discount_code || 'disc'}`,
-        title: `Descuento (${order.discount_code || ''})`,
+        id: `discount-${order.discountCode || 'disc'}`,
+        title: `Descuento (${order.discountCode || ''})`,
         quantity: 1,
-        unit_price: -Number(order.discount_amount),
+        unit_price: -Number(order.discountAmount),
         currency_id: 'ARS',
       });
     }
 
     const backBase = process.env.NEXT_PUBLIC_BASE_URL || '';
-    const preferenceData = {
+    const preferenceData: Record<string, unknown> = {
       items: preferenceItems,
       back_urls: {
         success: `${backBase}/checkout/success`,
@@ -72,12 +88,15 @@ export async function GET(_req: Request, { params }: { params: { token: string }
       locale: 'es-AR',
     };
 
-    const resp = await preference.create({ body: preferenceData as any });
-    const initPoint = resp.init_point;
+  // preference.create expects the library's request shape; cast here to `any`
+  // Call the external SDK (typed loosely) and normalize response as a record to avoid `any`.
+  const resp = await (preference as unknown as { create: (opts: unknown) => Promise<unknown> }).create({ body: preferenceData });
+  const respRecord = resp as unknown as Record<string, unknown>;
+  const initPoint = respRecord.init_point as string | undefined;
 
     // Persist init_point in order
     try {
-      await supabase.from('orders').update({ payment_link: initPoint, preference_id: resp.id, pref_created_at: new Date().toISOString() }).eq('id', payload.orderId);
+  await supabase.from('orders').update({ payment_link: initPoint, preference_id: respRecord.id as string | undefined, pref_created_at: new Date().toISOString() }).eq('id', payload.orderId);
     } catch (e) {
       console.error('Error updating order with preference', e);
     }

@@ -33,7 +33,7 @@ export function verifyPayToken(token: string) {
     const payload = JSON.parse(payloadB.toString('utf8')) as { orderId: string; exp: number };
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
     return payload;
-  } catch (e) {
+  } catch {
     return null;
   }
 }

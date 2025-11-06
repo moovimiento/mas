@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
             }
           }
         }
-      } catch (e) {
+      } catch {
         // ignore and fall back to currency.format(discountAmount)
       }
 
