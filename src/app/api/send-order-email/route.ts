@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-
-interface OrderItem {
-  title: string;
-  quantity: number;
-  unit_price: number;
-}
+import { saveOrder, OrderItem } from "@/lib/orders";
 
 interface EmailBody {
   name?: string;
@@ -73,7 +68,7 @@ export async function POST(request: NextRequest) {
       const differences = new Map<number, Set<string>>();
       
       items.forEach((item, index) => {
-        const match = item.title.match(/^(.*?)\s*\((.*)\)$/);
+        const match = (item.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
         if (!match) return;
         
         const composition = match[2];
@@ -92,7 +87,7 @@ export async function POST(request: NextRequest) {
         // Comparar con otros mixes
         items.forEach((otherItem, otherIndex) => {
           if (otherIndex !== index) {
-            const otherMatch = otherItem.title.match(/^(.*?)\s*\((.*)\)$/);
+            const otherMatch = (otherItem.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
             if (!otherMatch) return;
             
             const otherComposition = otherMatch[2];
@@ -127,8 +122,8 @@ export async function POST(request: NextRequest) {
     // Generar HTML del resumen
     const itemsHTML = items.map((item, index) => {
       // Extraer composición del título (ej: "Mix personalizado (Pera 20%, ...)")
-      const match = item.title.match(/^(.*?)\s*\((.*)\)$/);
-      const productName = match ? match[1] : item.title;
+      const match = (item.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
+      const productName = match ? match[1] : (item.title ?? '');
       let composition = match ? match[2] : '';
       
       // Destacar ingredientes que difieren
@@ -148,9 +143,11 @@ export async function POST(request: NextRequest) {
       }
       
       // Para mixs personalizados, mostrar precio original sin promos
-      let displayPrice = item.unit_price * item.quantity;
-      if (productName.includes('Mix personalizado')) {
-        displayPrice = 4000 * item.quantity; // Precio original sin promos
+      const qty = Number(item.quantity ?? 0);
+      const unit = Number(item.unit_price ?? 0);
+      let displayPrice = unit * qty;
+      if (productName && productName.includes('Mix personalizado')) {
+        displayPrice = 4000 * qty; // Precio original sin promos
       }
       
       return `
@@ -159,7 +156,7 @@ export async function POST(request: NextRequest) {
             <strong>${productName}</strong>
             ${composition ? `<br><span style="font-size: 13px; color: #666; line-height: 1.6;">${composition}</span>` : ''}
           </td>
-          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${qty}</td>
           <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">${currency.format(displayPrice)}</td>
         </tr>
       `;
@@ -237,6 +234,26 @@ export async function POST(request: NextRequest) {
       const emailSubject = paymentMethod === 'efectivo'
         ? `📱 ¡${name ? name + ', ' : ''}tu pedido está confirmado! Te contactaremos por WhatsApp`
         : `🎉 ¡${name ? name + ', ' : ''}tu pedido de Frutos Secos está casi listo!`;
+
+      // Persist order to orders datastore (Supabase)
+      try {
+        await saveOrder({
+          name,
+          email,
+          phone,
+          items,
+          deliveryOption,
+          deliveryAddress,
+          totalPrice,
+          totalMixQty,
+          paymentMethod,
+          paymentLink,
+          discountCode,
+          discountAmount,
+        });
+      } catch (err) {
+        console.error('Error persisting order:', err);
+      }
 
       result = await resend.emails.send({
       from: "Gonza de Moovimiento <gonza@moovimiento.com>",

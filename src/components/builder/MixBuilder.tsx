@@ -94,7 +94,9 @@ export function MixBuilder() {
     }
     return [];
   });
-  const [shakeRemaining, setShakeRemaining] = useState(false);
+  // value intentionally unused; only the setter is used elsewhere. Disable unused-vars lint for the value.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_shakeRemaining, setShakeRemaining] = useState(false);
   const [shakeAddToCart, setShakeAddToCart] = useState(false);
   const [shakeClassicMix, setShakeClassicMix] = useState(false);
   const [hoveredIngredient, setHoveredIngredient] = useState<IngredientId | null>(null);
