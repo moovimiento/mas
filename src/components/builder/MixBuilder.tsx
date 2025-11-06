@@ -1098,6 +1098,23 @@ export function MixBuilder() {
                     });
                   }
 
+                  // If there are promo-based savings (packs) or a discount code, add them as negative items
+                  // so that an on-demand Mercado Pago preference (created later from the saved order) matches the email total.
+                  if (pricing.discount > 0) {
+                    items.push({
+                      title: `Ahorro por promos`,
+                      quantity: 1,
+                      unit_price: -Math.round(pricing.discount),
+                    });
+                  }
+                  if (pricing.discountAmount > 0) {
+                    items.push({
+                      title: `Descuento ${appliedDiscount?.code ? `(${appliedDiscount.code})` : ''}`,
+                      quantity: 1,
+                      unit_price: -Math.round(pricing.discountAmount),
+                    });
+                  }
+
                   // Debug: verificar datos de descuento
                   console.log('Datos de descuento:', {
                     appliedDiscount,
