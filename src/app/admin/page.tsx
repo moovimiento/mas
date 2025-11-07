@@ -35,6 +35,7 @@ export default function AdminPage() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [promoOpen, setPromoOpen] = useState(false);
   const [promoSubject, setPromoSubject] = useState('');
+  const [promoTitle, setPromoTitle] = useState('');
   const [promoHtml, setPromoHtml] = useState('');
   const [promoEmailsText, setPromoEmailsText] = useState('');
   const [promoEmails, setPromoEmails] = useState<string[]>([]);
@@ -199,15 +200,16 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/send-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
-        body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, html: promoHtml, headerImage: promoCoverDataUrl }),
+        body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, title: promoTitle, html: promoHtml, headerImage: promoCoverDataUrl }),
       });
       const j = await res.json();
-      if (res.ok) {
+        if (res.ok) {
         // show concise success toast for 3s and clear state
         toast.success('Promos enviadas', { duration: 3000 });
         console.log('send-promo results', j.results);
         setPromoOpen(false);
         setPromoSubject('');
+        setPromoTitle('');
         setPromoHtml('');
         setSelected({});
         setPersonalTarget(null);
@@ -245,7 +247,7 @@ export default function AdminPage() {
 
   function buildPreviewHtml() {
     const headerImageHtml = promoCoverDataUrl ? `<div style="text-align:center;margin:12px 0;"><img src=\"${promoCoverDataUrl}\" alt=\"Portada\" style=\"max-width:100%;height:auto;border-radius:8px;\"/></div>` : '';
-    const titleHtml = promoSubject ? `<h1 style="font-size:20px;color:#fbbf24;margin-bottom:8px;">${promoSubject}</h1>` : '';
+  const titleHtml = promoTitle ? `<h1 style="font-size:20px;color:#fbbf24;margin-bottom:8px;">${promoTitle}</h1>` : '';
 
     // For preview only: if we have a personal target, interpolate {{name}} with the real name
     let previewContent = promoHtml || '';
@@ -427,7 +429,9 @@ export default function AdminPage() {
             // If there are selected orders, open the promo modal and show the recipients list
             const ids = selectedIds;
             setPersonalTarget(null);
-            setPromoSubject(ids.length > 0 ? `Promo exclusiva para ${ids.length} clientes` : `Promo exclusiva`);
+            const def = ids.length > 0 ? `Promo exclusiva para ${ids.length} clientes` : `Promo exclusiva`;
+            setPromoSubject(def);
+            setPromoTitle(def);
             setPromoHtml(`<p>Hola! Tenemos una promo para vos...</p>`);
             setPromoOpen(true);
           }}>
@@ -601,7 +605,7 @@ export default function AdminPage() {
                   </Button>
                 )}
                 {selectedIds.length > 0 && (
-                  <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar nomas</Button>
+                  <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar</Button>
                 )}
                 <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
               </div>
@@ -671,7 +675,7 @@ export default function AdminPage() {
                 </Button>
               )}
               {selectedIds.length > 0 && (
-                <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar nomas</Button>
+                <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar</Button>
               )}
               <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
             </div>
@@ -816,7 +820,9 @@ export default function AdminPage() {
                         // open personal promo modal for this order
                         setSelected({ [o.id]: true });
                         setPersonalTarget(o);
-                        setPromoSubject(`Promo exclusiva para ${o.name || o.email}`);
+                        const personalDef = `Promo exclusiva para ${o.name || o.email}`;
+                        setPromoSubject(personalDef);
+                        setPromoTitle(personalDef);
                         // Prefill with template placeholder instead of concrete name
                         setPromoHtml(`<p>Hola {{name}}! 👋</p><p>Tenemos una promo para vos...</p>`);
                         setPromoOpen(true);
@@ -920,13 +926,25 @@ export default function AdminPage() {
                             console.error('Error reading image', err);
                           }
                         }} style={{ display: 'none' }} />
-                        <Button variant="outline" onClick={() => { if (coverInputRef.current) coverInputRef.current.click(); }}>Subir foto</Button>
+                        <Button variant="outline" onClick={() => { if (coverInputRef.current) coverInputRef.current.click(); }}>
+                          {promoCoverDataUrl ? 'Actualizar foto' : 'Subir foto'}
+                        </Button>
                         {promoCoverDataUrl && (
-                          <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded ml-3 border" />
+                          <div className="ml-3 flex items-center gap-2">
+                            <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded border" />
+                            <button type="button" aria-label="Eliminar foto" className="text-red-400 hover:text-red-500" onClick={() => { setPromoCoverDataUrl(null); if (coverInputRef.current) coverInputRef.current.value = ''; }}>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
-                  <Label>Asunto</Label>
+                  <Label>Título (aparece en el mail)</Label>
+                  <Input value={promoTitle} onChange={e => setPromoTitle((e.target as HTMLInputElement).value)} />
+
+                  <Label className="mt-2">Asunto (solo en el asunto del mail)</Label>
                   <Input ref={subjectInputRef} value={promoSubject} onChange={e => setPromoSubject((e.target as HTMLInputElement).value)} />
 
                   {/* Top tools row removed per request: kept the HTML toolbar below instead */}
@@ -934,7 +952,7 @@ export default function AdminPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="pb-4">
                       <Label className="mb-2">HTML</Label>
-                      <div className="flex gap-2 mb-2">
+                      <div className="flex flex-wrap gap-2 mb-2">
                         <Button size="sm" variant="outline" onClick={() => wrapHtmlSelection('<strong>', '</strong>')}>B</Button>
                         <Button size="sm" variant="outline" onClick={() => wrapHtmlSelection('<em>', '</em>')}>I</Button>
                         <Button size="sm" variant="outline" onClick={() => wrapHtmlSelection('<h2>', '</h2>')}>H2</Button>

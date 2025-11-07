@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
   const body = await request.json();
-  const { orderIds, emails, subject, html, headerImage } = body || {};
+  const { orderIds, emails, subject, title, html, headerImage } = body || {};
     if ((!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) && (!emails || !Array.isArray(emails) || emails.length === 0)) {
       return NextResponse.json({ error: 'Missing recipients (orderIds or emails)' }, { status: 400 });
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         const to = row.email;
   const personalizedBody = (html || '').replace(/{{\s*name\s*}}/gi, row.name || '');
   const headerImageHtml = headerImage ? `<div style="text-align:center; margin:12px 0;"><img src="${headerImage}" alt="Portada" style="max-width:100%; height:auto; border-radius:8px;"/></div>` : undefined;
-  const wrapped = buildGenericEmailHtml({ title: subject, name: row.name || undefined, contentHtml: personalizedBody, headerImageHtml });
+  const wrapped = buildGenericEmailHtml({ title: (title || subject), name: row.name || undefined, contentHtml: personalizedBody, headerImageHtml });
         try {
           await resend.emails.send({
             from: 'Gonza de Moovimiento <gonza@moovimiento.com>',
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       for (const to of emails) {
   const personalizedBody = (html || '').replace(/{{\s*name\s*}}/gi, '');
   const headerImageHtml = headerImage ? `<div style="text-align:center; margin:12px 0;"><img src="${headerImage}" alt="Portada" style="max-width:100%; height:auto; border-radius:8px;"/></div>` : undefined;
-  const wrapped = buildGenericEmailHtml({ title: subject, contentHtml: personalizedBody, headerImageHtml });
+  const wrapped = buildGenericEmailHtml({ title: (title || subject), contentHtml: personalizedBody, headerImageHtml });
         try {
           await resend.emails.send({ from: 'Gonza de Moovimiento <gonza@moovimiento.com>', to, subject, html: wrapped });
           results.push({ email: to, ok: true });
