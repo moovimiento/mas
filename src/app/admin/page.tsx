@@ -254,18 +254,8 @@ export default function AdminPage() {
       previewContent = previewContent.replace(/{{\s*name\s*}}/gi, safeName);
     }
 
-    // split content into two columns by first </p>
-    let left = previewContent;
-    let right = '';
-    const idx = previewContent.toLowerCase().indexOf('</p>');
-    if (idx !== -1) {
-      left = previewContent.slice(0, idx + 4);
-      right = previewContent.slice(idx + 4) || '';
-    } else {
-      const mid = Math.floor(previewContent.length / 2);
-      left = previewContent.slice(0, mid);
-      right = previewContent.slice(mid);
-    }
+    // Render content as a single column in the preview (avoid automatic 2-column split)
+    const contentHtml = previewContent || '';
 
     const wrapped = `
       <div style="font-family: Arial, sans-serif; max-width:600px; background:#fff; border:1px solid #e5e7eb; padding:16px; border-radius:6px;">
@@ -273,10 +263,7 @@ export default function AdminPage() {
         <div style="padding:12px;">
           ${titleHtml}
           ${headerImageHtml}
-          <div style="display:flex;gap:12px;">
-            <div style="flex:1">${left}</div>
-            <div style="flex:1">${right}</div>
-          </div>
+          <div style="width:100%">${contentHtml}</div>
           <p style="margin-top:12px;color:#666;font-size:13px;">Si tenés alguna duda escribinos a <a href=\"mailto:gonza@moovimiento.com\">gonza@moovimiento.com</a></p>
         </div>
       </div>
@@ -614,7 +601,7 @@ export default function AdminPage() {
                   </Button>
                 )}
                 {selectedIds.length > 0 && (
-                  <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar clientes</Button>
+                  <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar nomas</Button>
                 )}
                 <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
               </div>
@@ -684,7 +671,7 @@ export default function AdminPage() {
                 </Button>
               )}
               {selectedIds.length > 0 && (
-                <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar clientes</Button>
+                <Button variant="outline" onClick={() => { setSelected({}); }}>Deseleccionar nomas</Button>
               )}
               <Button variant="outline" onClick={() => { setDateFrom(null); setDateTo(null); }}>Limpiar fechas</Button>
             </div>
@@ -942,15 +929,7 @@ export default function AdminPage() {
                   <Label>Asunto</Label>
                   <Input ref={subjectInputRef} value={promoSubject} onChange={e => setPromoSubject((e.target as HTMLInputElement).value)} />
 
-                  <div className="flex items-center gap-3 mt-2">
-                              <div className="text-sm text-gray-400">Herramientas:</div>
-                    <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => insertVariable('{{name}}', 'subject')}>Insertar <code className="ml-1">{"{{name}}"}</code> en asunto</button>
-                    <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => insertVariable('{{name}}', 'html')}>Insertar <code className="ml-1">{"{{name}}"}</code> en cuerpo</button>
-                              <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => wrapSelection('<strong>', '</strong>')}>Negrita</button>
-                              <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => wrapSelection('<em>', '</em>')}>Cursiva</button>
-                              <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => wrapSelection('<ul><li>', '</li></ul>')}>Lista</button>
-                              <button type="button" className="text-sm px-2 py-1 bg-yellow-400 text-black rounded" onClick={() => insertCTA()}>Insertar botón CTA</button>
-                  </div>
+                  {/* Top tools row removed per request: kept the HTML toolbar below instead */}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="pb-4">
@@ -962,6 +941,7 @@ export default function AdminPage() {
                         <Button size="sm" variant="outline" onClick={() => insertVariable('<hr/>', 'html')}>Separador</Button>
                         <Button size="sm" variant="outline" onClick={() => insertCta()}>Insertar CTA</Button>
                         <Button size="sm" variant="outline" onClick={() => insertVariable('{{name}}', 'html')}>Insertar {'{{name}}'}</Button>
+                        <Button size="sm" variant="outline" onClick={() => insertVariable('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia.</p>', 'html')}>Agregar párrafo (Lorem)</Button>
                       </div>
                       <textarea ref={htmlTextareaRef} rows={12} className="w-full border px-3 py-2 rounded h-[420px]" value={promoHtml} onChange={e => setPromoHtml(e.target.value)} />
                     </div>
