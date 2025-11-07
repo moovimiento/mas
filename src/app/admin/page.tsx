@@ -39,6 +39,10 @@ export default function AdminPage() {
   const [promoHtml, setPromoHtml] = useState('');
   const [promoEmailsText, setPromoEmailsText] = useState('');
   const [promoEmails, setPromoEmails] = useState<string[]>([]);
+  const [showAddRecipientInput, setShowAddRecipientInput] = useState(false);
+  const [newRecipientEmail, setNewRecipientEmail] = useState('');
+  const [editingEmailIndex, setEditingEmailIndex] = useState<number | null>(null);
+  const [editingEmailValue, setEditingEmailValue] = useState('');
   const [promoCoverDataUrl, setPromoCoverDataUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
@@ -857,22 +861,79 @@ export default function AdminPage() {
               <CardContent>
                 <div className="space-y-4">
                   {/* If there are selected recipients, show them here */}
-                  {selectedIds.length > 0 && (
-                    <div className="bg-slate-800 text-sm text-gray-200 p-3 rounded">
-                      <div className="font-medium mb-2">Destinatarios ({selectedIds.length})</div>
-                      <div className="flex flex-wrap gap-2">
+                  <div className="bg-slate-800 text-sm text-gray-200 p-3 rounded">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-medium">Destinatarios ({selectedIds.length + promoEmails.length})</div>
+                      <div className="flex items-center gap-2">
+                        <button type="button" className="text-sm px-2 py-1 bg-slate-700 rounded" onClick={() => setShowAddRecipientInput(s => !s)}>+</button>
+                      </div>
+                    </div>
+
+                    {/* List selected order recipients (cannot edit email, but can remove) */}
+                    {selectedIds.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
                         {selectedIds.map(id => {
                           const ord = orders.find(o => o.id === id);
                           if (!ord) return null;
                           return (
-                            <span key={id} className="bg-slate-700 px-3 py-1 rounded text-sm">
-                              {ord.name ? `${ord.name} <${ord.email}>` : ord.email}
+                            <span key={id} className="bg-slate-700 px-3 py-1 rounded text-sm flex items-center gap-2">
+                              <span>{ord.name ? `${ord.name} <${ord.email}>` : ord.email}</span>
+                              <button type="button" aria-label="Eliminar destinatario" className="text-red-400 hover:text-red-500" onClick={() => { setSelected(prev => { const next = { ...prev }; delete next[id]; return next; }); }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                                </svg>
+                              </button>
                             </span>
                           );
                         })}
                       </div>
-                    </div>
-                  )}
+                    )}
+
+                    {/* Raw email recipients (editable) */}
+                    {promoEmails.length > 0 && (
+                      <div className="flex flex-col gap-2 mb-2">
+                        {promoEmails.map((em, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            {editingEmailIndex === idx ? (
+                              <>
+                                <Input className="w-full" value={editingEmailValue} onChange={(e) => setEditingEmailValue((e.target as HTMLInputElement).value)} />
+                                <Button size="sm" onClick={() => {
+                                  const v = editingEmailValue.trim();
+                                  if (!v) return;
+                                  setPromoEmails(prev => prev.map((p, i) => i === idx ? v : p));
+                                  setPromoEmailsText(prev => promoEmails.map((p,i)=> i===idx ? v : p).join('\n'));
+                                  setEditingEmailIndex(null);
+                                }}>Guardar</Button>
+                                <Button size="sm" variant="outline" onClick={() => setEditingEmailIndex(null)}>Cancelar</Button>
+                              </>
+                            ) : (
+                              <>
+                                <span className="flex-1 text-sm">{em}</span>
+                                <Button size="sm" variant="outline" onClick={() => { setEditingEmailIndex(idx); setEditingEmailValue(em); }}>Editar</Button>
+                                <button type="button" aria-label="Eliminar email" className="text-red-400 hover:text-red-500" onClick={() => {
+                                  setPromoEmails(prev => prev.filter((_, i) => i !== idx));
+                                  setPromoEmailsText(prev => promoEmails.filter((_, i) => i !== idx).join('\n'));
+                                }}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add recipient input (toggleable) */}
+                    {showAddRecipientInput && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <Input className="flex-1" placeholder="email@example.com" value={newRecipientEmail} onChange={(e) => setNewRecipientEmail((e.target as HTMLInputElement).value)} onKeyDown={(e) => { if (e.key === 'Enter') { const v = newRecipientEmail.trim(); if (v) { setPromoEmails(prev => { const next = [...prev, v]; setPromoEmailsText(next.join('\n')); return next; }); setNewRecipientEmail(''); setShowAddRecipientInput(false); } } }} />
+                        <Button onClick={() => { const v = newRecipientEmail.trim(); if (!v) return; setPromoEmails(prev => { const next = [...prev, v]; setPromoEmailsText(next.join('\n')); return next; }); setNewRecipientEmail(''); setShowAddRecipientInput(false); }}>Agregar</Button>
+                        <Button variant="outline" onClick={() => { setShowAddRecipientInput(false); setNewRecipientEmail(''); }}>Cancelar</Button>
+                      </div>
+                    )}
+                  </div>
                     {!personalTarget && (
                       <>
                         <div className="pt-3 pb-2">
