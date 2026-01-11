@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🥜 Moovimiento
 
-## Getting Started
+**An interactive experience to create your own nut mixes.**
 
-First, run the development server:
+"Más Moovimiento" is your digital shop to customize and order nutritious 220g mixes. Designed to offer a seamless shopping experience, from ingredient selection to checkout and delivery.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **🥣 Mix Builder**: Intuitive interface (simple selection) to build your perfect mix.
+- **🛒 Integrated Checkout**: Optimized purchase process with real-time price calculation.
+- **💳 Secure Payments**: Full integration with Mercado Pago for reliable transactions.
+- **🚚 Delivery Management**: Configurable delivery options, focused on [Ciudad Universitaria](https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g).
+- **📱 Responsive & Dark Mode**: Flawless mobile experience and native dark mode support.
+- **⚡ High Performance**: Application built with the latest Next.js technology for instant navigation.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Technology Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: [Next.js 15](https://nextjs.org/) + [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Database**: [Supabase](https://supabase.com/)
+- **Global State**: [Zustand](https://github.com/pmndrs/zustand)
+- **Payments**: [Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/sdks-library/server-side)
+- **Email**: [Resend](https://resend.com/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📖 Usage
 
-## Deploy on Vercel
+### 🥣 Build a Mix
+1. Explore the variety of nuts, seeds, and dried fruits.
+2. Select your favorite ingredients until you complete the 220g.
+3. Visualize the cost and nutritional composition (if applicable) in real-time.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🛍️ Complete the Order
+1. Enter your shipping and billing details.
+2. Proceed to secure payment via Mercado Pago.
+3. Receive confirmation via email and status notifications.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📄 License
+
+This project is for commercial use by Moovimiento. All rights reserved.
+
+---
+
+Made with 💛 by [Gonza](https://github.com/gonzalogramagia)

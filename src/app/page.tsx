@@ -31,9 +31,9 @@ export default function Home() {
             <span className={`${sourceSans.className} text-lg font-semibold leading-none`}>Moovimiento</span>
           </a>
           <nav className="flex items-center gap-4 justify-end">
-            <a 
-              href="https://www.moovimiento.com/#faq" 
-              target="_blank" 
+            <a
+              href="https://www.moovimiento.com/#faq"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-sm hover:underline cursor-pointer"
             >
@@ -47,7 +47,7 @@ export default function Home() {
         <section className="mx-auto max-w-5xl px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-4 text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">Mixs de ⚡<br />Frutos Secos a tu manera</h1>
-            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados<br /><span className="hidden lg:inline">Delivery gratuito en Ciudad Universitaria</span></p>
+            <p className="text-muted-foreground">Armá tu mix de 220g con ingredientes seleccionados<br /><span className="hidden lg:inline">Delivery gratuito en <a href="https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors">Ciudad Universitaria</a></span></p>
           </div>
           <div className="flex justify-center">
             <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block rounded-lg overflow-hidden shadow-sm">
@@ -67,20 +67,18 @@ export default function Home() {
       <footer className="border-t">
         <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
           <span>
-            © {new Date().getFullYear()}<br className="md:hidden" />
-            <span className="hidden md:inline"> </span>Generado por {" "}
-            <a
-              href="https://catsulecorp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-sky-600 cursor-pointer"
-            >
-              Catsule Corp
-            </a>
+            © {new Date().getFullYear()} | Mens sana in corpore sano
           </span>
           <span className="text-right">
-            🇦🇷<br className="md:hidden" />
-            <span className="hidden md:inline"> </span>Hecho en Argentina
+            <a
+              href="https://gonzalogramagia.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-yellow-400 cursor-pointer transition-colors"
+            >
+              🇦🇷<br className="md:hidden" />
+              <span className="hidden md:inline"> </span>Hecho en Argentina
+            </a>
           </span>
         </div>
       </footer>
