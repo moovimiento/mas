@@ -2,7 +2,7 @@
 
 **An interactive experience to create your own nut mixes.**
 
-"Más Moovimiento" is your digital shop to customize and order nutritious 220g mixes. Designed to offer a seamless shopping experience, from ingredient selection to checkout and delivery.
+"Moovimiento" is your digital shop to customize and order nutritious 220g mixes. Designed to offer a seamless shopping experience, from ingredient selection to checkout and delivery.
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 🛠️ Technology Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) + [React 19](https://react.dev/)
+- **Framework**: [Next.js 16](https://nextjs.org/) + [React 19](https://react.dev/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Database**: [Supabase](https://supabase.com/)
@@ -29,7 +29,7 @@
 
 ---
 
-## 📖 Usage
+## � Usage
 
 ### 🥣 Build a Mix
 1. Explore the variety of nuts, seeds, and dried fruits.
