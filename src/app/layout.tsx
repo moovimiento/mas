@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: 'Moovimiento',
     images: [
       {
-        url: '/og-image.png',
+        url: '/moovimiento-emoji.png',
         width: 1200,
         height: 630,
         alt: 'Moovimiento - Mixs de Frutos Secos',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Mixs de ⚡ Frutos Secos | Moovimiento",
     description: "Armá tu mix de 220g con ingredientes seleccionados. Delivery gratuito en Ciudad Universitaria.",
-    images: ['/og-image.png'],
+    images: ['/moovimiento-emoji.png'],
   },
 };
 

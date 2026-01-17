@@ -147,12 +147,12 @@ export function MixBuilder() {
     const n5 = Math.floor(rem / 5);
     rem = rem - n5 * 5;
     const n1 = rem;
-    
+
     const parts: string[] = [];
     if (n15 > 0) parts.push(`${n15 * 15} Mix${n15 * 15 > 1 ? 's' : ''} (${n15} promo${n15 > 1 ? 's' : ''} de 15)`);
     if (n5 > 0) parts.push(`${n5 * 5} Mix${n5 * 5 > 1 ? 's' : ''} (${n5} promo${n5 > 1 ? 's' : ''} de 5)`);
     if (n1 > 0) parts.push(`${n1} Mix${n1 > 1 ? 's' : ''}`);
-    
+
     return parts.length > 0 ? parts.join(' + ') : '0 Mixs';
   }, [totalMixQty]);
 
@@ -177,7 +177,7 @@ export function MixBuilder() {
     const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
     if (mapEnv) {
       try {
-        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage'|'fixed'; value: number }>;
+        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage' | 'fixed'; value: number }>;
         const mapped = parsed[upperCode];
         if (mapped && (mapped.type === 'percentage' || mapped.type === 'fixed') && typeof mapped.value === 'number') {
           return {
@@ -187,8 +187,8 @@ export function MixBuilder() {
           } as const;
         }
       } catch {
-          // ignore parse errors and fall back to heuristic
-        }
+        // ignore parse errors and fall back to heuristic
+      }
     }
 
     // Fallback heurística (como antes): extraer número del final y decidir porcentaje o fijo
@@ -276,7 +276,7 @@ export function MixBuilder() {
     const basePrice = computePrice(totalMixQty);
     const deliveryCost = deliveryOption === "envio" ? DELIVERY_COST : 0;
     const subtotal = basePrice.price + deliveryCost;
-    
+
     // Aplicar descuento si existe
     let discountAmount = 0;
     let discountCapped = false;
@@ -296,9 +296,9 @@ export function MixBuilder() {
         discountAmount = raw;
       }
     }
-    
+
     const finalPrice = Math.max(0, subtotal - discountAmount);
-    
+
     return {
       ...basePrice,
       price: finalPrice,
@@ -315,7 +315,7 @@ export function MixBuilder() {
     const mapEnv = process.env.NEXT_PUBLIC_DISCOUNT_MAP || '';
     if (mapEnv) {
       try {
-        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage'|'fixed'; value: number }>;
+        const parsed = JSON.parse(mapEnv) as Record<string, { type: 'percentage' | 'fixed'; value: number }>;
         const mapped = parsed[appliedDiscount.code.toUpperCase()];
         if (mapped) {
           if (mapped.type === 'percentage') return `${mapped.value}% de descuento`;
@@ -360,13 +360,13 @@ export function MixBuilder() {
       const maxAllowedEven = Math.floor(maxAllowed / 2) * 2;
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
       let nextVal = Math.max(0, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
-      
+
       // Trigger shake animation if trying to add but no space
       if (delta > 0 && nextVal === current && maxAllowedEven === 0) {
         setShakeRemaining(true);
         setTimeout(() => setShakeRemaining(false), 500);
       }
-      
+
       // Round to nearest multiple of 11
       nextVal = Math.round(nextVal / 11) * 11;
       return { ...prev, [id]: nextVal } as Mix;
@@ -444,10 +444,10 @@ export function MixBuilder() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1">
-        <h2 className="text-2xl font-semibold">Armá tu mix (220g)</h2>
-        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-8 pt-2">
-          <span>Mínimo por ingrediente: <span className="font-medium">0g</span></span>
+      <div className="flex flex-col items-center md:flex-row md:items-center md:justify-between gap-1 text-center md:text-left">
+        <h2 className="hidden md:block text-2xl font-semibold">Armá tu mix (220g)</h2>
+        <div className="text-sm text-muted-foreground whitespace-normal flex flex-col items-center sm:flex-row sm:justify-between gap-0 sm:gap-8 pt-2 leading-tight">
+
           <span>Máximo por ingrediente: <span className="font-medium">66g</span></span>
         </div>
       </div>
@@ -458,7 +458,7 @@ export function MixBuilder() {
             <div className="flex items-center justify-between gap-3">
               <CardTitle>Ingredientes</CardTitle>
               <div className="flex items-center gap-2">
-                <div 
+                <div
                   className="relative cursor-pointer"
                   onClick={() => {
                     if (total < 220) {
@@ -467,15 +467,15 @@ export function MixBuilder() {
                   }}
                 >
                   <div className="w-24 h-6 bg-gray-300 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full transition-all duration-300 ease-out"
-                      style={{ 
+                      style={{
                         width: `${Math.min((total / 220) * 100, 100)}%`,
                         background: total === 220 ? 'linear-gradient(to right, #22c55e, #16a34a)' : // verde total solo en 220g
-                                   total < 55 ? 'linear-gradient(to right, #ef4444, #f97316)' : // rojo a naranja (0-25%)
-                                   total < 110 ? 'linear-gradient(to right, #f97316, #eab308)' : // naranja a amarillo (25-50%)
-                                   total < 165 ? 'linear-gradient(to right, #eab308, #facc15)' : // amarillo más intenso (50-75%)
-                                   'linear-gradient(to right, #eab308, #22c55e)' // amarillo a verde (75-99%)
+                          total < 55 ? 'linear-gradient(to right, #ef4444, #f97316)' : // rojo a naranja (0-25%)
+                            total < 110 ? 'linear-gradient(to right, #f97316, #eab308)' : // naranja a amarillo (25-50%)
+                              total < 165 ? 'linear-gradient(to right, #eab308, #facc15)' : // amarillo más intenso (50-75%)
+                                'linear-gradient(to right, #eab308, #22c55e)' // amarillo a verde (75-99%)
                       }}
                     />
                   </div>
@@ -489,7 +489,7 @@ export function MixBuilder() {
           <CardContent className="space-y-4 flex-1">
             {INGREDIENTS.map((ing) => (
               <div key={ing.id} className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] items-center gap-2 lg:gap-3">
-                <div 
+                <div
                   className={cn(
                     "font-medium text-center lg:text-left w-full lg:w-auto cursor-pointer transition-all",
                     (mix[ing.id] ?? 0) === 0 && "opacity-40"
@@ -649,7 +649,7 @@ export function MixBuilder() {
                 INGREDIENTS.map(ing => [ing.id, ing.color])
               ) as Record<IngredientId, string>
 
-              const parts = (INGREDIENTS as readonly {id: IngredientId; name: string}[]).map((ing) => ({
+              const parts = (INGREDIENTS as readonly { id: IngredientId; name: string }[]).map((ing) => ({
                 id: ing.id,
                 name: ing.name,
                 percent: percentages[ing.id] ?? 0,
@@ -668,10 +668,10 @@ export function MixBuilder() {
                 return `${color} ${p.startAngle / 3.6}% ${p.endAngle / 3.6}%`
               }).join(", ")
               const bg = `conic-gradient(${stops})`
-              
+
               return (
                 <div className="flex flex-col items-center gap-4">
-                  <div 
+                  <div
                     className="relative size-48"
                     onMouseLeave={() => setHoveredIngredient(null)}
                   >
@@ -690,7 +690,7 @@ export function MixBuilder() {
                         const y1 = 50 + 50 * Math.sin(startRad)
                         const x2 = 50 + 50 * Math.cos(endRad)
                         const y2 = 50 + 50 * Math.sin(endRad)
-                        
+
                         return (
                           <path
                             key={i}
@@ -709,25 +709,25 @@ export function MixBuilder() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                     {parts.map((p, i) => (
-                      <div 
-                        key={i} 
+                      <div
+                        key={i}
                         className={cn(
                           "flex items-center gap-2 cursor-pointer transition-all"
                         )}
                         onMouseEnter={() => setSelectedId(p.id)}
                         onClick={() => setSelectedId(p.id)}
                       >
-                        <span 
-                          className={cn("inline-block size-3 rounded-sm flex-shrink-0", (mix[p.id] ?? 0) === 0 && "opacity-40 bg-muted-foreground")} 
-                          style={(mix[p.id] ?? 0) > 0 ? { backgroundColor: p.id === selectedId ? '#eab308' : p.color } : undefined} 
+                        <span
+                          className={cn("inline-block size-3 rounded-sm flex-shrink-0", (mix[p.id] ?? 0) === 0 && "opacity-40 bg-muted-foreground")}
+                          style={(mix[p.id] ?? 0) > 0 ? { backgroundColor: p.id === selectedId ? '#eab308' : p.color } : undefined}
                         />
-                        <span 
+                        <span
                           className={cn("flex-1 whitespace-nowrap", (mix[p.id] ?? 0) === 0 && "text-muted-foreground opacity-40")}
                           style={(mix[p.id] ?? 0) > 0 ? { color: p.id === selectedId ? '#eab308' : p.color } : undefined}
                         >
                           {p.name}
                         </span>
-                        <span 
+                        <span
                           className={cn("ml-2 min-w-[2.5rem] text-right flex-shrink-0", (mix[p.id] ?? 0) === 0 && "text-muted-foreground opacity-40")}
                           style={(mix[p.id] ?? 0) > 0 ? { color: p.id === selectedId ? '#eab308' : p.color } : undefined}
                         >
@@ -752,7 +752,7 @@ export function MixBuilder() {
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
               <div className="text-muted-foreground py-5 border-t border-b border-border/80">
-                No hay mixs en el carrito 🛒 <button 
+                No hay mixs en el carrito 🛒 <button
                   onClick={() => {
                     const mixTitle = document.querySelector('h2');
                     if (mixTitle) {
@@ -768,32 +768,32 @@ export function MixBuilder() {
               <>
                 {cartItems.map((item, index) => {
                   const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
-                  
+
                   // Función para determinar si un ingrediente difiere de otros mixes
                   const getIngredientDifferences = () => {
                     const differences = new Set<string>();
-                    
+
                     // Comparar con todos los otros mixes
                     cartItems.forEach((otherItem, otherIndex) => {
                       if (otherIndex !== index) {
                         const otherTotal = Object.values(otherItem.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
-                        
+
                         INGREDIENTS.forEach((ing) => {
                           const currentPercent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
                           const otherPercent = otherTotal > 0 ? Math.round(((otherItem.mix[ing.id] ?? 0) / otherTotal) * 100) : 0;
-                          
+
                           if (currentPercent !== otherPercent) {
                             differences.add(ing.id);
                           }
                         });
                       }
                     });
-                    
+
                     return differences;
                   };
-                  
+
                   const differentIngredients = getIngredientDifferences();
-                  
+
                   return (
                     <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                       <div className="flex items-center justify-between gap-3">
@@ -855,7 +855,7 @@ export function MixBuilder() {
                   );
                 })}
                 <div className="pt-2 pb-3 border-b w-full" style={{ paddingBottom: '1.25rem' }}>
-                  <button 
+                  <button
                     onClick={() => {
                       const mixTitle = document.querySelector('h2');
                       if (mixTitle) {
@@ -1024,7 +1024,7 @@ export function MixBuilder() {
             {pricing.discountAmount > 0 && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600">
-                  {appliedDiscount?.type === 'percentage' 
+                  {appliedDiscount?.type === 'percentage'
                     ? `Ahorro por descuento del ${appliedDiscount.value}%`
                     : 'Ahorro por código de descuento'
                   }
@@ -1044,18 +1044,18 @@ export function MixBuilder() {
                 {deliveryOption === "ciudad" && pricing.discount > 0 && pricing.discountAmount > 0
                   ? "Total (con promo, descuento y envío gratis)"
                   : deliveryOption === "ciudad" && pricing.discount > 0
-                  ? "Total (con promo y envío gratis)"
-                  : deliveryOption === "ciudad" && pricing.discountAmount > 0
-                  ? "Total (con descuento y envío gratis)"
-                  : deliveryOption === "ciudad"
-                  ? "Total (con envío gratis)"
-                  : pricing.discount > 0 && pricing.discountAmount > 0
-                  ? "Total (con promo y descuento)"
-                  : pricing.discount > 0
-                  ? "Total (con promo)"
-                  : pricing.discountAmount > 0
-                  ? "Total (con descuento)"
-                  : "Total"}
+                    ? "Total (con promo y envío gratis)"
+                    : deliveryOption === "ciudad" && pricing.discountAmount > 0
+                      ? "Total (con descuento y envío gratis)"
+                      : deliveryOption === "ciudad"
+                        ? "Total (con envío gratis)"
+                        : pricing.discount > 0 && pricing.discountAmount > 0
+                          ? "Total (con promo y descuento)"
+                          : pricing.discount > 0
+                            ? "Total (con promo)"
+                            : pricing.discountAmount > 0
+                              ? "Total (con descuento)"
+                              : "Total"}
               </span>
               <span className="font-semibold">{currency.format(pricing.price)}</span>
             </div>
@@ -1080,7 +1080,7 @@ export function MixBuilder() {
                         return `${percent}% de ${ing.name} (${grams}g)`;
                       })
                       .join(" + ");
-                    
+
                     return {
                       title: `Mix personalizado (${ingredients})`,
                       quantity: item.quantity,
@@ -1167,7 +1167,7 @@ export function MixBuilder() {
                   }
                 } catch (error) {
                   console.error('Error al procesar el pedido:', error);
-                  
+
                   // Detectar errores de red específicos
                   if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
                     setErrorMessage("Error de conexión. Verifica tu internet e intenta nuevamente.");
@@ -1203,7 +1203,7 @@ export function MixBuilder() {
                         return `${percent}% de ${ing.name} (${grams}g)`;
                       })
                       .join(" + ");
-                    
+
                     return {
                       title: `Mix personalizado (${ingredients})`,
                       quantity: item.quantity,
@@ -1275,7 +1275,7 @@ export function MixBuilder() {
                   }
                 } catch (error) {
                   console.error("Error:", error);
-                  
+
                   // Detectar errores de red específicos
                   if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
                     setErrorMessage("Error de conexión. Verifica tu internet e intenta nuevamente.");
@@ -1289,7 +1289,7 @@ export function MixBuilder() {
               Abonar con Mercado Pago
             </Button>
           </div>
-          
+
           {/* Mensaje de error */}
           {errorMessage && (
             <div className="mt-4 p-3 bg-transparent border border-red-400 text-red-700 rounded">
@@ -1334,7 +1334,7 @@ export function MixBuilder() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            
+
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               ¡Pedido confirmado!
@@ -1344,7 +1344,7 @@ export function MixBuilder() {
               <br />
               <strong>Revisá tu email para más detalles.</strong>
             </p>
-            
+
             {/* Botón principal de WhatsApp */}
             <a
               href="https://wa.me/5493513239624?text=Hola!%20Confirmo%20mi%20pedido%20personalizado%20de%20Mix(s)%20de%20Frutos%20Secos%20y%20quiero%20coordinar%20la%20entrega%20y%20pago%20en%20efectivo.%20Gracias!"
@@ -1353,7 +1353,7 @@ export function MixBuilder() {
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors mb-4 cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
               </svg>
               Coordinar ahora por WhatsApp
             </a>
