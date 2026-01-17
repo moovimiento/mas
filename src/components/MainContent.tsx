@@ -1,7 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import { Source_Sans_3 } from "next/font/google";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { MixBuilder } from "@/components/builder/MixBuilder";
+import { Pricing } from "@/components/Pricing";
+import { FAQ } from "@/components/FAQ";
+import { Trust } from "@/components/Trust";
 import { dictionary, Language } from "@/lib/dictionary";
 
 const sourceSans = Source_Sans_3({ subsets: ["latin"], weight: ["400", "600", "700"] });
@@ -13,7 +18,15 @@ export function MainContent({ lang }: { lang: Language }) {
         <div className="min-h-screen flex flex-col">
             <header className="w-full border-b">
                 <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
-                    <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:cursor-pointer shrink-0" aria-label="Ir a moovimiento.com">
+                    <a
+                        href="#trust"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById('trust')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="flex items-center gap-2 hover:cursor-pointer shrink-0"
+                        aria-label="Ir a sección de confianza"
+                    >
                         {/* Logo - un solo contenedor para ambos temas */}
                         <div className="relative h-8 w-8">
                             <Image
@@ -35,9 +48,11 @@ export function MainContent({ lang }: { lang: Language }) {
                     </a>
                     <nav className="flex items-center gap-4 justify-end">
                         <a
-                            href="https://www.moovimiento.com/#faq"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="#faq"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
                             className="text-sm hover:underline cursor-pointer"
                         >
                             {t.faq}
@@ -50,10 +65,10 @@ export function MainContent({ lang }: { lang: Language }) {
                 <section className="mx-auto max-w-5xl px-6 py-8 md:py-16 grid md:grid-cols-2 gap-10 items-center">
                     <div className="space-y-4 text-center md:text-left">
                         <h1 className="text-4xl md:text-5xl font-bold leading-tight whitespace-pre-line">{t.hero_title}</h1>
-                        <p className="text-muted-foreground">{t.hero_subtitle}<br /><span className="hidden lg:inline">{t.delivery_free} <a href="https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors">{t.location}</a></span></p>
+                        <p className="text-muted-foreground">{t.hero_subtitle}<br /><span className="hidden lg:inline">{t.delivery_free} <a href="https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors cursor-pointer">{t.location}</a></span></p>
                     </div>
                     <div className="flex justify-center order-first md:order-none -mb-20 -mt-8 md:my-0">
-                        <a href="https://moovimiento.com" target="_blank" rel="noopener noreferrer" aria-label="Ir a moovimiento.com" className="group inline-block">
+                        <a href="https://instagram.com/moovimiento" target="_blank" rel="noopener noreferrer" aria-label="Ir a Instagram de Moovimiento" className="group inline-block">
                             <Image
                                 src="/moovimiento-emoji.png"
                                 alt="Moovimiento - Hero"
@@ -65,7 +80,12 @@ export function MainContent({ lang }: { lang: Language }) {
                         </a>
                     </div>
                 </section>
-                <MixBuilder lang={lang} />
+                <div id="mix-builder" className="scroll-mt-24">
+                    <MixBuilder lang={lang} />
+                </div>
+                <FAQ lang={lang} />
+                <Trust lang={lang} />
+                <Pricing lang={lang} />
             </main>
             <footer className="border-t">
                 <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
@@ -74,13 +94,12 @@ export function MainContent({ lang }: { lang: Language }) {
                     </span>
                     <span className="text-right">
                         <a
-                            href="https://gonzalogramagia.com/"
+                            href={lang === 'en' ? "https://gonzalogramagia.com/en" : "https://gonzalogramagia.com/"}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:text-foreground cursor-pointer transition-colors"
+                            className="hover:text-foreground cursor-pointer transition-colors whitespace-nowrap"
                         >
-                            🇦🇷<br className="md:hidden" />
-                            <span className="hidden md:inline"> </span>{t.made_in}
+                            {t.made_in} 🇦🇷
                         </a>
                     </span>
                 </div>

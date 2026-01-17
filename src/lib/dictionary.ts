@@ -15,7 +15,7 @@ export const dictionary = {
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            pera: "Pera deshidratada",
+            durazno: "Durazno deshidratado",
             almendras: "Almendras",
             nueces: "Nueces",
             uva: "Uva deshidratada",
@@ -108,6 +108,40 @@ export const dictionary = {
         promo_mixs: "Mixs",
         promo_of: "de",
         promo_promo: "promo",
+
+        // Pricing
+        pricing_title: "Precios y Promos",
+        pricing_subtitle: "Simples y transparentes",
+        pricing_tier_1_title: "1 Cápsula (220g)",
+        pricing_tier_1_price: "$4000 pesos",
+        pricing_tier_1_desc: "Energía para toda la semana",
+        pricing_tier_2_title: "5 Cápsulas (1100g)",
+        pricing_tier_2_price: "$18000 pesos",
+        pricing_tier_2_desc: "Energía para todo el mes",
+        pricing_tier_3_title: "15 Cápsulas (3300g)",
+        pricing_tier_3_price: "$53000 pesos",
+        pricing_tier_3_desc: "Energía para eventos especiales",
+        pricing_buy_btn: "Comprar",
+        pricing_includes: "FRUTOS SELECCIONADOS:",
+        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Durazno, Banana chips",
+
+        // FAQ
+        faq_title_full: "Preguntas Frecuentes",
+        faq_subtitle: "¡Preguntanos lo que quieras!",
+        faq_contact_email: "gonza@moovimiento.com",
+        faq_q1: "¿Es seguro comprar en Moovimiento?",
+        faq_a1: "Totalmente. Usamos Mercado Pago para procesar los cobros, así que tu dinero y tus datos están siempre protegidos. ¡Podés comprar tranquila/o!",
+        faq_q2: "¿Puedo disfrutar de los frutos secos de Moovimiento en cualquier momento?",
+        faq_a2: "¡Sí! Trabajamos con stock fresco y hacemos envíos rápidos en Ciudad Universitaria y Nueva Córdoba para que te lleguen impecables.",
+        faq_q3: "¿Por qué elegir frutos secos como snack?",
+        faq_a3: "Porque son prácticos, saludables y naturales. Te aportan energía, proteínas y grasas buenas que te ayudan a rendir mejor en el estudio, trabajo o entrenamiento.",
+        faq_q4: "¿Puedo personalizar la composición?",
+        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de mixs (más arriba en esta página) podés elegir exactamente qué querés. Si no te gusta algún ingrediente lo sacás, y si querés más de otro, lo agregás. ¡Vos decidís!",
+
+        // Trust / Footer Slogan
+        trust_slogan: "Energía que te acompaña en cada paso",
+        trust_sub: "Snacks ricos y prácticos para rendir en la facu, el trabajo o donde pinten las pilas",
+        trust_made_for: "Elegido por cada vez más estudiantes universitarios.",
     },
     en: {
         // Header & Footer
@@ -123,7 +157,7 @@ export const dictionary = {
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            pera: "Dried Pear",
+            durazno: "Dried Peach",
             almendras: "Almonds",
             nueces: "Walnuts",
             uva: "Raisins",
@@ -216,5 +250,39 @@ export const dictionary = {
         promo_mixs: "Mixes",
         promo_of: "of",
         promo_promo: "promo",
+
+        // Pricing
+        pricing_title: "Prices and Promos",
+        pricing_subtitle: "Simple and transparent",
+        pricing_tier_1_title: "1 Capsule (220g)",
+        pricing_tier_1_price: "$4000 ARS",
+        pricing_tier_1_desc: "Energy for the whole week",
+        pricing_tier_2_title: "5 Capsules (1100g)",
+        pricing_tier_2_price: "$18000 ARS",
+        pricing_tier_2_desc: "Energy for the whole month",
+        pricing_tier_3_title: "15 Capsules (3300g)",
+        pricing_tier_3_price: "$53000 ARS",
+        pricing_tier_3_desc: "Energy for special events",
+        pricing_buy_btn: "Buy",
+        pricing_includes: "SELECTED NUTS:",
+        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Peaches, Banana chips",
+
+        // FAQ
+        faq_title_full: "Frequently Asked Questions",
+        faq_subtitle: "Ask us anything!",
+        faq_contact_email: "gonza@moovimiento.com",
+        faq_q1: "Is it safe to buy at Moovimiento?",
+        faq_a1: "Absolutely. We use Mercado Pago to process payments, ensuring your transaction is secure and your data is protected.",
+        faq_q2: "Can I enjoy Moovimiento nuts at any time?",
+        faq_a2: "Yes! We work with fresh stock and provide fast delivery in Ciudad Universitaria and Nueva Córdoba, so they arrive in perfect condition.",
+        faq_q3: "Why choose nuts as a snack?",
+        faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
+        faq_q4: "Can I customize the composition?",
+        faq_a4: "Of course! By default, mixes are balanced, but you can customize them in the 'Build your mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
+
+        // Trust / Footer Slogan
+        trust_slogan: "Energy that accompanies you at every step",
+        trust_sub: "Tasty and practical snacks to perform at university, work, or wherever you need energy",
+        trust_made_for: "Chosen by more and more university students.",
     }
 };
