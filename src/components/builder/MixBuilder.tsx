@@ -5,20 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { dictionary, Language } from "@/lib/dictionary";
 
 const TOTAL_GRAMS = 220;
 const MAX_PER_INGREDIENT = 66;
 const MIN_NONZERO = 22;
 
-const INGREDIENTS = [
-  { id: "banana", name: "Banana chips", color: "#a8d8ea" },    // celeste claro argentino
-  { id: "pera", name: "Pera deshidratada", color: "#75c9e0" },      // celeste medio claro
-  { id: "almendras", name: "Almendras", color: "#4fb3d4" }, // celeste argentino
-  { id: "nueces", name: "Nueces", color: "#2a9cc0" },    // celeste medio oscuro
-  { id: "uva", name: "Uva deshidratada", color: "#1a7fa0" },       // celeste oscuro
+const INGREDIENTS_BASE = [
+  { id: "banana", color: "#a8d8ea" },    // celeste claro argentino
+  { id: "pera", color: "#75c9e0" },      // celeste medio claro
+  { id: "almendras", color: "#4fb3d4" }, // celeste argentino
+  { id: "nueces", color: "#2a9cc0" },    // celeste medio oscuro
+  { id: "uva", color: "#1a7fa0" },       // celeste oscuro
 ] as const;
 
-type IngredientId = typeof INGREDIENTS[number]["id"];
+type IngredientId = typeof INGREDIENTS_BASE[number]["id"];
 
 type Mix = Record<IngredientId, number>;
 
@@ -35,7 +36,13 @@ const preset44x5: Mix = {
   banana: 44,
 };
 
-export function MixBuilder() {
+export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
+  const t = dictionary[lang];
+
+  const INGREDIENTS = useMemo(() => INGREDIENTS_BASE.map(ing => ({
+    ...ing,
+    name: t.ingredients[ing.id]
+  })), [t]);
   const [mix, setMix] = useState<Mix>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_mix');
@@ -149,11 +156,11 @@ export function MixBuilder() {
     const n1 = rem;
 
     const parts: string[] = [];
-    if (n15 > 0) parts.push(`${n15 * 15} Mix${n15 * 15 > 1 ? 's' : ''} (${n15} promo${n15 > 1 ? 's' : ''} de 15)`);
-    if (n5 > 0) parts.push(`${n5 * 5} Mix${n5 * 5 > 1 ? 's' : ''} (${n5} promo${n5 > 1 ? 's' : ''} de 5)`);
-    if (n1 > 0) parts.push(`${n1} Mix${n1 > 1 ? 's' : ''}`);
+    if (n15 > 0) parts.push(`${n15 * 15} ${t.promo_mixs} (${n15} ${t.promo_promo}${n15 > 1 ? 's' : ''} ${t.promo_of} 15)`);
+    if (n5 > 0) parts.push(`${n5 * 5} ${t.promo_mixs} (${n5} ${t.promo_promo}${n5 > 1 ? 's' : ''} ${t.promo_of} 5)`);
+    if (n1 > 0) parts.push(`${n1} ${t.promo_mixs}`);
 
-    return parts.length > 0 ? parts.join(' + ') : '0 Mixs';
+    return parts.length > 0 ? parts.join(' + ') : `0 ${t.promo_mixs}`;
   }, [totalMixQty]);
 
   const isValidEmail = useMemo(() => {
@@ -222,7 +229,7 @@ export function MixBuilder() {
 
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
-      setDiscountError("Por favor ingrese un código de descuento válido");
+      setDiscountError(t.discount_invalid);
       return;
     }
 
@@ -235,7 +242,7 @@ export function MixBuilder() {
       });
       setDiscountError("");
     } else {
-      setDiscountError("Por favor ingrese un código de descuento válido");
+      setDiscountError(t.discount_invalid);
     }
   };
 
@@ -445,10 +452,10 @@ export function MixBuilder() {
   return (
     <div className="mx-auto max-w-5xl px-6 space-y-6 pb-8">
       <div className="flex flex-col items-center md:flex-row md:items-center md:justify-between gap-1 text-center md:text-left">
-        <h2 className="hidden md:block text-2xl font-semibold">Armá tu mix (220g)</h2>
+        <h2 className="hidden md:block text-2xl font-semibold">{t.builder_title}</h2>
         <div className="text-sm text-muted-foreground whitespace-normal flex flex-col items-center sm:flex-row sm:justify-between gap-0 sm:gap-8 pt-2 leading-tight">
 
-          <span>Máximo por ingrediente: <span className="font-medium">66g</span></span>
+          <span>{t.max_per_ingredient}: <span className="font-medium">66g</span></span>
         </div>
       </div>
 
@@ -456,7 +463,7 @@ export function MixBuilder() {
         <Card className="h-full flex flex-col" data-card="ingredients">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
-              <CardTitle>Ingredientes</CardTitle>
+              <CardTitle>{t.card_ingredients_title}</CardTitle>
               <div className="flex items-center gap-2">
                 <div
                   className="relative cursor-pointer"
@@ -587,10 +594,10 @@ export function MixBuilder() {
                   isClassicMix && "opacity-50 cursor-not-allowed",
                   shakeClassicMix && "animate-wiggle"
                 )}
-                title={isClassicMix ? "Ya es mix clásico" : "Poner todos los ingredientes en 44g"}
-                aria-label="Mix clásico (44g cada ingrediente)"
+                title={isClassicMix ? t.classic_mix_already : t.classic_mix_tooltip}
+                aria-label={t.classic_mix_tooltip}
               >
-                Mix clásico (≡)
+                {t.classic_mix_btn}
               </Button>
               <Button
                 onClick={() => {
@@ -628,10 +635,10 @@ export function MixBuilder() {
                   !isValid && "opacity-50",
                   shakeAddToCart && isValid && "animate-wiggle"
                 )}
-                title={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : ""}
-                aria-label={!isValid ? `Completá los ${remaining}g restantes para agregar al carrito` : "Agregar al carrito"}
+                title={!isValid ? t.complete_remaining.replace('{g}', remaining.toString()) : ""}
+                aria-label={!isValid ? t.complete_remaining.replace('{g}', remaining.toString()) : t.add_to_cart}
               >
-                Agregar al carrito
+                {t.add_to_cart}
               </Button>
             </div>
           </CardContent>
@@ -639,7 +646,7 @@ export function MixBuilder() {
 
         <Card className="h-full flex flex-col">
           <CardHeader className="items-center text-center">
-            <CardTitle>Distribución del mix</CardTitle>
+            <CardTitle>{t.distribution_title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 flex-1 flex flex-col items-center justify-center">
             {/** Pie chart usando conic-gradient dinámico **/}
@@ -746,13 +753,13 @@ export function MixBuilder() {
       {/* Carrito debajo del builder */}
       <Card ref={cartRef}>
         <CardHeader>
-          <CardTitle>Carrito de Compra</CardTitle>
+          <CardTitle>{t.cart_title}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3 text-sm">
             {cartItems.length === 0 ? (
               <div className="text-muted-foreground py-5 border-t border-b border-border/80">
-                No hay mixs en el carrito 🛒 <button
+                {t.cart_empty} <button
                   onClick={() => {
                     const mixTitle = document.querySelector('h2');
                     if (mixTitle) {
@@ -761,7 +768,7 @@ export function MixBuilder() {
                   }}
                   className="text-foreground hover:text-muted-foreground cursor-pointer"
                 >
-                  Armalo arriba y agregalo ↑
+                  {t.cart_build_link}
                 </button>
               </div>
             ) : (
@@ -797,11 +804,11 @@ export function MixBuilder() {
                   return (
                     <div key={index} className="space-y-2 pb-3 border-b last:border-b-0 last:pb-0">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">Mix compuesto por {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
+                        <div className="font-medium text-yellow-600 max-w-80 md:max-w-96">{t.mix_composed_of} {INGREDIENTS.filter((ing) => (item.mix[ing.id] ?? 0) > 0)
                           .map((ing) => {
                             const percent = itemTotal > 0 ? Math.round(((item.mix[ing.id] ?? 0) / itemTotal) * 100) : 0;
                             const isDifferent = differentIngredients.has(ing.id);
-                            const text = `${percent}% de ${ing.name}`;
+                            const text = `${percent}% ${t.mix_percent_of} ${ing.name}`;
                             return (
                               <span key={ing.id}>
                                 {isDifferent ? <strong className="text-yellow-400">{text}</strong> : text}
@@ -864,7 +871,7 @@ export function MixBuilder() {
                     }}
                     className="text-foreground hover:text-muted-foreground cursor-pointer text-sm text-left w-full block"
                   >
-                    Volver arriba para agregar un mix con otros ingredientes ↑
+                    {t.back_to_top}
                   </button>
                 </div>
               </>
@@ -872,11 +879,11 @@ export function MixBuilder() {
           </div>
 
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-            <div className="text-muted-foreground">Cantidad</div>
+            <div className="text-muted-foreground">{t.label_quantity}</div>
             <div className="text-right font-medium">{promoBreakdown} <span className="ml-2">📦</span></div>
-            <div className="text-muted-foreground">Gramos</div>
+            <div className="text-muted-foreground">{t.label_grams}</div>
             <div className="text-right font-medium">{totalMixQty * TOTAL_GRAMS}g <span className="ml-2">⚡</span></div>
-            <div className="text-muted-foreground">Delivery</div>
+            <div className="text-muted-foreground">{t.label_delivery}</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
@@ -885,7 +892,7 @@ export function MixBuilder() {
               >
                 ←
               </button>
-              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? "Ciudad Universitaria ($0)" : "Córdoba Capital ($1000)"}</span>
+              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? t.delivery_compact_pickup : t.delivery_compact_shipping.replace('${price}', DELIVERY_COST.toString())}</span>
               <button
                 onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
                 className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
@@ -900,12 +907,12 @@ export function MixBuilder() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
-                {deliveryOption === "ciudad" ? "Facultad o lugar de entrega" : "Dirección de entrega"} <span className="text-red-500">*</span>
+                {deliveryOption === "ciudad" ? t.delivery_label_pickup : t.delivery_label_shipping} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="delivery-address"
                 type="text"
-                placeholder={deliveryOption === "ciudad" ? "Ej: Pabellón Argentina" : "Ej: Av. Valparaíso 1234, Córdoba"}
+                placeholder={deliveryOption === "ciudad" ? t.delivery_placeholder_pickup : t.delivery_placeholder_shipping}
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 className="w-full"
@@ -915,12 +922,12 @@ export function MixBuilder() {
             </div>
             <div>
               <label htmlFor="phone" className="text-sm text-muted-foreground block mb-1">
-                Celular (para coordinar la entrega) <span className="text-red-500">*</span>
+                {t.label_phone_contact} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="Ej: 351 153 123456"
+                placeholder={t.placeholder_phone_contact}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full"
@@ -934,12 +941,12 @@ export function MixBuilder() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="name" className="text-sm text-muted-foreground block mb-1">
-                Nombre <span className="text-red-500">*</span>
+                {t.label_name} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Tu nombre"
+                placeholder={t.placeholder_name}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full"
@@ -949,12 +956,12 @@ export function MixBuilder() {
             </div>
             <div>
               <label htmlFor="email" className="text-sm text-muted-foreground block mb-1">
-                Email (para recibir el resumen de la compra) <span className="text-red-500">*</span>
+                {t.label_email} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t.placeholder_email}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full"
@@ -967,12 +974,12 @@ export function MixBuilder() {
           {/* Campo de código de descuento */}
           <div className="space-y-1">
             <label className="text-sm text-muted-foreground block">
-              Descuento (opcional)
+              {t.discount_title} (opcional)
             </label>
             <div className="flex items-center gap-2 w-full md:w-1/2 md:pr-2">
               <Input
                 type="text"
-                placeholder="Tu código de descuento"
+                placeholder={t.discount_placeholder}
                 value={discountCode}
                 onChange={(e) => {
                   setDiscountCode(e.target.value);
@@ -988,7 +995,7 @@ export function MixBuilder() {
                   disabled={!discountCode.trim()}
                   className="whitespace-nowrap"
                 >
-                  Aplicar
+                  {t.discount_apply}
                 </Button>
               )}
             </div>
@@ -1010,14 +1017,14 @@ export function MixBuilder() {
           {/* Precios */}
           <div className="space-y-1 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Subtotal (sin promo)</span>
+              <span className="text-muted-foreground">{t.subtotal_no_promo}</span>
               <span className={(pricing.discount > 0 || deliveryOption === "ciudad" || pricing.discountAmount > 0) ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
                 {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
             {deliveryOption === "ciudad" && (
               <div className="flex items-center justify-between">
-                <span className="text-green-600 whitespace-nowrap">Ahorro por envío gratuito</span>
+                <span className="text-green-600 whitespace-nowrap">{t.savings_free_shipping}</span>
                 <span className="text-green-600 whitespace-nowrap">- {currency.format(DELIVERY_COST)}</span>
               </div>
             )}
@@ -1025,8 +1032,8 @@ export function MixBuilder() {
               <div className="flex items-center justify-between">
                 <span className="text-green-600">
                   {appliedDiscount?.type === 'percentage'
-                    ? `Ahorro por descuento del ${appliedDiscount.value}%`
-                    : 'Ahorro por código de descuento'
+                    ? t.savings_discount_percentage.replace('{value}', appliedDiscount.value.toString())
+                    : t.savings_discount_code
                   }
                   {pricing.discountCapped ? ' (tope alcanzado)' : ''}
                 </span>
@@ -1035,27 +1042,13 @@ export function MixBuilder() {
             )}
             {pricing.discount > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-green-600">Ahorro por las promos</span>
+                <span className="text-green-600">{t.savings_promos}</span>
                 <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discount)}</span>
               </div>
             )}
             <div className="flex items-center justify-between pt-2 mt-3 border-t-2 border-border">
               <span className="font-medium">
-                {deliveryOption === "ciudad" && pricing.discount > 0 && pricing.discountAmount > 0
-                  ? "Total (con promo, descuento y envío gratis)"
-                  : deliveryOption === "ciudad" && pricing.discount > 0
-                    ? "Total (con promo y envío gratis)"
-                    : deliveryOption === "ciudad" && pricing.discountAmount > 0
-                      ? "Total (con descuento y envío gratis)"
-                      : deliveryOption === "ciudad"
-                        ? "Total (con envío gratis)"
-                        : pricing.discount > 0 && pricing.discountAmount > 0
-                          ? "Total (con promo y descuento)"
-                          : pricing.discount > 0
-                            ? "Total (con promo)"
-                            : pricing.discountAmount > 0
-                              ? "Total (con descuento)"
-                              : "Total"}
+                {t.total_to_pay}
               </span>
               <span className="font-semibold">{currency.format(pricing.price)}</span>
             </div>
@@ -1178,7 +1171,7 @@ export function MixBuilder() {
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500"
             >
-              Abonar en efectivo
+              {t.pay_cash}
             </Button>
             <Button
               disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
@@ -1286,7 +1279,7 @@ export function MixBuilder() {
               }}
               className="bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500"
             >
-              Abonar con Mercado Pago
+              {t.pay_mercadopago}
             </Button>
           </div>
 
@@ -1337,12 +1330,10 @@ export function MixBuilder() {
 
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              ¡Pedido confirmado!
+              {t.order_confirmed}
             </h2>
-            <p className="text-gray-600 mb-6">
-              Te contactaremos por WhatsApp para coordinar la entrega y el pago en efectivo.
-              <br />
-              <strong>Revisá tu email para más detalles.</strong>
+            <p className="text-gray-600 mb-6 whitespace-pre-line">
+              {t.order_confirmed_body}
             </p>
 
             {/* Botón principal de WhatsApp */}
@@ -1355,7 +1346,7 @@ export function MixBuilder() {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
               </svg>
-              Coordinar ahora por WhatsApp
+              {t.whatsapp_button}
             </a>
             {/* Botón alternativo para abrir Gmail (misma altura/estilo para consistencia) */}
             <a
@@ -1365,7 +1356,7 @@ export function MixBuilder() {
               className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold transition-colors mb-4 ml-3 cursor-pointer"
             >
               <span className="text-lg">✉️</span>
-              Abrir casilla de Gmail
+              {t.open_gmail}
             </a>
           </div>
         </div>
