@@ -187,11 +187,11 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     const n1 = rem;
 
     const parts: string[] = [];
-    if (n15 > 0) parts.push(`${n15 * 15} ${t.promo_mixs} (${n15} ${t.promo_promo}${n15 > 1 ? 's' : ''} ${t.promo_of} 15)`);
-    if (n5 > 0) parts.push(`${n5 * 5} ${t.promo_mixs} (${n5} ${t.promo_promo}${n5 > 1 ? 's' : ''} ${t.promo_of} 5)`);
-    if (n1 > 0) parts.push(`${n1} ${t.promo_mixs}`);
+    if (n15 > 0) parts.push(`${n15 * 15} ${t.promo_mixes} (${n15} ${t.promo_promo}${n15 > 1 ? 's' : ''} ${t.promo_of} 15)`);
+    if (n5 > 0) parts.push(`${n5 * 5} ${t.promo_mixes} (${n5} ${t.promo_promo}${n5 > 1 ? 's' : ''} ${t.promo_of} 5)`);
+    if (n1 > 0) parts.push(`${n1} ${t.promo_mixes}`);
 
-    return parts.length > 0 ? parts.join(' + ') : `0 ${t.promo_mixs}`;
+    return parts.length > 0 ? parts.join(' + ') : `0 ${t.promo_mixes}`;
   }, [totalMixQty]);
 
   const isValidEmail = useMemo(() => {
@@ -615,33 +615,41 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
               </div>
             ))}
 
-            <div className="flex items-center justify-end gap-3 pt-4 pb-2">
-              <span className="text-sm font-medium text-muted-foreground">{t.label_quantity}:</span>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 cursor-pointer"
-                  onClick={() => setQuantityToAdd(Math.max(1, quantityToAdd - 1))}
-                  disabled={quantityToAdd <= 1}
-                >
-                  -
-                </Button>
-                <Input
-                  type="number"
-                  min={1}
-                  value={quantityToAdd}
-                  onChange={(e) => setQuantityToAdd(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-16 text-center h-8"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 cursor-pointer"
-                  onClick={() => setQuantityToAdd(quantityToAdd + 1)}
-                >
-                  +
-                </Button>
+            <div className="pt-4 pb-6 lg:py-4 mt-2 mb-4 lg:mb-2 border-t border-b border-border/60">
+              <div className="flex flex-col lg:grid lg:grid-cols-[1fr_auto] items-center gap-2 lg:gap-3">
+                <div className="font-medium text-center lg:text-left w-full lg:w-auto text-muted-foreground">
+                  {t.label_quantity}
+                </div>
+                <div className="flex items-center gap-1 w-full lg:w-auto justify-center lg:justify-end">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 cursor-pointer"
+                    onClick={() => setQuantityToAdd(Math.max(1, quantityToAdd - 1))}
+                    disabled={quantityToAdd <= 1}
+                  >
+                    -
+                  </Button>
+                  <div className="relative flex-shrink-0">
+                    <span className="pointer-events-none absolute left-6 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">x</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={quantityToAdd}
+                      onChange={(e) => setQuantityToAdd(Math.max(1, parseInt(e.target.value) || 1))}
+                      readOnly
+                      className="w-24 pl-6 text-center h-8 cursor-default"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 cursor-pointer"
+                    onClick={() => setQuantityToAdd(quantityToAdd + 1)}
+                  >
+                    +
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -711,7 +719,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           <CardHeader className="items-center text-center">
             <CardTitle>{t.distribution_title}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6 flex-1 flex flex-col items-center justify-center">
+          <CardContent className="space-y-6 flex-1 flex flex-col items-center justify-center lg:justify-start lg:pt-2">
             {/** Pie chart usando conic-gradient dinámico **/}
             {(() => {
               // Usar colores de INGREDIENTS
@@ -740,7 +748,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
               const bg = `conic-gradient(${stops})`
 
               return (
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-4 lg:gap-10">
                   <div
                     className="relative size-48"
                     onMouseLeave={() => setHoveredIngredient(null)}
@@ -777,7 +785,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       })}
                     </svg>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div className="grid grid-cols-1 gap-y-2 text-sm w-full max-w-[240px]">
                     {parts.map((p, i) => (
                       <div
                         key={i}
@@ -839,11 +847,11 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                 {cartItems.map((item, index) => {
                   const itemTotal = Object.values(item.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
 
-                  // Función para determinar si un ingrediente difiere de otros mixes
+                  // Función para determinar si un ingrediente difiere de otros Mixes
                   const getIngredientDifferences = () => {
                     const differences = new Set<string>();
 
-                    // Comparar con todos los otros mixes
+                    // Comparar con todos los otros Mixes
                     cartItems.forEach((otherItem, otherIndex) => {
                       if (otherIndex !== index) {
                         const otherTotal = Object.values(otherItem.mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
