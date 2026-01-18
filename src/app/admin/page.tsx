@@ -52,7 +52,7 @@ export default function AdminPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  type SortKey = 'createdAt'|'name'|'email'|'phone'|'totalMixQty'|'totalPrice'|'status'|'id'|null;
+  type SortKey = 'createdAt' | 'name' | 'email' | 'phone' | 'totalMixQty' | 'totalPrice' | 'status' | 'id' | null;
   const [sortBy, setSortBy] = useState<SortKey>(null);
   const [sortAsc, setSortAsc] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -120,7 +120,7 @@ export default function AdminPage() {
     fetchOrders();
   }
 
-  
+
 
   function toggleSelect(id: string) {
     setSelected(prev => ({ ...prev, [id]: !prev[id] }));
@@ -207,7 +207,7 @@ export default function AdminPage() {
         body: JSON.stringify({ orderIds: ids, emails: emails.length > 0 ? emails : undefined, subject: promoSubject, title: promoTitle, html: promoHtml, headerImage: promoCoverDataUrl }),
       });
       const j = await res.json();
-        if (res.ok) {
+      if (res.ok) {
         // show concise success toast for 3s and clear state
         toast.success('Promos enviadas', { duration: 3000 });
         console.log('send-promo results', j.results);
@@ -228,7 +228,7 @@ export default function AdminPage() {
     }
   }
 
-  
+
 
   // Template helpers for preview and variable insertion
   function insertVariable(varName: string, target: 'html' | 'subject' = 'html') {
@@ -251,7 +251,7 @@ export default function AdminPage() {
 
   function buildPreviewHtml() {
     const headerImageHtml = promoCoverDataUrl ? `<div style="text-align:center;margin:12px 0;"><img src=\"${promoCoverDataUrl}\" alt=\"Portada\" style=\"max-width:100%;height:auto;border-radius:8px;\"/></div>` : '';
-  const titleHtml = promoTitle ? `<h1 style="font-size:20px;color:#fbbf24;margin-bottom:8px;">${promoTitle}</h1>` : '';
+    const titleHtml = promoTitle ? `<h1 style="font-size:20px;color:#fbbf24;margin-bottom:8px;">${promoTitle}</h1>` : '';
 
     // For preview only: if we have a personal target, interpolate {{name}} with the real name
     let previewContent = promoHtml || '';
@@ -348,8 +348,8 @@ export default function AdminPage() {
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return (ta - tb) * direction;
       }
-  const va: unknown = (a as unknown as Record<string, unknown>)[sortBy as string];
-  const vb: unknown = (b as unknown as Record<string, unknown>)[sortBy as string];
+      const va: unknown = (a as unknown as Record<string, unknown>)[sortBy as string];
+      const vb: unknown = (b as unknown as Record<string, unknown>)[sortBy as string];
       // handle numbers
       if (typeof va === 'number' && typeof vb === 'number') {
         return (va - vb) * direction;
@@ -412,7 +412,7 @@ export default function AdminPage() {
   }
 
   return (
-  <div className="px-6 sm:px-12 lg:px-24 py-6 max-w-7xl mx-auto">
+    <div className="px-6 sm:px-12 lg:px-24 py-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h1 className="text-2xl font-bold">Panel de Admin: Pedidos de ⚡</h1>
         <div className="flex gap-2 items-center flex-wrap">
@@ -427,7 +427,7 @@ export default function AdminPage() {
 
           {/* Filtrar moved below (between search and date filters) */}
 
-          
+
 
           <Button className="w-full sm:w-auto" onClick={() => {
             // If there are selected orders, open the promo modal and show the recipients list
@@ -452,7 +452,7 @@ export default function AdminPage() {
         <Card className="mb-6">
           <CardContent>
             <div className="grid grid-cols-1 gap-4 items-start">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto justify-items-center">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto justify-items-center">
                 <div onClick={() => {
                   // clear filters
                   setFilterStatus('all');
@@ -735,7 +735,7 @@ export default function AdminPage() {
                   <th className="px-12 py-3 text-left text-white">Delivery</th>
                   <th className="px-12 py-3 text-left text-white">
                     <button className="flex items-center gap-2 hover:cursor-pointer" onClick={() => { if (sortBy === 'totalMixQty') setSortAsc(s => !s); else { setSortBy('totalMixQty'); setSortAsc(false); } }}>
-                      Mixs {sortBy === 'totalMixQty' ? (sortAsc ? '↑' : '↓') : ''}
+                      Mixes {sortBy === 'totalMixQty' ? (sortAsc ? '↑' : '↓') : ''}
                     </button>
                   </th>
                   <th className="px-12 py-3 text-left text-white">
@@ -799,9 +799,9 @@ export default function AdminPage() {
                     <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.deliveryOption || '-'}</td>
                     <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.totalMixQty}</td>
                     <td className="px-12 py-3 text-sm text-white group-hover:text-black">${o.totalPrice}</td>
-                      <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.discountCode || '-'}</td>
-                      <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.discountAmount ? new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(o.discountAmount) : '-'}</td>
-                      <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.status}</td>
+                    <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.discountCode || '-'}</td>
+                    <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.discountAmount ? new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(o.discountAmount) : '-'}</td>
+                    <td className="px-12 py-3 text-sm text-white group-hover:text-black">{o.status}</td>
                     <td className="px-12 py-3 text-sm">
                       {o.status === 'delivered' ? (
                         <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); markPending(o.id); }}>
@@ -820,7 +820,8 @@ export default function AdminPage() {
                       )}
                     </td>
                     <td className="px-8 py-3 text-sm">
-                        <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation();
+                      <Button size="sm" variant="ghost" onClick={(e) => {
+                        e.stopPropagation();
                         // open personal promo modal for this order
                         setSelected({ [o.id]: true });
                         setPersonalTarget(o);
@@ -901,7 +902,7 @@ export default function AdminPage() {
                                   const v = editingEmailValue.trim();
                                   if (!v) return;
                                   setPromoEmails(prev => prev.map((p, i) => i === idx ? v : p));
-                                  setPromoEmailsText(prev => promoEmails.map((p,i)=> i===idx ? v : p).join('\n'));
+                                  setPromoEmailsText(prev => promoEmails.map((p, i) => i === idx ? v : p).join('\n'));
                                   setEditingEmailIndex(null);
                                 }}>Guardar</Button>
                                 <Button size="sm" variant="outline" onClick={() => setEditingEmailIndex(null)}>Cancelar</Button>
@@ -934,74 +935,74 @@ export default function AdminPage() {
                       </div>
                     )}
                   </div>
-                    {!personalTarget && (
-                      <>
-                        <div className="pt-3 pb-2">
-                          <Label className='pb-3'>Importar CSV de mails</Label>
-                          <div className="flex gap-2 items-start mt-2">
-                            <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
-                              const f = (e.target as HTMLInputElement).files?.[0];
-                              if (!f) return;
-                              try {
-                                const txt = await f.text();
-                                // split by comma or newline
-                                const raw = txt.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
-                                setPromoEmails(raw.filter(r => r.includes('@')));
-                                setPromoEmailsText(raw.filter(r => r.includes('@')).join('\n'));
-                              } catch (err) {
-                                console.error('Error reading file', err);
-                              }
-                            }} />
-                            <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
-                          </div>
-                        </div>
-
-                        {/* Move paste textarea to its own row and change label text */}
-                        <div className="mt-3">
-                          <Label className="mb-1">O directamente pegarlos uno por linea (o separados por coma)</Label>
-                          <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
-                            const v = (e.target as HTMLTextAreaElement).value;
-                            setPromoEmailsText(v);
-                            const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
-                            setPromoEmails(parsed);
+                  {!personalTarget && (
+                    <>
+                      <div className="pt-3 pb-2">
+                        <Label className='pb-3'>Importar CSV de mails</Label>
+                        <div className="flex gap-2 items-start mt-2">
+                          <input ref={fileInputRef} type="file" accept=".csv,text/plain" onChange={async (e) => {
+                            const f = (e.target as HTMLInputElement).files?.[0];
+                            if (!f) return;
+                            try {
+                              const txt = await f.text();
+                              // split by comma or newline
+                              const raw = txt.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
+                              setPromoEmails(raw.filter(r => r.includes('@')));
+                              setPromoEmailsText(raw.filter(r => r.includes('@')).join('\n'));
+                            } catch (err) {
+                              console.error('Error reading file', err);
+                            }
                           }} />
+                          <Button variant="outline" onClick={() => { if (fileInputRef.current) fileInputRef.current.click(); }}>Cargar archivo</Button>
                         </div>
-                      </>
-                    )}
-
-                    {/* Cover image upload for promo (optional) */}
-                    <div className="mt-4">
-                      <Label>Foto de portada (opcional)</Label>
-                      <div className="flex items-center gap-2 mt-2">
-                        <input ref={coverInputRef} type="file" accept="image/*" onChange={async (e) => {
-                          const f = (e.target as HTMLInputElement).files?.[0];
-                          if (!f) return;
-                          try {
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                              const res = reader.result as string | null;
-                              if (res) setPromoCoverDataUrl(res);
-                            };
-                            reader.readAsDataURL(f);
-                          } catch (err) {
-                            console.error('Error reading image', err);
-                          }
-                        }} style={{ display: 'none' }} />
-                        <Button variant="outline" onClick={() => { if (coverInputRef.current) coverInputRef.current.click(); }}>
-                          {promoCoverDataUrl ? 'Actualizar foto' : 'Subir foto'}
-                        </Button>
-                        {promoCoverDataUrl && (
-                          <div className="ml-3 flex items-center gap-2">
-                            <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded border" />
-                            <button type="button" aria-label="Eliminar foto" className="text-red-400 hover:text-red-500" onClick={() => { setPromoCoverDataUrl(null); if (coverInputRef.current) coverInputRef.current.value = ''; }}>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
-                              </svg>
-                            </button>
-                          </div>
-                        )}
                       </div>
+
+                      {/* Move paste textarea to its own row and change label text */}
+                      <div className="mt-3">
+                        <Label className="mb-1">O directamente pegarlos uno por linea (o separados por coma)</Label>
+                        <textarea rows={4} className="w-full border px-3 py-2 rounded mt-1" placeholder="mail1@example.com, mail2@example.com or one per line" value={promoEmailsText} onChange={(e) => {
+                          const v = (e.target as HTMLTextAreaElement).value;
+                          setPromoEmailsText(v);
+                          const parsed = v.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean).filter(s => s.includes('@'));
+                          setPromoEmails(parsed);
+                        }} />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Cover image upload for promo (optional) */}
+                  <div className="mt-4">
+                    <Label>Foto de portada (opcional)</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <input ref={coverInputRef} type="file" accept="image/*" onChange={async (e) => {
+                        const f = (e.target as HTMLInputElement).files?.[0];
+                        if (!f) return;
+                        try {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            const res = reader.result as string | null;
+                            if (res) setPromoCoverDataUrl(res);
+                          };
+                          reader.readAsDataURL(f);
+                        } catch (err) {
+                          console.error('Error reading image', err);
+                        }
+                      }} style={{ display: 'none' }} />
+                      <Button variant="outline" onClick={() => { if (coverInputRef.current) coverInputRef.current.click(); }}>
+                        {promoCoverDataUrl ? 'Actualizar foto' : 'Subir foto'}
+                      </Button>
+                      {promoCoverDataUrl && (
+                        <div className="ml-3 flex items-center gap-2">
+                          <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded border" />
+                          <button type="button" aria-label="Eliminar foto" className="text-red-400 hover:text-red-500" onClick={() => { setPromoCoverDataUrl(null); if (coverInputRef.current) coverInputRef.current.value = ''; }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
+                  </div>
                   <Label>Título (aparece en el mail)</Label>
                   <Input value={promoTitle} onChange={e => setPromoTitle((e.target as HTMLInputElement).value)} />
 

@@ -22,13 +22,13 @@ export async function POST(request: NextRequest) {
     console.log("Iniciando envío de email...");
     const body = await request.json() as EmailBody;
     const { name, email, phone, items, deliveryOption, deliveryAddress, totalPrice, totalMixQty, paymentLink, paymentMethod, discountCode, discountAmount } = body;
-    
-    console.log("Datos recibidos:", { 
-      email, 
-      name, 
-      phone, 
-      itemsCount: items.length, 
-      deliveryOption, 
+
+    console.log("Datos recibidos:", {
+      email,
+      name,
+      phone,
+      itemsCount: items.length,
+      deliveryOption,
       paymentMethod,
       totalPrice,
       discountCode,
@@ -57,23 +57,23 @@ export async function POST(request: NextRequest) {
     console.log("Inicializando Resend...");
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const currency = new Intl.NumberFormat("es-AR", { 
-      style: "currency", 
-      currency: "ARS", 
-      maximumFractionDigits: 0 
+    const currency = new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0
     });
 
     // Función para detectar ingredientes que difieren entre mixes
     const getIngredientDifferences = (items: OrderItem[]) => {
       const differences = new Map<number, Set<string>>();
-      
+
       items.forEach((item, index) => {
         const match = (item.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
         if (!match) return;
-        
+
         const composition = match[2];
         const currentIngredients = new Map<string, number>();
-        
+
         // Parsear ingredientes del mix actual
         composition.split(',').forEach(ing => {
           const ingMatch = ing.trim().match(/^(.+?)\s+(\d+)%$/);
@@ -81,18 +81,18 @@ export async function POST(request: NextRequest) {
             currentIngredients.set(ingMatch[1].trim(), parseInt(ingMatch[2]));
           }
         });
-        
+
         const itemDifferences = new Set<string>();
-        
-        // Comparar con otros mixes
+
+        // Comparar con otros Mixes
         items.forEach((otherItem, otherIndex) => {
           if (otherIndex !== index) {
             const otherMatch = (otherItem.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
             if (!otherMatch) return;
-            
+
             const otherComposition = otherMatch[2];
             const otherIngredients = new Map<string, number>();
-            
+
             // Parsear ingredientes del otro mix
             otherComposition.split(',').forEach(ing => {
               const ingMatch = ing.trim().match(/^(.+?)\s+(\d+)%$/);
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
                 otherIngredients.set(ingMatch[1].trim(), parseInt(ingMatch[2]));
               }
             });
-            
+
             // Comparar ingredientes
             currentIngredients.forEach((percent, ingredient) => {
               const otherPercent = otherIngredients.get(ingredient);
@@ -110,10 +110,10 @@ export async function POST(request: NextRequest) {
             });
           }
         });
-        
+
         differences.set(index, itemDifferences);
       });
-      
+
       return differences;
     };
 
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       const match = (item.title ?? '').match(/^(.*?)\s*\((.*)\)$/);
       const productName = match ? match[1] : (item.title ?? '');
       let composition = match ? match[2] : '';
-      
+
       // Destacar ingredientes que difieren
       if (composition && ingredientDifferences.has(index)) {
         const differentIngredients = ingredientDifferences.get(index)!;
@@ -141,15 +141,15 @@ export async function POST(request: NextRequest) {
           return ing.trim();
         }).join(', ');
       }
-      
-      // Para mixs personalizados, mostrar precio original sin promos
+
+      // Para Mixes personalizados, mostrar precio original sin promos
       const qty = Number(item.quantity ?? 0);
       const unit = Number(item.unit_price ?? 0);
       let displayPrice = unit * qty;
       if (productName && productName.includes('Mix personalizado')) {
         displayPrice = 4000 * qty; // Precio original sin promos
       }
-      
+
       return `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #eee;">
@@ -166,19 +166,19 @@ export async function POST(request: NextRequest) {
     const precioUnitario = 4000;
     const precioSinPromo = totalMixQty * precioUnitario;
     const costoEnvio = deliveryOption === "envio" ? 1000 : 0;
-    
+
     // Calcular precio con promos aplicadas (packs de 15, packs de 5, y unidades sueltas)
-  const n15 = Math.floor(totalMixQty / 15);
-  const remAfter15 = totalMixQty - n15 * 15;
+    const n15 = Math.floor(totalMixQty / 15);
+    const remAfter15 = totalMixQty - n15 * 15;
     const n5 = Math.floor(remAfter15 / 5);
     const n1 = remAfter15 - n5 * 5;
 
     const precioConPromo = n15 * 53000 + n5 * 18000 + n1 * precioUnitario;
     const descuentoPromo = precioSinPromo - precioConPromo;
-    
+
     // Generar filas de ahorros
     let ahorrosHTML = '';
-    
+
     // Ahorro por envío gratuito
     if (costoEnvio > 0) {
       ahorrosHTML += `
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
         </tr>
       `;
     }
-    
+
     // Ahorro por descuento por código
     if (discountCode && discountAmount && discountAmount > 0) {
       // Aplicar tope por seguridad (en caso de que venga mayor desde el cliente)
@@ -243,12 +243,12 @@ export async function POST(request: NextRequest) {
         </tr>
       `;
     }
-    
+
     // Ahorro por promos (desglose por packs de 15 y de 5)
     if (descuentoPromo > 0) {
       const promoParts: string[] = [];
-      if (n15 > 0) promoParts.push(`${n15} de 15 Mixs`);
-      if (n5 > 0) promoParts.push(`${n5} de 5 Mixs`);
+      if (n15 > 0) promoParts.push(`${n15} de 15 Mixes`);
+      if (n5 > 0) promoParts.push(`${n5} de 5 Mixes`);
       const promoLabel = promoParts.length > 0 ? ` (${promoParts.join(' + ')})` : '';
 
       ahorrosHTML += `
@@ -262,12 +262,12 @@ export async function POST(request: NextRequest) {
       `;
     }
 
-    const deliveryText = deliveryOption === "ciudad" 
-      ? "Ciudad Universitaria (Envío gratuito)" 
+    const deliveryText = deliveryOption === "ciudad"
+      ? "Ciudad Universitaria (Envío gratuito)"
       : `Córdoba (${currency.format(1000)})`;
 
     console.log("Enviando email...");
-    
+
     let result;
     try {
       const emailSubject = paymentMethod === 'efectivo'
@@ -307,8 +307,8 @@ export async function POST(request: NextRequest) {
         }
       }
 
-  // Build action block (WhatsApp + optional Mercado Pago button) with matching heights and spacing
-  // Use an emoji for the WhatsApp button to avoid image-blocking in email clients
+      // Build action block (WhatsApp + optional Mercado Pago button) with matching heights and spacing
+      // Use an emoji for the WhatsApp button to avoid image-blocking in email clients
       const whatsappButton = `
         <a href="https://wa.me/5493513239624" style="display:inline-block; height:48px; line-height:48px; background-color:#25d366; color:white; padding:0 14px; text-decoration:none; border-radius:8px; font-weight:700; vertical-align:middle;">
           <span style="display:inline-block; vertical-align:middle; font-size:18px; margin-right:8px;">📱</span>
@@ -328,8 +328,8 @@ export async function POST(request: NextRequest) {
       const spacer = payButton ? '<span style="display:inline-block; width:10px; height:1px;"></span>' : '';
       const buttonsRow = `<div style="text-align:center; margin-top:16px;">${whatsappButton}${spacer}${payButton}</div>`;
 
-  // Small hint shown below buttons when a Mercado Pago button is available
-  const mpNote = payButton ? `<p style="margin-top:8px; font-size:14px; color:#333;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
+      // Small hint shown below buttons when a Mercado Pago button is available
+      const mpNote = payButton ? `<p style="margin-top:8px; font-size:14px; color:#333;">Si preferís pagar ahora, usá el botón de Mercado Pago (pago seguro y rápido).</p>` : '';
 
       const efectivoBlock = `
         <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 4px;">
@@ -350,11 +350,11 @@ export async function POST(request: NextRequest) {
       const actionBlock = (paymentMethod === 'efectivo') ? efectivoBlock : nonEfectivoBlock;
 
       result = await resend.emails.send({
-      from: "Gonza de Moovimiento <gonza@moovimiento.com>",
-      to: email,
-      bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
-      subject: emailSubject,
-      html: `
+        from: "Gonza de Moovimiento <gonza@moovimiento.com>",
+        to: email,
+        bcc: ["gonza@moovimiento.com", "gonzalogramagia@gmail.com"],
+        subject: emailSubject,
+        html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background-color: #fbbf24; padding: 20px; border-radius: 8px 8px 0 0;">
             <h2 style="margin: 0; color: white; font-size: 20px;">⚡ Moovimiento</h2>
@@ -389,7 +389,7 @@ export async function POST(request: NextRequest) {
             </table>
 
             <div style="background-color: #fff; border: 1px solid #e5e7eb; padding: 16px; margin: 20px 0; border-radius: 4px;">
-              <p style="margin: 0 0 8px 0;"><strong>Total de mixs:</strong> ${totalMixQty} 📦</p>
+              <p style="margin: 0 0 8px 0;"><strong>Total de Mixes:</strong> ${totalMixQty} 📦</p>
               <p style="margin: 0;"><strong>Gramos:</strong> ${totalMixQty * 220}g ⚡</p>
             </div>
             
@@ -439,7 +439,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error sending email:", error);
-    
+
     return NextResponse.json(
       { error: "Hubo un error: Por favor intente nuevamente más tarde" },
       { status: 500 }
