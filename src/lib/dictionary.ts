@@ -7,8 +7,8 @@ export const dictionary = {
         made_in: "Hecho en Argentina",
 
         // Hero
-        hero_title: "Mixs de ⚡\nFrutos Secos a tu manera",
-        hero_subtitle: "Armá tu mix de 220g con ingredientes seleccionados",
+        hero_title: "Mixes de ⚡\nFrutos Secos a tu manera",
+        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados",
         delivery_free: "Delivery gratuito en",
         location: "Ciudad Universitaria",
 
@@ -20,31 +20,31 @@ export const dictionary = {
             nueces: "Nueces",
             uva: "Uva deshidratada",
         },
-        builder_title: "Armá tu mix (220g)",
+        builder_title: "Armá tu Mix (220g)",
         min_per_ingredient: "Mínimo por ingrediente",
         max_per_ingredient: "Máximo por ingrediente",
         card_ingredients_title: "Ingredientes",
-        classic_mix_btn: "Mix clásico (≡)",
+        classic_mix_btn: "Mix Clásico (≡)",
         classic_mix_tooltip: "Poner todos los ingredientes en 44g",
-        classic_mix_already: "Ya es mix clásico",
+        classic_mix_already: "Ya es Mix Clásico",
         add_to_cart: "Agregar al carrito",
         complete_remaining: "Completá los {g}g restantes para agregar al carrito",
 
         // Distribution Chart
-        distribution_title: "Distribución del mix",
+        distribution_title: "Distribución del Mix",
 
         // Cart
         cart_title: "Carrito de Compra",
-        cart_empty: "No hay mixs en el carrito 🛒",
-        cart_build_link: "Armalo arriba y agregalo ↑",
+        cart_empty: "No hay Mixes en el carrito 🛒",
+        cart_build_link: "Armalos arriba y agregalos ↑",
         mix_composed_of: "Mix compuesto por",
         edit: "Editar",
         duplicate: "Duplicar",
         remove: "Eliminar",
         mix_percent_of: "de",
-        back_to_top: "Volver arriba para agregar un mix con otros ingredientes ↑",
-        label_quantity: "Cantidad",
-        label_grams: "Gramos",
+        back_to_top: "Volver arriba para agregar más Mixes con otros ingredientes ↑",
+        label_quantity: "Cantidad de Mixes",
+        label_grams: "Gramos en total",
         label_delivery: "Delivery",
         delivery_compact_pickup: "Ciudad Universitaria ($0)",
         delivery_compact_shipping: "Córdoba Capital (${price})",
@@ -94,7 +94,7 @@ export const dictionary = {
         discount_invalid: "Por favor ingrese un código de descuento válido",
 
         summary_title: "Resumen",
-        total_mixes: "Total Mixs",
+        total_mixes: "Total de Mixes",
         subtotal: "Subtotal",
         delivery_cost: "Costo de envío",
         discount_applied: "Descuento aplicado",
@@ -105,7 +105,7 @@ export const dictionary = {
         send_whatsapp: "Enviar pedido por WhatsApp",
 
         // Promo logic text (generated)
-        promo_mixs: "Mixs",
+        promo_mixes: "Mixes",
         promo_of: "de",
         promo_promo: "promo",
 
@@ -136,7 +136,7 @@ export const dictionary = {
         faq_q3: "¿Por qué elegir frutos secos como snack?",
         faq_a3: "Porque son prácticos, saludables y naturales. Te aportan energía, proteínas y grasas buenas que te ayudan a rendir mejor en el estudio, trabajo o entrenamiento.",
         faq_q4: "¿Puedo personalizar la composición?",
-        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de mixs (más arriba en esta página) podés elegir exactamente qué querés. Si no te gusta algún ingrediente lo sacás, y si querés más de otro, lo agregás. ¡Vos decidís!",
+        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de Mixes (más arriba en esta página) podés elegir exactamente qué querés. Si no te gusta algún ingrediente lo sacás, y si querés más de otro, lo agregás. ¡Vos decidís!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energía que te acompaña en cada paso",
@@ -177,7 +177,7 @@ export const dictionary = {
 
         // Cart
         cart_title: "Shopping Cart",
-        cart_empty: "No mixes in the cart 🛒",
+        cart_empty: "No Mixes in the cart 🛒",
         cart_build_link: "Build it above and add it ↑",
         mix_composed_of: "Mix composed of",
         edit: "Edit",
@@ -247,7 +247,7 @@ export const dictionary = {
         send_whatsapp: "Send order via WhatsApp",
 
         // Promo logic text
-        promo_mixs: "Mixes",
+        promo_mixes: "Mixes",
         promo_of: "of",
         promo_promo: "promo",
 
@@ -278,7 +278,7 @@ export const dictionary = {
         faq_q3: "Why choose nuts as a snack?",
         faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
         faq_q4: "Can I customize the composition?",
-        faq_a4: "Of course! By default, mixes are balanced, but you can customize them in the 'Build your mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
+        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energy that accompanies you at every step",
