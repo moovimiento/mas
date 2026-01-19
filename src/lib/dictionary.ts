@@ -8,7 +8,7 @@ export const dictionary = {
 
         // Hero
         hero_title: "Mixes de ⚡\nFrutos Secos a tu manera",
-        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados",
+        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas ⚡",
         delivery_free: "Delivery gratuito en",
         location: "Ciudad Universitaria",
 
@@ -29,6 +29,7 @@ export const dictionary = {
         classic_mix_already: "Ya es Mix Clásico",
         add_to_cart: "Agregar al carrito",
         complete_remaining: "Completá los {g}g restantes para agregar al carrito",
+        min_mixes_required: "Se requiere un mínimo de 5 Mixes para realizar el pedido (actualmente: {qty})",
 
         // Distribution Chart
         distribution_title: "Distribución del Mix",
@@ -111,13 +112,14 @@ export const dictionary = {
 
         // Pricing
         pricing_title: "Precios y Promos",
-        pricing_subtitle: "Simples y transparentes",
-        pricing_tier_1_title: "1 Mix (220g)",
-        pricing_tier_1_price: "$4000 pesos",
-        pricing_tier_1_desc: "Energía para toda la semana",
+        pricing_subtitle: "Elegí la mejor opción para vos",
+        pricing_min_notice: "El pedido mínimo es de 5 unidades ➡",
+        pricing_tier_1_title: "10 Mixes (2200g)",
+        pricing_tier_1_price: "$35000 pesos",
+        pricing_tier_1_desc: "Energía para compartir",
         pricing_tier_2_title: "5 Mixes (1100g)",
         pricing_tier_2_price: "$18000 pesos",
-        pricing_tier_2_desc: "Energía para todo el mes",
+        pricing_tier_2_desc: "Energía para varias semanas",
         pricing_tier_3_title: "15 Mixes (3300g)",
         pricing_tier_3_price: "$53000 pesos",
         pricing_tier_3_desc: "Energía para eventos especiales",
@@ -149,7 +151,7 @@ export const dictionary = {
 
         // Hero
         hero_title: "Build your ⚡\nTrail Mix your way",
-        hero_subtitle: "Build your 220g Mix with selected ingredients",
+        hero_subtitle: "Build your 220g Mix with selected ingredients\nGet 5, or more, to recharge your energy ⚡",
         delivery_free: "Free delivery at",
         location: "Ciudad Universitaria",
 
@@ -170,6 +172,7 @@ export const dictionary = {
         classic_mix_already: "It's already a Classic Mix",
         add_to_cart: "Add to cart",
         complete_remaining: "Complete the remaining {g}g to add to cart",
+        min_mixes_required: "A minimum of 5 Mixes is required to place an order (currently: {qty})",
 
         // Distribution Chart
         distribution_title: "Mix distribution",
@@ -252,13 +255,14 @@ export const dictionary = {
 
         // Pricing
         pricing_title: "Prices and Promos",
-        pricing_subtitle: "Simple and transparents",
-        pricing_tier_1_title: "1 Mix (220g)",
-        pricing_tier_1_price: "$4000 ARS",
-        pricing_tier_1_desc: "Energy for the whole week",
+        pricing_subtitle: "Choose the best option for you",
+        pricing_min_notice: "Minimum order is 5 Mixes ➡",
+        pricing_tier_1_title: "10 Mixes (2200g)",
+        pricing_tier_1_price: "$35000 ARS",
+        pricing_tier_1_desc: "Energy to share",
         pricing_tier_2_title: "5 Mixes (1100g)",
         pricing_tier_2_price: "$18000 ARS",
-        pricing_tier_2_desc: "Energy for the whole month",
+        pricing_tier_2_desc: "Energy for a bunch of weeks",
         pricing_tier_3_title: "15 Mixes (3300g)",
         pricing_tier_3_price: "$53000 ARS",
         pricing_tier_3_desc: "Energy for special events",

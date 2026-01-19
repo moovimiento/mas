@@ -159,22 +159,27 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   // Pricing (ARS): base 4000 per mix; promos -> 5 for 18000, 15 for 53000
   const PRICE_SINGLE = 4000;
   const PRICE_PACK5 = 18000;  // per 5
+  const PRICE_PACK10 = 35000; // per 10
   const PRICE_PACK15 = 53000; // per 15
   const DELIVERY_COST = 1000;
 
   const currency = useMemo(() => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }), []);
 
   function computePrice(qty: number) {
-    // Greedy: maximize 15-packs, then 5-packs, then singles
-    const n15 = Math.floor(qty / 15);
-    let rem = qty - n15 * 15;
+    // Greedy: maximize 15-packs, then 10-packs, then 5-packs, then singles
+    let rem = qty;
+    const n15 = Math.floor(rem / 15);
+    rem -= n15 * 15;
+    const n10 = Math.floor(rem / 10);
+    rem -= n10 * 10;
     const n5 = Math.floor(rem / 5);
-    rem = rem - n5 * 5;
+    rem -= n5 * 5;
     const n1 = rem;
-    const price = n15 * PRICE_PACK15 + n5 * PRICE_PACK5 + n1 * PRICE_SINGLE;
+
+    const price = n15 * PRICE_PACK15 + n10 * PRICE_PACK10 + n5 * PRICE_PACK5 + n1 * PRICE_SINGLE;
     const original = qty * PRICE_SINGLE;
     const discount = original - price;
-    return { price, discount, breakdown: { n15, n5, n1 } };
+    return { price, discount, breakdown: { n15, n10, n5, n1 } };
   }
 
   const totalMixQty = useMemo(() => {
@@ -183,14 +188,18 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
   const promoBreakdown = useMemo(() => {
     const qty = totalMixQty;
-    const n15 = Math.floor(qty / 15);
-    let rem = qty - n15 * 15;
+    let rem = qty;
+    const n15 = Math.floor(rem / 15);
+    rem -= n15 * 15;
+    const n10 = Math.floor(rem / 10);
+    rem -= n10 * 10;
     const n5 = Math.floor(rem / 5);
-    rem = rem - n5 * 5;
+    rem -= n5 * 5;
     const n1 = rem;
 
     const parts: string[] = [];
     if (n15 > 0) parts.push(`${n15 * 15} ${t.promo_mixes} (${n15} ${t.promo_promo}${n15 > 1 ? 's' : ''} ${t.promo_of} 15)`);
+    if (n10 > 0) parts.push(`${n10 * 10} ${t.promo_mixes} (${n10} ${t.promo_promo}${n10 > 1 ? 's' : ''} ${t.promo_of} 10)`);
     if (n5 > 0) parts.push(`${n5 * 5} ${t.promo_mixes} (${n5} ${t.promo_promo}${n5 > 1 ? 's' : ''} ${t.promo_of} 5)`);
     if (n1 > 0) parts.push(`${n1} ${t.promo_mixes}`);
 
@@ -1129,11 +1138,22 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
             </div>
           </div>
 
+          {/* Aviso de mínimo de 5 mixes */}
+          {totalMixQty > 0 && totalMixQty < 5 && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg text-sm flex items-center gap-2">
+              <span className="text-lg">⚠️</span>
+              {t.min_mixes_required.replace('{qty}', totalMixQty.toString())}
+            </div>
+          )}
+
           {/* Removed web-only 'Total a pagar' extra row per UX request */}
+
+
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <Button
-              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              disabled={cartItems.length === 0 || totalMixQty < 5 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              title={totalMixQty > 0 && totalMixQty < 5 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
               onClick={async () => {
                 // proceed with cash flow
                 try {
@@ -1249,7 +1269,8 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
               {t.pay_cash}
             </Button>
             <Button
-              disabled={cartItems.length === 0 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              disabled={cartItems.length === 0 || totalMixQty < 5 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              title={totalMixQty > 0 && totalMixQty < 5 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
               onClick={async () => {
                 // proceed with Mercado Pago flow
                 try {
