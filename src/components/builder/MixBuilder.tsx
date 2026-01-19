@@ -13,13 +13,14 @@ const MIN_NONZERO = 22;
 
 const INGREDIENTS_BASE = [
   { id: "banana", color: "#a8d8ea" },    // celeste claro argentino
-  { id: "durazno", color: "#75c9e0" },   // celeste medio claro
   { id: "almendras", color: "#4fb3d4" }, // celeste argentino
   { id: "nueces", color: "#2a9cc0" },    // celeste medio oscuro
   { id: "uva", color: "#1a7fa0" },       // celeste oscuro
+  { id: "durazno", color: "#75c9e0", comingSoon: true },   // celeste medio claro
 ] as const;
 
 type IngredientId = typeof INGREDIENTS_BASE[number]["id"];
+type IngredientBase = typeof INGREDIENTS_BASE[number];
 
 type Mix = Record<IngredientId, number>;
 
@@ -29,11 +30,11 @@ type CartItem = {
 };
 
 const presetMix: Mix = {
-  durazno: 44,
-  almendras: 44,
-  nueces: 44,
-  uva: 44,
-  banana: 44,
+  durazno: 0,
+  almendras: 55,
+  nueces: 55,
+  uva: 55,
+  banana: 55,
 };
 
 export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
@@ -57,7 +58,9 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           const hasInvalid = keys.some(k => !validKeys.includes(k as any));
           const missingValid = validKeys.some(k => typeof parsed[k] !== 'number');
 
-          if (!hasInvalid && !missingValid && Object.values(parsed).reduce((a: any, b: any) => a + b, 0) === 220) {
+          const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as any).comingSoon && parsed[ing.id] > 0);
+
+          if (!hasInvalid && !missingValid && !hasComingSoon && Object.values(parsed).reduce((a: any, b: any) => a + b, 0) === 220) {
             return parsed;
           }
         } catch (e) { }
@@ -66,7 +69,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     }
     return presetMix;
   });
-  const [selectedId, setSelectedId] = useState<IngredientId>("durazno");
+  const [selectedId, setSelectedId] = useState<IngredientId>("almendras");
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_deliveryOption');
@@ -414,11 +417,11 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
   function setClassicMix() {
     setMix({
-      durazno: 44,
-      almendras: 44,
-      nueces: 44,
-      uva: 44,
-      banana: 44,
+      durazno: 0,
+      almendras: 55,
+      nueces: 55,
+      uva: 55,
+      banana: 55,
     });
     // Quitar focus de cualquier input activo
     if (document.activeElement && document.activeElement instanceof HTMLElement) {
@@ -427,7 +430,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   }
 
   const isClassicMix = useMemo(() => {
-    return Object.values(mix).every(value => value === 44);
+    return mix.durazno === 0 && mix.almendras === 55 && mix.nueces === 55 && mix.uva === 55 && mix.banana === 55;
   }, [mix]);
 
   // Press-and-hold support for +/- buttons
@@ -561,7 +564,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Restar 11 gramos a ${ing.name}`}
-                    disabled={(mix[ing.id] ?? 0) <= 0}
+                    disabled={(mix[ing.id] ?? 0) <= 0 || (ing as any).comingSoon}
                   >
                     -
                   </Button>
@@ -578,6 +581,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       value={mix[ing.id] ?? 0}
                       onChange={(e) => setGram(ing.id, Number(e.target.value))}
                       onFocus={() => setSelectedId(ing.id)}
+                      disabled={(ing as any).comingSoon}
                       readOnly
                       className="w-24 pr-6 text-right cursor-default"
                     />
@@ -607,7 +611,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Sumar 11 gramos a ${ing.name}`}
-                    disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT}
+                    disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT || (ing as any).comingSoon}
                   >
                     +
                   </Button>

@@ -15,7 +15,7 @@ export const dictionary = {
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Durazno deshidratado",
+            durazno: "Durazno (Próximamente)",
             almendras: "Almendras",
             nueces: "Nueces",
             uva: "Uva deshidratada",
@@ -123,7 +123,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energía para eventos especiales",
         pricing_buy_btn: "Comprar",
         pricing_includes: "FRUTOS SELECCIONADOS:",
-        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Durazno, Banana chips",
+        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Banana chips",
 
         // FAQ
         faq_title_full: "Preguntas Frecuentes",
@@ -156,7 +156,7 @@ export const dictionary = {
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Dried Peach",
+            durazno: "Peach (Coming Soon)",
             almendras: "Almonds",
             nueces: "Walnuts",
             uva: "Raisins",
@@ -264,7 +264,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energy for special events",
         pricing_buy_btn: "Buy",
         pricing_includes: "SELECTED NUTS:",
-        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Peaches, Banana chips",
+        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Banana chips",
 
         // FAQ
         faq_title_full: "Frequently Asked Questions",
