@@ -55,12 +55,12 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           // Quick check: if keys don't match INGREDIENTS_BASE ids
           const keys = Object.keys(parsed);
           const validKeys = INGREDIENTS_BASE.map(i => i.id);
-          const hasInvalid = keys.some(k => !validKeys.includes(k as any));
+          const hasInvalid = keys.some(k => !validKeys.includes(k as IngredientId));
           const missingValid = validKeys.some(k => typeof parsed[k] !== 'number');
 
-          const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as any).comingSoon && parsed[ing.id] > 0);
+          const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as { comingSoon?: boolean }).comingSoon && parsed[ing.id] > 0);
 
-          if (!hasInvalid && !missingValid && !hasComingSoon && Object.values(parsed).reduce((a: any, b: any) => a + b, 0) === 220) {
+          if (!hasInvalid && !missingValid && !hasComingSoon && (Object.values(parsed) as number[]).reduce((a, b) => a + b, 0) === 220) {
             return parsed;
           }
         } catch (e) { }
@@ -195,7 +195,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     if (n1 > 0) parts.push(`${n1} ${t.promo_mixes}`);
 
     return parts.length > 0 ? parts.join(' + ') : `0 ${t.promo_mixes}`;
-  }, [totalMixQty]);
+  }, [totalMixQty, t]);
 
   const isValidEmail = useMemo(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -564,7 +564,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Restar 11 gramos a ${ing.name}`}
-                    disabled={(mix[ing.id] ?? 0) <= 0 || (ing as any).comingSoon}
+                    disabled={(mix[ing.id] ?? 0) <= 0 || (ing as { comingSoon?: boolean }).comingSoon}
                   >
                     -
                   </Button>
@@ -581,7 +581,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       value={mix[ing.id] ?? 0}
                       onChange={(e) => setGram(ing.id, Number(e.target.value))}
                       onFocus={() => setSelectedId(ing.id)}
-                      disabled={(ing as any).comingSoon}
+                      disabled={(ing as { comingSoon?: boolean }).comingSoon}
                       readOnly
                       className="w-24 pr-6 text-right cursor-default"
                     />
@@ -611,7 +611,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Sumar 11 gramos a ${ing.name}`}
-                    disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT || (ing as any).comingSoon}
+                    disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT || (ing as { comingSoon?: boolean }).comingSoon}
                   >
                     +
                   </Button>

@@ -299,15 +299,6 @@ export default function AdminPage() {
     insertVariable(snippet, 'html');
   }
 
-  // Aliases / convenience wrappers used by toolbar buttons (some buttons call the other name)
-  function insertCTA() {
-    return insertCta();
-  }
-
-  function wrapSelection(openTag: string, closeTag: string) {
-    return wrapHtmlSelection(openTag, closeTag);
-  }
-
   // Derived/list state: apply search, filter and sort
   const selectedIds = Object.keys(selected).filter(id => selected[id]);
   const displayedOrders = orders
@@ -902,7 +893,7 @@ export default function AdminPage() {
                                   const v = editingEmailValue.trim();
                                   if (!v) return;
                                   setPromoEmails(prev => prev.map((p, i) => i === idx ? v : p));
-                                  setPromoEmailsText(prev => promoEmails.map((p, i) => i === idx ? v : p).join('\n'));
+                                  setPromoEmailsText(_prev => promoEmails.map((p, i) => i === idx ? v : p).join('\n'));
                                   setEditingEmailIndex(null);
                                 }}>Guardar</Button>
                                 <Button size="sm" variant="outline" onClick={() => setEditingEmailIndex(null)}>Cancelar</Button>
@@ -913,7 +904,7 @@ export default function AdminPage() {
                                 <Button size="sm" variant="outline" onClick={() => { setEditingEmailIndex(idx); setEditingEmailValue(em); }}>Editar</Button>
                                 <button type="button" aria-label="Eliminar email" className="text-red-400 hover:text-red-500" onClick={() => {
                                   setPromoEmails(prev => prev.filter((_, i) => i !== idx));
-                                  setPromoEmailsText(prev => promoEmails.filter((_, i) => i !== idx).join('\n'));
+                                  setPromoEmailsText(_prev => promoEmails.filter((_, i) => i !== idx).join('\n'));
                                 }}>
                                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
