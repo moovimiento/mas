@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { toast } from 'sonner';
 import type { OrderItem } from '@/lib/orders';
 import { Button } from '@/components/ui/button';
@@ -49,8 +50,10 @@ export default function AdminPage() {
   const subjectInputRef = useRef<HTMLInputElement | null>(null);
   const htmlTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [personalTarget, setPersonalTarget] = useState<Order | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_detailOpen, setDetailOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   type SortKey = 'createdAt' | 'name' | 'email' | 'phone' | 'totalMixQty' | 'totalPrice' | 'status' | 'id' | null;
   const [sortBy, setSortBy] = useState<SortKey>(null);
@@ -893,7 +896,7 @@ export default function AdminPage() {
                                   const v = editingEmailValue.trim();
                                   if (!v) return;
                                   setPromoEmails(prev => prev.map((p, i) => i === idx ? v : p));
-                                  setPromoEmailsText(_prev => promoEmails.map((p, i) => i === idx ? v : p).join('\n'));
+                                  setPromoEmailsText(() => promoEmails.map((p, i) => i === idx ? v : p).join('\n'));
                                   setEditingEmailIndex(null);
                                 }}>Guardar</Button>
                                 <Button size="sm" variant="outline" onClick={() => setEditingEmailIndex(null)}>Cancelar</Button>
@@ -904,7 +907,7 @@ export default function AdminPage() {
                                 <Button size="sm" variant="outline" onClick={() => { setEditingEmailIndex(idx); setEditingEmailValue(em); }}>Editar</Button>
                                 <button type="button" aria-label="Eliminar email" className="text-red-400 hover:text-red-500" onClick={() => {
                                   setPromoEmails(prev => prev.filter((_, i) => i !== idx));
-                                  setPromoEmailsText(_prev => promoEmails.filter((_, i) => i !== idx).join('\n'));
+                                  setPromoEmailsText(() => promoEmails.filter((_, i) => i !== idx).join('\n'));
                                 }}>
                                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
@@ -984,7 +987,7 @@ export default function AdminPage() {
                       </Button>
                       {promoCoverDataUrl && (
                         <div className="ml-3 flex items-center gap-2">
-                          <img src={promoCoverDataUrl} alt="Portada" className="max-h-24 rounded border" />
+                          <Image src={promoCoverDataUrl} alt="Portada" className="max-h-24 w-auto rounded border" width={100} height={100} unoptimized />
                           <button type="button" aria-label="Eliminar foto" className="text-red-400 hover:text-red-500" onClick={() => { setPromoCoverDataUrl(null); if (coverInputRef.current) coverInputRef.current.value = ''; }}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />

@@ -9,7 +9,7 @@ import { dictionary, Language } from "@/lib/dictionary";
 
 const TOTAL_GRAMS = 220;
 const MAX_PER_INGREDIENT = 66;
-const MIN_NONZERO = 22;
+// const MIN_NONZERO = 22;
 
 const INGREDIENTS_BASE = [
   { id: "banana", color: "#a8d8ea" },    // celeste claro argentino
@@ -20,7 +20,7 @@ const INGREDIENTS_BASE = [
 ] as const;
 
 type IngredientId = typeof INGREDIENTS_BASE[number]["id"];
-type IngredientBase = typeof INGREDIENTS_BASE[number];
+// type IngredientBase = typeof INGREDIENTS_BASE[number];
 
 type Mix = Record<IngredientId, number>;
 
@@ -60,12 +60,12 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
           const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as { comingSoon?: boolean }).comingSoon && parsed[ing.id] > 0);
 
-          const hasUnderMin = INGREDIENTS_BASE.some(ing => !(ing as any).comingSoon && parsed[ing.id] < 22);
+          const hasUnderMin = INGREDIENTS_BASE.some(ing => !(ing as { comingSoon?: boolean }).comingSoon && (parsed as Record<string, number>)[ing.id] < 22);
 
           if (!hasInvalid && !missingValid && !hasComingSoon && !hasUnderMin && (Object.values(parsed) as number[]).reduce((a, b) => a + b, 0) === 220) {
             return parsed;
           }
-        } catch (e) { }
+        } catch { }
       }
       return presetMix;
     }
@@ -134,7 +134,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
   const isValid = total === TOTAL_GRAMS && INGREDIENTS_BASE.every((ing) => {
-    const isComingSoon = (ing as any).comingSoon;
+    const isComingSoon = (ing as { comingSoon?: boolean }).comingSoon;
     const g = mix[ing.id] ?? 0;
     return isComingSoon ? g === 0 : g >= 22 && g <= MAX_PER_INGREDIENT;
   });
@@ -399,7 +399,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
 
       const ing = INGREDIENTS_BASE.find(i => i.id === id);
-      const isComingSoon = (ing as any)?.comingSoon;
+      const isComingSoon = (ing as { comingSoon?: boolean })?.comingSoon;
       const minAllowed = isComingSoon ? 0 : 22;
 
       let nextVal = Math.min(desiredEven, maxAllowedEven, perIngredientEven);
@@ -421,7 +421,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
 
       const ing = INGREDIENTS_BASE.find(i => i.id === id);
-      const isComingSoon = (ing as any)?.comingSoon;
+      const isComingSoon = (ing as { comingSoon?: boolean })?.comingSoon;
       const minAllowed = isComingSoon ? 0 : 22;
 
       let nextVal = Math.max(minAllowed, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
@@ -618,7 +618,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     className={cn(
                       "h-8 w-8 cursor-pointer flex-shrink-0 transition-colors"
                     )}
-                    style={remaining > 0 && (mix[ing.id] ?? 0) < MAX_PER_INGREDIENT && !(ing as any).comingSoon ? {
+                    style={remaining > 0 && (mix[ing.id] ?? 0) < MAX_PER_INGREDIENT && !(ing as { comingSoon?: boolean }).comingSoon ? {
                       borderColor: '#eab308',
                       color: '#eab308',
                       backgroundColor: '#eab30815'
