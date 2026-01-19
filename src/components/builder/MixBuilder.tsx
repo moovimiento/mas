@@ -60,7 +60,9 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
           const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as { comingSoon?: boolean }).comingSoon && parsed[ing.id] > 0);
 
-          if (!hasInvalid && !missingValid && !hasComingSoon && (Object.values(parsed) as number[]).reduce((a, b) => a + b, 0) === 220) {
+          const hasUnderMin = INGREDIENTS_BASE.some(ing => !(ing as any).comingSoon && parsed[ing.id] < 22);
+
+          if (!hasInvalid && !missingValid && !hasComingSoon && !hasUnderMin && (Object.values(parsed) as number[]).reduce((a, b) => a + b, 0) === 220) {
             return parsed;
           }
         } catch (e) { }
@@ -131,7 +133,11 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
   const total = useMemo(() => Object.values(mix).reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0), [mix]);
   const remaining = TOTAL_GRAMS - total;
-  const isValid = total === TOTAL_GRAMS && Object.values(mix).every((g) => g >= 0 && g <= TOTAL_GRAMS);
+  const isValid = total === TOTAL_GRAMS && INGREDIENTS_BASE.every((ing) => {
+    const isComingSoon = (ing as any).comingSoon;
+    const g = mix[ing.id] ?? 0;
+    return isComingSoon ? g === 0 : g >= 22 && g <= MAX_PER_INGREDIENT;
+  });
 
   const percentages = useMemo(() => {
     return Object.fromEntries(
@@ -391,9 +397,13 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
       // Max allowed should also be even (floor to even)
       const maxAllowedEven = Math.floor(maxAllowed / 2) * 2;
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
+
+      const ing = INGREDIENTS_BASE.find(i => i.id === id);
+      const isComingSoon = (ing as any)?.comingSoon;
+      const minAllowed = isComingSoon ? 0 : 22;
+
       let nextVal = Math.min(desiredEven, maxAllowedEven, perIngredientEven);
-      // Enforce 0 <-> 22 jump for non-zero values smaller than MIN_NONZERO
-      if (nextVal > 0 && nextVal < MIN_NONZERO) nextVal = MIN_NONZERO;
+      if (nextVal < minAllowed) nextVal = minAllowed;
       return { ...prev, [id]: nextVal } as Mix;
     });
   }
@@ -409,7 +419,12 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
       // Cap to even maximum
       const maxAllowedEven = Math.floor(maxAllowed / 2) * 2;
       const perIngredientEven = Math.floor(MAX_PER_INGREDIENT / 2) * 2;
-      let nextVal = Math.max(0, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
+
+      const ing = INGREDIENTS_BASE.find(i => i.id === id);
+      const isComingSoon = (ing as any)?.comingSoon;
+      const minAllowed = isComingSoon ? 0 : 22;
+
+      let nextVal = Math.max(minAllowed, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
 
       // Trigger shake animation if trying to add but no space
       if (delta > 0 && nextVal === current && maxAllowedEven === 0) {
@@ -498,6 +513,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
         <h2 className="hidden md:block text-2xl font-semibold">{t.builder_title}</h2>
         <div className="text-sm text-muted-foreground whitespace-normal flex flex-col items-center sm:flex-row sm:justify-between gap-0 sm:gap-8 pt-2 leading-tight">
 
+          <span>{t.min_per_ingredient}: <span className="font-medium">22g</span></span>
           <span>{t.max_per_ingredient}: <span className="font-medium">66g</span></span>
         </div>
       </div>
@@ -573,7 +589,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Restar 11 gramos a ${ing.name}`}
-                    disabled={(mix[ing.id] ?? 0) <= 0 || (ing as { comingSoon?: boolean }).comingSoon}
+                    disabled={(mix[ing.id] ?? 0) <= 22 || (ing as { comingSoon?: boolean }).comingSoon}
                   >
                     -
                   </Button>
@@ -602,7 +618,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     className={cn(
                       "h-8 w-8 cursor-pointer flex-shrink-0 transition-colors"
                     )}
-                    style={remaining > 0 && (mix[ing.id] ?? 0) < MAX_PER_INGREDIENT ? {
+                    style={remaining > 0 && (mix[ing.id] ?? 0) < MAX_PER_INGREDIENT && !(ing as any).comingSoon ? {
                       borderColor: '#eab308',
                       color: '#eab308',
                       backgroundColor: '#eab30815'

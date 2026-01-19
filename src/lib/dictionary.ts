@@ -138,7 +138,7 @@ export const dictionary = {
         faq_q3: "¿Por qué elegir frutos secos como snack?",
         faq_a3: "Porque son prácticos, saludables y naturales. Te aportan energía, proteínas y grasas buenas que te ayudan a rendir mejor en el estudio, trabajo o entrenamiento.",
         faq_q4: "¿Puedo personalizar la composición?",
-        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de Mixes (más arriba en esta página) podés elegir exactamente qué querés. Si no te gusta algún ingrediente lo sacás, y si querés más de otro, lo agregás. ¡Vos decidís!",
+        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de Mixes (más arriba en esta página) podés elegir la proporción de cada ingrediente (mínimo 22g y máximo 66g por ingrediente). ¡Vos decidís!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energía que te acompaña en cada paso",
@@ -281,7 +281,7 @@ export const dictionary = {
         faq_q3: "Why choose nuts as a snack?",
         faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
         faq_q4: "Can I customize the composition?",
-        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your Mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
+        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your Mix' section above. You can adjust the amount of each ingredient (between 22g and 66g). You're in control!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energy that accompanies you at every step",
