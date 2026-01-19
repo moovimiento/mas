@@ -3,7 +3,7 @@ export type Language = 'es' | 'en';
 export const dictionary = {
     es: {
         // Header & Footer
-        faq: "Preguntas frecuentes",
+        faq: "Preguntas Frecuentes",
         made_in: "Hecho en Argentina",
 
         // Hero
@@ -36,7 +36,7 @@ export const dictionary = {
         // Cart
         cart_title: "Carrito de Compra",
         cart_empty: "No hay Mixes en el carrito 🛒",
-        cart_build_link: "Armalos arriba y agregalos ↑",
+        cart_build_link: "Agregalos arriba ↑",
         mix_composed_of: "Mix compuesto por",
         edit: "Editar",
         duplicate: "Duplicar",
@@ -44,7 +44,7 @@ export const dictionary = {
         mix_percent_of: "de",
         back_to_top: "Volver arriba para agregar más Mixes con otros ingredientes ↑",
         label_quantity: "Cantidad de Mixes",
-        label_grams: "Gramos en total",
+        label_grams: "Gramos totales",
         label_delivery: "Delivery",
         delivery_compact_pickup: "Ciudad Universitaria ($0)",
         delivery_compact_shipping: "Córdoba Capital (${price})",
@@ -84,11 +84,11 @@ export const dictionary = {
         placeholder_phone: "Tu teléfono (WhatsApp)",
         label_address: "Dirección de envío",
         placeholder_address: "Calle y número, Piso/Depto",
-        label_email: "Email (opcional)",
+        label_email: "Email",
         placeholder_email: "tu@email.com",
 
-        discount_title: "Código de descuento",
-        discount_placeholder: "Ingresa tu código",
+        discount_title: "Código de descuento (opcional)",
+        discount_placeholder: "Tu código",
         discount_apply: "Aplicar",
         discount_question: "¿Tenés un código de descuento? Hacé click aquí",
         discount_invalid: "Por favor ingrese un código de descuento válido",
@@ -112,13 +112,13 @@ export const dictionary = {
         // Pricing
         pricing_title: "Precios y Promos",
         pricing_subtitle: "Simples y transparentes",
-        pricing_tier_1_title: "1 Cápsula (220g)",
+        pricing_tier_1_title: "1 Mix (220g)",
         pricing_tier_1_price: "$4000 pesos",
         pricing_tier_1_desc: "Energía para toda la semana",
-        pricing_tier_2_title: "5 Cápsulas (1100g)",
+        pricing_tier_2_title: "5 Mixes (1100g)",
         pricing_tier_2_price: "$18000 pesos",
         pricing_tier_2_desc: "Energía para todo el mes",
-        pricing_tier_3_title: "15 Cápsulas (3300g)",
+        pricing_tier_3_title: "15 Mixes (3300g)",
         pricing_tier_3_price: "$53000 pesos",
         pricing_tier_3_desc: "Energía para eventos especiales",
         pricing_buy_btn: "Comprar",
@@ -140,17 +140,16 @@ export const dictionary = {
 
         // Trust / Footer Slogan
         trust_slogan: "Energía que te acompaña en cada paso",
-        trust_sub: "Snacks ricos y prácticos para rendir en la facu, el trabajo o donde pinten las pilas",
-        trust_made_for: "Elegido por cada vez más estudiantes universitarios.",
+        trust_sub: "Snacks ricos y prácticos para rendir en la facu, el trabajo, ¡o donde pinten las pilas!",
     },
     en: {
         // Header & Footer
-        faq: "FAQ",
+        faq: "FAQs",
         made_in: "Made in Argentina",
 
         // Hero
         hero_title: "Build your ⚡\nTrail Mix your way",
-        hero_subtitle: "Build your 220g mix with selected ingredients",
+        hero_subtitle: "Build your 220g Mix with selected ingredients",
         delivery_free: "Free delivery at",
         location: "Ciudad Universitaria",
 
@@ -162,13 +161,13 @@ export const dictionary = {
             nueces: "Walnuts",
             uva: "Raisins",
         },
-        builder_title: "Build your mix (220g)",
+        builder_title: "Build your Mix (220g)",
         min_per_ingredient: "Min per ingredient",
         max_per_ingredient: "Max per ingredient",
         card_ingredients_title: "Ingredients",
         classic_mix_btn: "Classic Mix (≡)",
         classic_mix_tooltip: "Set all ingredients to 44g",
-        classic_mix_already: "It's already a classic mix",
+        classic_mix_already: "It's already a Classic Mix",
         add_to_cart: "Add to cart",
         complete_remaining: "Complete the remaining {g}g to add to cart",
 
@@ -178,22 +177,22 @@ export const dictionary = {
         // Cart
         cart_title: "Shopping Cart",
         cart_empty: "No Mixes in the cart 🛒",
-        cart_build_link: "Build it above and add it ↑",
+        cart_build_link: "Add above ↑",
         mix_composed_of: "Mix composed of",
         edit: "Edit",
         duplicate: "Duplicate",
         remove: "Remove",
         mix_percent_of: "of",
-        back_to_top: "Back to top to add a mix with other ingredients ↑",
-        label_quantity: "Quantity",
-        label_grams: "Grams",
+        back_to_top: "Back to top to add Mixes with other ingredients ↑",
+        label_quantity: "Number of Mixes",
+        label_grams: "Total grams",
         label_delivery: "Delivery",
         delivery_compact_pickup: "Ciudad Universitaria ($0)",
-        delivery_compact_shipping: "Córdoba Capital (${price})",
-        delivery_label_pickup: "Faculty or meeting point",
+        delivery_compact_shipping: "Cordoba Capital (${price})",
+        delivery_label_pickup: "Meeting point",
         delivery_label_shipping: "Shipping address",
         delivery_placeholder_pickup: "Ex: Pabellón Argentina",
-        delivery_placeholder_shipping: "Ex: Av. Valparaíso 1234, Córdoba",
+        delivery_placeholder_shipping: "Ex: Av. Valparaíso 1234, Cordoba",
         label_phone_contact: "Phone (to coordinate delivery)",
         placeholder_phone_contact: "Ex: 351 153 123456",
 
@@ -215,9 +214,9 @@ export const dictionary = {
         // Checkout form
         delivery_method_title: "Delivery method",
         delivery_pickup: "Meeting point",
-        delivery_pickup_detail: "(Free) - Pabellón Argentina (UNC)",
+        delivery_pickup_detail: "(Free) - Pabellon Argentina (UNC)",
         delivery_shipping: "Home delivery",
-        delivery_shipping_detail: "($1000) - Only Nueva Córdoba / Centro / Güemes",
+        delivery_shipping_detail: "($1000) - Only Nueva Cordoba / Centro / Güemes",
 
         contact_info_title: "Contact info",
         label_name: "Name",
@@ -226,11 +225,11 @@ export const dictionary = {
         placeholder_phone: "Your phone (WhatsApp)",
         label_address: "Shipping address",
         placeholder_address: "Street and number, Apt/Floor",
-        label_email: "Email (optional)",
+        label_email: "Email",
         placeholder_email: "you@email.com",
 
-        discount_title: "Discount code",
-        discount_placeholder: "Enter your code",
+        discount_title: "Discount code (optional)",
+        discount_placeholder: "Your code",
         discount_apply: "Apply",
         discount_question: "Do you have a discount code? Click here",
         discount_invalid: "Please enter a valid discount code",
@@ -253,14 +252,14 @@ export const dictionary = {
 
         // Pricing
         pricing_title: "Prices and Promos",
-        pricing_subtitle: "Simple and transparent",
-        pricing_tier_1_title: "1 Capsule (220g)",
+        pricing_subtitle: "Simple and transparents",
+        pricing_tier_1_title: "1 Mix (220g)",
         pricing_tier_1_price: "$4000 ARS",
         pricing_tier_1_desc: "Energy for the whole week",
-        pricing_tier_2_title: "5 Capsules (1100g)",
+        pricing_tier_2_title: "5 Mixes (1100g)",
         pricing_tier_2_price: "$18000 ARS",
         pricing_tier_2_desc: "Energy for the whole month",
-        pricing_tier_3_title: "15 Capsules (3300g)",
+        pricing_tier_3_title: "15 Mixes (3300g)",
         pricing_tier_3_price: "$53000 ARS",
         pricing_tier_3_desc: "Energy for special events",
         pricing_buy_btn: "Buy",
@@ -269,20 +268,19 @@ export const dictionary = {
 
         // FAQ
         faq_title_full: "Frequently Asked Questions",
-        faq_subtitle: "Ask us anything!",
+        faq_subtitle: "Ask me anything!",
         faq_contact_email: "gonza@moovimiento.com",
         faq_q1: "Is it safe to buy at Moovimiento?",
         faq_a1: "Absolutely. We use Mercado Pago to process payments, ensuring your transaction is secure and your data is protected.",
         faq_q2: "Can I enjoy Moovimiento nuts at any time?",
-        faq_a2: "Yes! We work with fresh stock and provide fast delivery in Ciudad Universitaria and Nueva Córdoba, so they arrive in perfect condition.",
+        faq_a2: "Yes! We work with fresh stock and provide fast delivery in Ciudad Universitaria and Nueva Cordoba, so they arrive in perfect condition.",
         faq_q3: "Why choose nuts as a snack?",
         faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
         faq_q4: "Can I customize the composition?",
-        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
+        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your Mix' section above. Don't like raisins? Remove them. Want more walnuts? Add them. You're in control!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energy that accompanies you at every step",
-        trust_sub: "Tasty and practical snacks to perform at university, work, or wherever you need energy",
-        trust_made_for: "Chosen by more and more university students.",
+        trust_sub: "Tasty and practical snacks to perform at university, work, or wherever you want!",
     }
 };

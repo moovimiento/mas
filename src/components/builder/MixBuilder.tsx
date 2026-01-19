@@ -1045,7 +1045,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           {/* Campo de código de descuento */}
           <div className="space-y-1">
             <label className="text-sm text-muted-foreground block">
-              {t.discount_title} (opcional)
+              {t.discount_title}
             </label>
             <div className="flex items-center gap-2 w-full md:w-1/2 md:pr-2">
               <Input

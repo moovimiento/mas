@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Source_Sans_3 } from "next/font/google";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageToggle } from "@/components/language-toggle";
 import { MixBuilder } from "@/components/builder/MixBuilder";
 import { Pricing } from "@/components/Pricing";
 import { FAQ } from "@/components/FAQ";
@@ -46,7 +47,7 @@ export function MainContent({ lang }: { lang: Language }) {
                         </div>
                         <span className={`${sourceSans.className} text-lg font-semibold leading-none`}>Moovimiento</span>
                     </a>
-                    <nav className="flex items-center gap-4 justify-end">
+                    <nav className="flex items-center gap-5 justify-end">
                         <a
                             href="#faq"
                             onClick={(e) => {
@@ -57,7 +58,12 @@ export function MainContent({ lang }: { lang: Language }) {
                         >
                             {t.faq}
                         </a>
-                        <ThemeToggle />
+                        <div className="flex items-center gap-2">
+                            <div className="hidden sm:block">
+                                <LanguageToggle currentLang={lang} />
+                            </div>
+                            <ThemeToggle />
+                        </div>
                     </nav>
                 </div>
             </header>
