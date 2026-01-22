@@ -8,14 +8,14 @@ export const dictionary = {
 
         // Hero
         hero_title: "Mixes de ⚡\nFrutos Secos a tu manera",
-        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas ⚡",
+        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas 🔋⚡",
         delivery_free: "Delivery gratuito en",
         location: "Ciudad Universitaria",
 
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Durazno (Próximamente)",
+            durazno: "Durazno",
             almendras: "Almendras",
             nueces: "Nueces",
             uva: "Uva deshidratada",
@@ -125,7 +125,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energía para eventos especiales",
         pricing_buy_btn: "Comprar",
         pricing_includes: "FRUTOS SELECCIONADOS:",
-        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Banana chips",
+        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Banana chips, Durazno",
 
         // FAQ
         faq_title_full: "Preguntas Frecuentes",
@@ -138,7 +138,7 @@ export const dictionary = {
         faq_q3: "¿Por qué elegir frutos secos como snack?",
         faq_a3: "Porque son prácticos, saludables y naturales. Te aportan energía, proteínas y grasas buenas que te ayudan a rendir mejor en el estudio, trabajo o entrenamiento.",
         faq_q4: "¿Puedo personalizar la composición?",
-        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de Mixes (más arriba en esta página) podés elegir la proporción de cada ingrediente (mínimo 22g y máximo 66g por ingrediente). ¡Vos decidís!",
+        faq_a4: "¡Sí, claro! Por defecto vienen equilibrados, pero en el armador de Mixes (más arriba en esta página) podés elegir la proporción de cada ingrediente (máximo 66g por ingrediente). ¡Vos decidís!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energía que te acompaña en cada paso",
@@ -151,14 +151,14 @@ export const dictionary = {
 
         // Hero
         hero_title: "Build your ⚡\nTrail Mix your way",
-        hero_subtitle: "Build your 220g Mix with selected ingredients\nGet 5, or more, to recharge your energy ⚡",
+        hero_subtitle: "Build your 220g Mix with selected ingredients\nGet 5, or more, to recharge your energy 🔋⚡",
         delivery_free: "Free delivery at",
         location: "Ciudad Universitaria",
 
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Peach (Coming Soon)",
+            durazno: "Peach",
             almendras: "Almonds",
             nueces: "Walnuts",
             uva: "Raisins",
@@ -268,7 +268,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energy for special events",
         pricing_buy_btn: "Buy",
         pricing_includes: "SELECTED NUTS:",
-        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Banana chips",
+        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Banana chips, Peach",
 
         // FAQ
         faq_title_full: "Frequently Asked Questions",
@@ -281,7 +281,7 @@ export const dictionary = {
         faq_q3: "Why choose nuts as a snack?",
         faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
         faq_q4: "Can I customize the composition?",
-        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your Mix' section above. You can adjust the amount of each ingredient (between 22g and 66g). You're in control!",
+        faq_a4: "Of course! By default, Mixes are balanced, but you can customize them in the 'Build your Mix' section above. You can adjust the amount of each ingredient (up to 66g). You're in control!",
 
         // Trust / Footer Slogan
         trust_slogan: "Energy that accompanies you at every step",

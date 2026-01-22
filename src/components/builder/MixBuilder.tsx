@@ -16,7 +16,7 @@ const INGREDIENTS_BASE = [
   { id: "almendras", color: "#4fb3d4" }, // celeste argentino
   { id: "nueces", color: "#2a9cc0" },    // celeste medio oscuro
   { id: "uva", color: "#1a7fa0" },       // celeste oscuro
-  { id: "durazno", color: "#75c9e0", comingSoon: true },   // celeste medio claro
+  { id: "durazno", color: "#75c9e0" },   // celeste medio claro
 ] as const;
 
 type IngredientId = typeof INGREDIENTS_BASE[number]["id"];
@@ -30,11 +30,11 @@ type CartItem = {
 };
 
 const presetMix: Mix = {
-  durazno: 0,
-  almendras: 55,
-  nueces: 55,
-  uva: 55,
-  banana: 55,
+  durazno: 44,
+  almendras: 44,
+  nueces: 44,
+  uva: 44,
+  banana: 44,
 };
 
 export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
@@ -60,7 +60,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
           const hasComingSoon = INGREDIENTS_BASE.some(ing => (ing as { comingSoon?: boolean }).comingSoon && parsed[ing.id] > 0);
 
-          const hasUnderMin = INGREDIENTS_BASE.some(ing => !(ing as { comingSoon?: boolean }).comingSoon && (parsed as Record<string, number>)[ing.id] < 22);
+          const hasUnderMin = false; // logic removed
 
           if (!hasInvalid && !missingValid && !hasComingSoon && !hasUnderMin && (Object.values(parsed) as number[]).reduce((a, b) => a + b, 0) === 220) {
             return parsed;
@@ -136,7 +136,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   const isValid = total === TOTAL_GRAMS && INGREDIENTS_BASE.every((ing) => {
     const isComingSoon = (ing as { comingSoon?: boolean }).comingSoon;
     const g = mix[ing.id] ?? 0;
-    return isComingSoon ? g === 0 : g >= 22 && g <= MAX_PER_INGREDIENT;
+    return g >= 0 && g <= MAX_PER_INGREDIENT;
   });
 
   const percentages = useMemo(() => {
@@ -400,7 +400,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
       const ing = INGREDIENTS_BASE.find(i => i.id === id);
       const isComingSoon = (ing as { comingSoon?: boolean })?.comingSoon;
-      const minAllowed = isComingSoon ? 0 : 22;
+      const minAllowed = 0;
 
       let nextVal = Math.min(desiredEven, maxAllowedEven, perIngredientEven);
       if (nextVal < minAllowed) nextVal = minAllowed;
@@ -422,7 +422,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
       const ing = INGREDIENTS_BASE.find(i => i.id === id);
       const isComingSoon = (ing as { comingSoon?: boolean })?.comingSoon;
-      const minAllowed = isComingSoon ? 0 : 22;
+      const minAllowed = 0;
 
       let nextVal = Math.max(minAllowed, Math.min(desiredEven, maxAllowedEven, perIngredientEven));
 
@@ -441,11 +441,11 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
   function setClassicMix() {
     setMix({
-      durazno: 0,
-      almendras: 55,
-      nueces: 55,
-      uva: 55,
-      banana: 55,
+      durazno: 44,
+      almendras: 44,
+      nueces: 44,
+      uva: 44,
+      banana: 44,
     });
     // Quitar focus de cualquier input activo
     if (document.activeElement && document.activeElement instanceof HTMLElement) {
@@ -454,7 +454,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   }
 
   const isClassicMix = useMemo(() => {
-    return mix.durazno === 0 && mix.almendras === 55 && mix.nueces === 55 && mix.uva === 55 && mix.banana === 55;
+    return mix.durazno === 44 && mix.almendras === 44 && mix.nueces === 44 && mix.uva === 44 && mix.banana === 44;
   }, [mix]);
 
   // Press-and-hold support for +/- buttons
@@ -512,8 +512,6 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
       <div className="flex flex-col items-center md:flex-row md:items-center md:justify-between gap-1 text-center md:text-left">
         <h2 className="hidden md:block text-2xl font-semibold">{t.builder_title}</h2>
         <div className="text-sm text-muted-foreground whitespace-normal flex flex-col items-center sm:flex-row sm:justify-between gap-0 sm:gap-8 pt-2 leading-tight">
-
-          <span>{t.min_per_ingredient}: <span className="font-medium">22g</span></span>
           <span>{t.max_per_ingredient}: <span className="font-medium">66g</span></span>
         </div>
       </div>
@@ -589,7 +587,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     onTouchEnd={stopHold}
                     onTouchCancel={stopHold}
                     aria-label={`Restar 11 gramos a ${ing.name}`}
-                    disabled={(mix[ing.id] ?? 0) <= 22 || (ing as { comingSoon?: boolean }).comingSoon}
+                    disabled={(mix[ing.id] ?? 0) <= 0 || (ing as { comingSoon?: boolean }).comingSoon}
                   >
                     -
                   </Button>
