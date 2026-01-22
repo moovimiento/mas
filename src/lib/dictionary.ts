@@ -8,14 +8,14 @@ export const dictionary = {
 
         // Hero
         hero_title: "Mixes de ⚡\nFrutos Secos a tu manera",
-        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas 🔋⚡",
+        hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas 🔋 ⚡",
         delivery_free: "Delivery gratuito en",
         location: "Ciudad Universitaria",
 
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Durazno",
+            durazno: "Durazno deshidratado",
             almendras: "Almendras",
             nueces: "Nueces",
             uva: "Uva deshidratada",
@@ -125,7 +125,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energía para eventos especiales",
         pricing_buy_btn: "Comprar",
         pricing_includes: "FRUTOS SELECCIONADOS:",
-        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Banana chips, Durazno",
+        pricing_ingredients_list: "Pasas de uva, Almendras, Nueces, Banana chips, Durazno deshidratado",
 
         // FAQ
         faq_title_full: "Preguntas Frecuentes",
@@ -158,7 +158,7 @@ export const dictionary = {
         // MixBuilder
         ingredients: {
             banana: "Banana chips",
-            durazno: "Peach",
+            durazno: "Dried peach",
             almendras: "Almonds",
             nueces: "Walnuts",
             uva: "Raisins",
@@ -268,7 +268,7 @@ export const dictionary = {
         pricing_tier_3_desc: "Energy for special events",
         pricing_buy_btn: "Buy",
         pricing_includes: "SELECTED NUTS:",
-        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Banana chips, Peach",
+        pricing_ingredients_list: "Raisins, Almonds, Walnuts, Banana chips, Dried peach",
 
         // FAQ
         faq_title_full: "Frequently Asked Questions",
