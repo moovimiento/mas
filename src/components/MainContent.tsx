@@ -56,7 +56,8 @@ export function MainContent({ lang }: { lang: Language }) {
                             }}
                             className="text-sm hover:underline cursor-pointer"
                         >
-                            {t.faq}
+                            <span className="hidden sm:inline">{t.faq}</span>
+                            <span className="sm:hidden">FAQs</span>
                         </a>
                         <div className="flex items-center gap-2">
                             <div className="hidden sm:block">
@@ -108,20 +109,43 @@ export function MainContent({ lang }: { lang: Language }) {
                 <Pricing lang={lang} />
             </main>
             <footer className="border-t">
-                <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex items-center justify-between">
-                    <span>
-                        © {new Date().getFullYear()} | Mens sana in corpore sano
-                    </span>
-                    <span className="text-right">
+                <div className="mx-auto max-w-5xl px-6 py-8 text-sm text-muted-foreground flex flex-col gap-y-0.5 sm:gap-y-2">
+                    {/* Fila 1: Copyright (izq) y Bandera (der) en Mobile / Contenido principal en Desktop */}
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center text-sm">
+                            <span>© {new Date().getFullYear()}</span>
+                            <span className="hidden sm:inline mx-1">|</span>
+                            <span className="hidden sm:inline">Mens sana in corpore sano</span>
+                        </div>
+
+                        {/* Bandera en Mobile */}
+                        <span className="sm:hidden text-sm">🇦🇷</span>
+
+                        {/* Made in Desktop (Single line) */}
+                        <div className="hidden sm:block text-sm">
+                            <a
+                                href={lang === 'en' ? "https://gonzalogramagia.com/en" : "https://gonzalogramagia.com/"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-foreground cursor-pointer transition-colors whitespace-nowrap"
+                            >
+                                {t.made_in} 🇦🇷
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Fila 2: Slogan (izq) y Texto Made in (der) - Solo Mobile */}
+                    <div className="flex sm:hidden items-center justify-between w-full text-sm">
+                        <span>Mens sana in corpore sano</span>
                         <a
                             href={lang === 'en' ? "https://gonzalogramagia.com/en" : "https://gonzalogramagia.com/"}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:text-foreground cursor-pointer transition-colors whitespace-nowrap"
                         >
-                            {t.made_in} 🇦🇷
+                            {t.made_in}
                         </a>
-                    </span>
+                    </div>
                 </div>
             </footer>
         </div>
