@@ -574,18 +574,13 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       "h-8 w-8 cursor-pointer flex-shrink-0 transition-all",
                       (mix[ing.id] ?? 0) === 0 && "opacity-40"
                     )}
-                    onMouseDown={() => {
+                    onPointerDown={(e) => {
+                      if (e.pointerType === 'mouse' && e.button !== 0) return;
                       setSelectedId(ing.id);
                       startHold(ing.id, -11);
                     }}
-                    onMouseUp={stopHold}
-                    onMouseLeave={stopHold}
-                    onTouchStart={() => {
-                      setSelectedId(ing.id);
-                      startHold(ing.id, -11);
-                    }}
-                    onTouchEnd={stopHold}
-                    onTouchCancel={stopHold}
+                    onPointerUp={stopHold}
+                    onPointerLeave={stopHold}
                     aria-label={`Restar 11 gramos a ${ing.name}`}
                     disabled={(mix[ing.id] ?? 0) <= 0 || (ing as { comingSoon?: boolean }).comingSoon}
                   >
@@ -621,18 +616,13 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       color: '#eab308',
                       backgroundColor: '#eab30815'
                     } : undefined}
-                    onMouseDown={() => {
+                    onPointerDown={(e) => {
+                      if (e.pointerType === 'mouse' && e.button !== 0) return;
                       setSelectedId(ing.id);
                       startHold(ing.id, +11);
                     }}
-                    onMouseUp={stopHold}
-                    onMouseLeave={stopHold}
-                    onTouchStart={() => {
-                      setSelectedId(ing.id);
-                      startHold(ing.id, +11);
-                    }}
-                    onTouchEnd={stopHold}
-                    onTouchCancel={stopHold}
+                    onPointerUp={stopHold}
+                    onPointerLeave={stopHold}
                     aria-label={`Sumar 11 gramos a ${ing.name}`}
                     disabled={remaining <= 0 || (mix[ing.id] ?? 0) >= MAX_PER_INGREDIENT || (ing as { comingSoon?: boolean }).comingSoon}
                   >
