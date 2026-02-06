@@ -11,6 +11,7 @@ export const dictionary = {
         hero_subtitle: "Armá tu Mix de 220g con ingredientes seleccionados\nLlevate 5, o más, para recargar las pilas 🔋 ⚡",
         delivery_free: "Delivery gratuito en",
         location: "Ciudad Universitaria",
+        location_2: "Sagrada Familia 672",
 
         // MixBuilder
         ingredients: {
@@ -48,10 +49,13 @@ export const dictionary = {
         label_grams: "Gramos totales",
         label_delivery: "Delivery",
         delivery_compact_pickup: "Ciudad Universitaria ($0)",
-        delivery_compact_shipping: "Córdoba Capital (${price})",
+        delivery_compact_sagrada: "Sagrada Familia 672 ($0)",
+        delivery_compact_shipping: "Córdoba Capital ($${price})",
         delivery_label_pickup: "Facultad o lugar de entrega",
+        delivery_label_sagrada: "Lugar de encuentro (Sagrada Familia)",
         delivery_label_shipping: "Dirección de entrega",
         delivery_placeholder_pickup: "Ej: Pabellón Argentina",
+        delivery_placeholder_sagrada: "Ej: Comedor de la oficina de APEX",
         delivery_placeholder_shipping: "Ej: Av. Valparaíso 1234, Córdoba",
         label_phone_contact: "Celular (para coordinar la entrega)",
         placeholder_phone_contact: "Ej: 351 153 123456",
@@ -134,7 +138,7 @@ export const dictionary = {
         faq_q1: "¿Es seguro comprar en Moovimiento?",
         faq_a1: "Totalmente. Usamos Mercado Pago para procesar los cobros, así que tu dinero y tus datos están siempre protegidos. ¡Podés comprar tranquila/o!",
         faq_q2: "¿Puedo disfrutar de los frutos secos de Moovimiento en cualquier momento?",
-        faq_a2: "¡Sí! Trabajamos con stock fresco y hacemos envíos rápidos en Ciudad Universitaria y Nueva Córdoba para que te lleguen impecables.",
+        faq_a2: "¡Sí! Trabajamos con stock fresco y hacemos envíos rápidos en Ciudad Universitaria, Sagrada Familia y Nueva Córdoba para que te lleguen impecables.",
         faq_q3: "¿Por qué elegir frutos secos como snack?",
         faq_a3: "Porque son prácticos, saludables y naturales. Te aportan energía, proteínas y grasas buenas que te ayudan a rendir mejor en el estudio, trabajo o entrenamiento.",
         faq_q4: "¿Puedo personalizar la composición?",
@@ -154,6 +158,7 @@ export const dictionary = {
         hero_subtitle: "Build your 220g Mix with selected ingredients\nGet 5, or more, to recharge your energy 🔋⚡",
         delivery_free: "Free delivery at",
         location: "Ciudad Universitaria",
+        location_2: "Sagrada Familia 672",
 
         // MixBuilder
         ingredients: {
@@ -191,10 +196,13 @@ export const dictionary = {
         label_grams: "Total grams",
         label_delivery: "Delivery",
         delivery_compact_pickup: "Ciudad Universitaria ($0)",
-        delivery_compact_shipping: "Cordoba Capital (${price})",
+        delivery_compact_sagrada: "Sagrada Familia 672 ($0)",
+        delivery_compact_shipping: "Cordoba Capital ($${price})",
         delivery_label_pickup: "Meeting point",
+        delivery_label_sagrada: "Meeting point (Sagrada Familia)",
         delivery_label_shipping: "Shipping address",
         delivery_placeholder_pickup: "Ex: Pabellón Argentina",
+        delivery_placeholder_sagrada: "Ex: APEX office dining room",
         delivery_placeholder_shipping: "Ex: Av. Valparaíso 1234, Cordoba",
         label_phone_contact: "Phone (to coordinate delivery)",
         placeholder_phone_contact: "Ex: 351 153 123456",
@@ -277,7 +285,7 @@ export const dictionary = {
         faq_q1: "Is it safe to buy at Moovimiento?",
         faq_a1: "Absolutely. We use Mercado Pago to process payments, ensuring your transaction is secure and your data is protected.",
         faq_q2: "Can I enjoy Moovimiento nuts at any time?",
-        faq_a2: "Yes! We work with fresh stock and provide fast delivery in Ciudad Universitaria and Nueva Cordoba, so they arrive in perfect condition.",
+        faq_a2: "Yes! We work with fresh stock and provide fast delivery in Ciudad Universitaria, Sagrada Familia, and Nueva Cordoba, so they arrive in perfect condition.",
         faq_q3: "Why choose nuts as a snack?",
         faq_a3: "Because they are practical, healthy, and natural. They provide energy, protein, and good fats to help you perform better in study, work, or training.",
         faq_q4: "Can I customize the composition?",

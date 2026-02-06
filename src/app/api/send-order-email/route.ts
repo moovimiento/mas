@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     // Calcular ahorros para mostrar en la tabla
     const precioUnitario = 4000;
     const precioSinPromo = totalMixQty * precioUnitario;
-    const costoEnvio = deliveryOption === "envio" ? 1000 : 0;
+    const costoEnvio = (deliveryOption === "ciudad" || deliveryOption === "sagrada") ? 0 : 1000;
 
     // Calcular precio con promos aplicadas (packs de 15, packs de 5, y unidades sueltas)
     const n15 = Math.floor(totalMixQty / 15);
@@ -264,7 +264,9 @@ export async function POST(request: NextRequest) {
 
     const deliveryText = deliveryOption === "ciudad"
       ? "Ciudad Universitaria (Envío gratuito)"
-      : `Córdoba (${currency.format(1000)})`;
+      : deliveryOption === "sagrada"
+        ? "Sagrada Familia 672 (Envío gratuito)"
+        : `Córdoba (${currency.format(1000)})`;
 
     console.log("Enviando email...");
 

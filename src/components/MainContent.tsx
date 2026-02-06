@@ -80,7 +80,7 @@ export function MainContent({ lang }: { lang: Language }) {
                                 </p>
                             )}
                             <p className="text-muted-foreground text-sm">
-                                <span className="hidden lg:inline">{t.delivery_free} <a href="https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors cursor-pointer">{t.location}</a></span>
+                                <span className="hidden lg:inline">{t.delivery_free} <a href="https://www.google.com/maps/place/Pabell%C3%B3n+Argentina+%7C+U.N.C./@-31.4377036,-64.1924841,16z/data=!4m15!1m8!3m7!1s0x9432a2f390acbf49:0x76ac4d048e43a498!2sCdad.+Universitaria,+X5000+C%C3%B3rdoba!3b1!8m2!3d-31.4391398!4d-64.1861887!16s%2Fg%2F11rf7v8hwm!3m5!1s0x9432a2f3f4c88b1f:0x52fd4a14aa234bf!8m2!3d-31.4385451!4d-64.1888835!16s%2Fg%2F1q5bm3s9g" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors cursor-pointer">{t.location}</a> y <a href="https://www.google.com/maps/search/Sagrada+Familia+672,+C%C3%B3rdoba,+Argentina" target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-foreground transition-colors cursor-pointer">{t.location_2}</a></span>
                             </p>
                         </div>
                     </div>

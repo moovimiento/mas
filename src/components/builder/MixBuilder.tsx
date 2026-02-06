@@ -72,7 +72,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     return presetMix;
   });
   const [selectedId, setSelectedId] = useState<IngredientId>("almendras");
-  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "envio">(() => {
+  const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "sagrada" | "envio">(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_deliveryOption');
       return saved ? JSON.parse(saved) : "ciudad";
@@ -974,15 +974,27 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
             <div className="text-muted-foreground">{t.label_delivery}</div>
             <div className="text-right flex items-center justify-end gap-2">
               <button
-                onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
+                onClick={() => {
+                  if (deliveryOption === "ciudad") setDeliveryOption("envio");
+                  else if (deliveryOption === "envio") setDeliveryOption("sagrada");
+                  else setDeliveryOption("ciudad");
+                }}
                 className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Opción anterior de delivery"
               >
                 ←
               </button>
-              <span className="whitespace-nowrap text-sky-600">{deliveryOption === "ciudad" ? t.delivery_compact_pickup : t.delivery_compact_shipping.replace('${price}', DELIVERY_COST.toString())}</span>
+              <span className="whitespace-nowrap text-sky-600">
+                {deliveryOption === "ciudad" ? t.delivery_compact_pickup :
+                  deliveryOption === "sagrada" ? t.delivery_compact_sagrada :
+                    t.delivery_compact_shipping.replace('${price}', DELIVERY_COST.toString())}
+              </span>
               <button
-                onClick={() => setDeliveryOption(deliveryOption === "ciudad" ? "envio" : "ciudad")}
+                onClick={() => {
+                  if (deliveryOption === "ciudad") setDeliveryOption("sagrada");
+                  else if (deliveryOption === "sagrada") setDeliveryOption("envio");
+                  else setDeliveryOption("ciudad");
+                }}
                 className="text-sky-500 hover:text-sky-600 transition-colors border border-sky-500 rounded px-1 cursor-pointer flex-shrink-0"
                 aria-label="Siguiente opción de delivery"
               >
@@ -995,12 +1007,16 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="delivery-address" className="text-sm text-muted-foreground block mb-1">
-                {deliveryOption === "ciudad" ? t.delivery_label_pickup : t.delivery_label_shipping} <span className="text-red-500">*</span>
+                {deliveryOption === "sagrada" ? t.delivery_label_sagrada :
+                  deliveryOption === "ciudad" ? t.delivery_label_pickup :
+                    t.delivery_label_shipping} <span className="text-red-500">*</span>
               </label>
               <Input
                 id="delivery-address"
                 type="text"
-                placeholder={deliveryOption === "ciudad" ? t.delivery_placeholder_pickup : t.delivery_placeholder_shipping}
+                placeholder={deliveryOption === "sagrada" ? t.delivery_placeholder_sagrada :
+                  deliveryOption === "ciudad" ? t.delivery_placeholder_pickup :
+                    t.delivery_placeholder_shipping}
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 className="w-full"
@@ -1110,7 +1126,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                 {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
               </span>
             </div>
-            {deliveryOption === "ciudad" && (
+            {(deliveryOption === "ciudad" || deliveryOption === "sagrada") && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600 whitespace-nowrap">{t.savings_free_shipping}</span>
                 <span className="text-green-600 whitespace-nowrap">- {currency.format(DELIVERY_COST)}</span>
