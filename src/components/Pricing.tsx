@@ -69,7 +69,7 @@ export function Pricing({ lang }: PricingProps) {
 
                                 <button
                                     onClick={() => {
-                                        const quantities = [10, 5, 15];
+                                        const quantities = [10, 5, 1];
                                         const qty = quantities[index];
                                         // Dispatch custom event for MixBuilder
                                         if (typeof window !== 'undefined') {

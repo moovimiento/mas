@@ -16,7 +16,7 @@ const INGREDIENTS_BASE = [
   { id: "almendras", color: "#4fb3d4" }, // celeste argentino
   { id: "nueces", color: "#2a9cc0" },    // celeste medio oscuro
   { id: "uva", color: "#1a7fa0" },       // celeste oscuro
-  { id: "durazno", color: "#75c9e0" },   // celeste medio claro
+  { id: "anana", color: "#75c9e0" },   // celeste medio claro
 ] as const;
 
 type IngredientId = typeof INGREDIENTS_BASE[number]["id"];
@@ -30,7 +30,7 @@ type CartItem = {
 };
 
 const presetMix: Mix = {
-  durazno: 44,
+  anana: 44,
   almendras: 44,
   nueces: 44,
   uva: 44,
@@ -75,9 +75,9 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   const [deliveryOption, setDeliveryOption] = useState<"ciudad" | "sagrada" | "envio">(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('moovimiento_deliveryOption');
-      return saved ? JSON.parse(saved) : "ciudad";
+      return saved ? JSON.parse(saved) : "sagrada";
     }
-    return "ciudad";
+    return "sagrada";
   });
   const [deliveryAddress, setDeliveryAddress] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -162,30 +162,27 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     };
   }, []);
 
-  // Pricing (ARS): base 4000 per mix; promos -> 5 for 18000, 15 for 53000
-  const PRICE_SINGLE = 4000;
-  const PRICE_PACK5 = 18000;  // per 5
-  const PRICE_PACK10 = 35000; // per 10
-  const PRICE_PACK15 = 53000; // per 15
+  // Pricing (ARS): base 4600 per mix; promos -> 5 for 22000, 10 for 44000
+  const PRICE_SINGLE = 4600;
+  const PRICE_PACK5 = 22000;  // per 5
+  const PRICE_PACK10 = 44000; // per 10
   const DELIVERY_COST = 1000;
 
   const currency = useMemo(() => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }), []);
 
   function computePrice(qty: number) {
-    // Greedy: maximize 15-packs, then 10-packs, then 5-packs, then singles
+    // Greedy: maximize 10-packs, then 5-packs, then singles
     let rem = qty;
-    const n15 = Math.floor(rem / 15);
-    rem -= n15 * 15;
     const n10 = Math.floor(rem / 10);
     rem -= n10 * 10;
     const n5 = Math.floor(rem / 5);
     rem -= n5 * 5;
     const n1 = rem;
 
-    const price = n15 * PRICE_PACK15 + n10 * PRICE_PACK10 + n5 * PRICE_PACK5 + n1 * PRICE_SINGLE;
+    const price = n10 * PRICE_PACK10 + n5 * PRICE_PACK5 + n1 * PRICE_SINGLE;
     const original = qty * PRICE_SINGLE;
     const discount = original - price;
-    return { price, discount, breakdown: { n15, n10, n5, n1 } };
+    return { price, discount, breakdown: { n10, n5, n1 } };
   }
 
   const totalMixQty = useMemo(() => {
@@ -195,8 +192,6 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   const promoBreakdown = useMemo(() => {
     const qty = totalMixQty;
     let rem = qty;
-    const n15 = Math.floor(rem / 15);
-    rem -= n15 * 15;
     const n10 = Math.floor(rem / 10);
     rem -= n10 * 10;
     const n5 = Math.floor(rem / 5);
@@ -204,7 +199,6 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
     const n1 = rem;
 
     const parts: string[] = [];
-    if (n15 > 0) parts.push(`${n15 * 15} ${t.promo_mixes} (${n15} ${t.promo_promo}${n15 > 1 ? 's' : ''} ${t.promo_of} 15)`);
     if (n10 > 0) parts.push(`${n10 * 10} ${t.promo_mixes} (${n10} ${t.promo_promo}${n10 > 1 ? 's' : ''} ${t.promo_of} 10)`);
     if (n5 > 0) parts.push(`${n5 * 5} ${t.promo_mixes} (${n5} ${t.promo_promo}${n5 > 1 ? 's' : ''} ${t.promo_of} 5)`);
     if (n1 > 0) parts.push(`${n1} ${t.promo_mixes}`);
@@ -441,7 +435,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
   function setClassicMix() {
     setMix({
-      durazno: 44,
+      anana: 44,
       almendras: 44,
       nueces: 44,
       uva: 44,
@@ -454,7 +448,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
   }
 
   const isClassicMix = useMemo(() => {
-    return mix.durazno === 44 && mix.almendras === 44 && mix.nueces === 44 && mix.uva === 44 && mix.banana === 44;
+    return mix.anana === 44 && mix.almendras === 44 && mix.nueces === 44 && mix.uva === 44 && mix.banana === 44;
   }, [mix]);
 
   // Press-and-hold support for +/- buttons
@@ -709,7 +703,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     setCartItems((prev) => [...prev, { mix, quantity: quantityToAdd }]);
                   }
                   if (cartItems.length === 0) {
-                    setDeliveryOption("ciudad");
+                    setDeliveryOption("sagrada");
                   }
                   // Reset quantity
                   setQuantityToAdd(1);
@@ -802,12 +796,12 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                       })}
                     </svg>
                   </div>
-                  <div className="grid grid-cols-1 gap-y-2 text-sm w-full max-w-[240px]">
+                  <div className="grid grid-cols-1 gap-y-3 text-sm w-full max-w-[320px] px-2">
                     {parts.map((p, i) => (
                       <div
                         key={i}
                         className={cn(
-                          "flex items-center gap-2 cursor-pointer transition-all"
+                          "flex items-center gap-4 cursor-pointer transition-all"
                         )}
                         onMouseEnter={() => setSelectedId(p.id)}
                         onClick={() => setSelectedId(p.id)}
@@ -921,7 +915,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                                   .filter((cartItem) => cartItem.quantity > 0)
                               );
                               if (cartItems.length === 1 && item.quantity === 1) {
-                                setDeliveryOption("ciudad");
+                                setDeliveryOption("sagrada");
                               }
                             }}
                             aria-label="Reducir cantidad de mix"
@@ -1075,81 +1069,19 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
             </div>
           </div>
 
-          {/* Campo de código de descuento */}
-          <div className="space-y-1">
-            <label className="text-sm text-muted-foreground block">
-              {t.discount_title}
-            </label>
-            <div className="flex items-center gap-2 w-full md:w-1/2 md:pr-2">
-              <Input
-                type="text"
-                placeholder={t.discount_placeholder}
-                value={discountCode}
-                onChange={(e) => {
-                  setDiscountCode(e.target.value);
-                  setDiscountError("");
-                }}
-                className="flex-1"
-                disabled={!!appliedDiscount}
-              />
-              {!appliedDiscount && (
-                <Button
-                  variant="outline"
-                  onClick={handleApplyDiscount}
-                  disabled={!discountCode.trim()}
-                  className="whitespace-nowrap"
-                >
-                  {t.discount_apply}
-                </Button>
-              )}
-            </div>
-            {appliedDiscount && (
-              <div className="flex items-center gap-2 text-sm text-foreground">
-                <span>✓</span>
-                <span>
-                  Código {appliedDiscount.code} aplicado: {appliedDiscountLabel || (appliedDiscount.type === 'percentage' ? ` ${appliedDiscount.value}% de descuento` : ` $${appliedDiscount.value} de descuento`)}
-                </span>
-              </div>
-            )}
-            {discountError && (
-              <div className="text-sm text-destructive">
-                {discountError}
-              </div>
-            )}
-          </div>
+
 
           {/* Precios */}
           <div className="space-y-1 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">{t.subtotal_no_promo}</span>
-              <span className={(pricing.discount > 0 || deliveryOption === "ciudad" || pricing.discountAmount > 0) ? "line-through text-muted-foreground" : "font-medium text-muted-foreground"}>
-                {currency.format(totalMixQty > 0 ? (totalMixQty * PRICE_SINGLE + DELIVERY_COST) : 0)}
-              </span>
-            </div>
+            {/* Desgloses ocultos por requerimiento de UX simplificado, excepto Ahorro Envío */}
+
             {(deliveryOption === "ciudad" || deliveryOption === "sagrada") && (
               <div className="flex items-center justify-between">
                 <span className="text-green-600 whitespace-nowrap">{t.savings_free_shipping}</span>
                 <span className="text-green-600 whitespace-nowrap">- {currency.format(DELIVERY_COST)}</span>
               </div>
             )}
-            {pricing.discountAmount > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-green-600">
-                  {appliedDiscount?.type === 'percentage'
-                    ? t.savings_discount_percentage.replace('{value}', appliedDiscount.value.toString())
-                    : t.savings_discount_code
-                  }
-                  {pricing.discountCapped ? ' (tope alcanzado)' : ''}
-                </span>
-                <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discountAmount)}</span>
-              </div>
-            )}
-            {pricing.discount > 0 && (
-              <div className="flex items-center justify-between">
-                <span className="text-green-600">{t.savings_promos}</span>
-                <span className="text-green-600 whitespace-nowrap">- {currency.format(pricing.discount)}</span>
-              </div>
-            )}
+
             <div className="flex items-center justify-between pt-2 mt-3 border-t-2 border-border">
               <span className="font-medium">
                 {t.total_to_pay}
@@ -1159,7 +1091,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
           </div>
 
           {/* Aviso de mínimo de 5 mixes */}
-          {totalMixQty > 0 && totalMixQty < 5 && (
+          {totalMixQty > 0 && totalMixQty < 1 && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg text-sm flex items-center gap-2">
               <span className="text-lg">⚠️</span>
               {t.min_mixes_required.replace('{qty}', totalMixQty.toString())}
@@ -1172,8 +1104,8 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
             <Button
-              disabled={cartItems.length === 0 || totalMixQty < 5 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
-              title={totalMixQty > 0 && totalMixQty < 5 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
+              disabled={cartItems.length === 0 || totalMixQty < 1 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              title={totalMixQty > 0 && totalMixQty < 1 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
               onClick={async () => {
                 // proceed with cash flow
                 try {
@@ -1262,7 +1194,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                     setDiscountError("");
                     // Setear mix clásico
                     setMix({
-                      durazno: 44,
+                      anana: 44,
                       almendras: 44,
                       nueces: 44,
                       uva: 44,
@@ -1289,8 +1221,8 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
               {t.pay_cash}
             </Button>
             <Button
-              disabled={cartItems.length === 0 || totalMixQty < 5 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
-              title={totalMixQty > 0 && totalMixQty < 5 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
+              disabled={cartItems.length === 0 || totalMixQty < 1 || !deliveryAddress.trim() || !phone.trim() || !name.trim() || !isValidEmail}
+              title={totalMixQty > 0 && totalMixQty < 1 ? t.min_mixes_required.replace('{qty}', totalMixQty.toString()) : ""}
               onClick={async () => {
                 // proceed with Mercado Pago flow
                 try {
@@ -1430,7 +1362,7 @@ export function MixBuilder({ lang = 'es' }: { lang?: Language }) {
                   setDiscountCode("");
                   setDiscountError("");
                   setMix({
-                    durazno: 44,
+                    anana: 44,
                     almendras: 44,
                     nueces: 44,
                     uva: 44,
